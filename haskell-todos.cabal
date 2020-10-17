@@ -34,6 +34,7 @@ library
       base >=4.7 && <5
     , hasql
     , hasql-optparse-applicative
+    , hasql-pool
     , optparse-applicative
     , scotty
   default-language: Haskell2010
@@ -50,6 +51,7 @@ executable haskell-todos-exe
     , haskell-todos
     , hasql
     , hasql-optparse-applicative
+    , hasql-pool
     , optparse-applicative
     , scotty
   default-language: Haskell2010
@@ -67,6 +69,7 @@ test-suite haskell-todos-test
     , haskell-todos
     , hasql
     , hasql-optparse-applicative
+    , hasql-pool
     , hspec
     , optparse-applicative
     , scotty
