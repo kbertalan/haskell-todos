@@ -25,13 +25,17 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      App
   other-modules:
       Paths_haskell_todos
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , hasql
+    , hasql-optparse-applicative
+    , optparse-applicative
+    , scotty
   default-language: Haskell2010
 
 executable haskell-todos-exe
@@ -44,6 +48,10 @@ executable haskell-todos-exe
   build-depends:
       base >=4.7 && <5
     , haskell-todos
+    , hasql
+    , hasql-optparse-applicative
+    , optparse-applicative
+    , scotty
   default-language: Haskell2010
 
 test-suite haskell-todos-test
@@ -57,5 +65,9 @@ test-suite haskell-todos-test
   build-depends:
       base >=4.7 && <5
     , haskell-todos
+    , hasql
+    , hasql-optparse-applicative
     , hspec
+    , optparse-applicative
+    , scotty
   default-language: Haskell2010
