@@ -1,17 +1,24 @@
-{-# LANGUAGE OverloadedStrings, TemplateHaskell, QuasiQuotes #-}
+{-# LANGUAGE OverloadedStrings, DeriveGeneric, DeriveAnyClass #-}
 module App
   ( app
   ) where
 
+import Data.Aeson.Types as A
 import Data.Int
+import Data.Text.Lazy as T
 import Control.Exception (bracket)
 import Control.Monad.IO.Class
-import Options.Applicative
+import Options.Applicative as O
+import GHC.Generics (Generic)
 import Hasql.Session as DB
 import Hasql.Pool as Pool
 import Hasql.OptparseApplicative as DB
 import Hasql.TH as TH
+import Network.HTTP.Types.Status
 import Web.Scotty as S
+
+import Health (healthApi)
+import Todo (todoApi)
 
 data AppOptions = AppOptions
   { port :: !Int
@@ -19,7 +26,7 @@ data AppOptions = AppOptions
   }
   deriving (Show)
 
-appOptions :: Parser AppOptions
+appOptions :: O.Parser AppOptions
 appOptions = AppOptions
   <$> option auto
     ( long "port"
@@ -39,14 +46,15 @@ app = do
   opts <- execParser appInfo
   bracket (Pool.acquire $ db opts) Pool.release $ \pool ->
     scotty (port opts) $ do
-      get "/hello" $ S.json ["hello"::String]
-      get "/bello" $ do
-        lit <- liftIO $ use pool selectLiteral
-        case lit of
-          Left e -> liftIO (print e) >> S.json ("Error"::String)
-          Right l -> S.json l
+      defaultHandler $ \message -> do
+        liftIO $ print message
+        status status500
+        S.json $ App.Error message
 
-selectLiteral :: DB.Session Int64
-selectLiteral = DB.statement () $ [TH.singletonStatement|
-  select 1 :: int8
-  |]
+      healthApi pool
+      todoApi pool
+
+newtype Error = Error
+  { message :: Text
+  } deriving (Generic, ToJSON)
+

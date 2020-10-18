@@ -27,6 +27,10 @@ dependencies:
 - hasql-optparse-applicative
 - scotty
 - optparse-applicative
+- text
+- postgresql-binary
+- http-types
+- aeson
 
 library:
   source-dirs: src
