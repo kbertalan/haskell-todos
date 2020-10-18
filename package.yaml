@@ -24,9 +24,7 @@ dependencies:
 - hasql
 - hasql-th
 - hasql-pool
-- hasql-optparse-applicative
 - scotty
-- optparse-applicative
 - text
 - postgresql-binary
 - http-types
@@ -45,6 +43,8 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - haskell-todos
+    - optparse-applicative
+    - hasql-optparse-applicative
 
 tests:
   haskell-todos-test:

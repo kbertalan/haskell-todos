@@ -36,11 +36,9 @@ library
       aeson
     , base >=4.7 && <5
     , hasql
-    , hasql-optparse-applicative
     , hasql-pool
     , hasql-th
     , http-types
-    , optparse-applicative
     , postgresql-binary
     , scotty
     , text
@@ -81,12 +79,10 @@ test-suite haskell-todos-test
     , base >=4.7 && <5
     , haskell-todos
     , hasql
-    , hasql-optparse-applicative
     , hasql-pool
     , hasql-th
     , hspec
     , http-types
-    , optparse-applicative
     , postgresql-binary
     , scotty
     , text
