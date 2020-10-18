@@ -30,6 +30,14 @@ dependencies:
 - http-types
 - aeson
 
+ghc-options:
+  - -Werror
+  - -Wall
+  - -Wcompat
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wredundant-constraints
+
 library:
   source-dirs: src
 

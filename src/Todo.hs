@@ -17,5 +17,5 @@ data Todo = Todo
   } deriving (Show)
 
 todoApi :: DB.Pool -> ScottyM ()
-todoApi pool = get "/todo" $ raise "OK"
+todoApi _pool = get "/todo" $ raise "OK"
 

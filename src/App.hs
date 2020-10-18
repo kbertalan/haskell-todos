@@ -26,10 +26,10 @@ app :: App.Options -> IO ()
 app opts = do
   bracket (Pool.acquire $ db opts) Pool.release $ \pool ->
     scotty (port opts) $ do
-      defaultHandler $ \message -> do
-        liftIO $ print message
+      defaultHandler $ \msg -> do
+        liftIO $ print msg
         status status500
-        S.json $ App.Error message
+        S.json $ App.Error msg
 
       healthApi pool
       todoApi pool

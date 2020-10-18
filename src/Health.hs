@@ -6,12 +6,13 @@ module Health
 
 import Control.Monad.IO.Class
 import Data.Int (Int64)
-import Hasql.Pool (use)
+import Hasql.Pool (use, Pool)
 import Hasql.Session as DB
 import Hasql.TH as TH
 import Network.HTTP.Types.Status
 import Web.Scotty as S
 
+healthApi :: Pool -> ScottyM ()
 healthApi pool = get "/health" $ do
   liftIO (use pool selectLiteral) >>= \case
     Right _ -> text "OK"

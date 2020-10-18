@@ -10,7 +10,7 @@ main = execParser appInfo >>= app
 options :: O.Parser Options
 options = Options
   <$> option auto
-    ( long "port"
+    ( long "http-port"
     <> help "Web server port"
     <> value 3000
     <> showDefault
@@ -18,7 +18,8 @@ options = Options
     )
   <*> poolSettings ("db-" <>)
 
+appInfo :: ParserInfo Options
 appInfo = info (options <**> helper)
   $ fullDesc
-  <> progDesc "Simple TODO web app"
+  <> progDesc "Simple ToDo web app"
 
