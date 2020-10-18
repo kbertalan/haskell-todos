@@ -32,6 +32,13 @@ packages:
       sha256: 8babe7ad5e12f6569cf0bd7cac342b6f1a1669643469383e41137c61499e2120
   original:
     hackage: headed-megaparsec-0.1.0.4@sha256:2888428f8cee84088b196639a2b5d7741d98caaeaa7a68662e54031f0dbf4655,1569
+- completed:
+    hackage: hasql-migration-0.3.0@sha256:6ca4cc6c89834bb79eb9f15b504774043b5b3994336bd86a9d79e59da6d54963,2799
+    pantry-tree:
+      size: 589
+      sha256: 55e3dfca36ffe0d11e1c42bce446e3cc1d5b9a4983e196ec99c650c8b4268845
+  original:
+    hackage: hasql-migration-0.3.0@sha256:6ca4cc6c89834bb79eb9f15b504774043b5b3994336bd86a9d79e59da6d54963,2799
 snapshots:
 - completed:
     size: 532172

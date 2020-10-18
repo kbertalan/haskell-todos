@@ -38,8 +38,10 @@ library
       aeson
     , base >=4.7 && <5
     , hasql
+    , hasql-migration
     , hasql-pool
     , hasql-th
+    , hasql-transaction
     , http-types
     , postgresql-binary
     , scotty
@@ -59,9 +61,11 @@ executable haskell-todos-exe
     , base >=4.7 && <5
     , haskell-todos
     , hasql
+    , hasql-migration
     , hasql-optparse-applicative
     , hasql-pool
     , hasql-th
+    , hasql-transaction
     , http-types
     , optparse-applicative
     , postgresql-binary
@@ -83,8 +87,10 @@ test-suite haskell-todos-test
     , base >=4.7 && <5
     , haskell-todos
     , hasql
+    , hasql-migration
     , hasql-pool
     , hasql-th
+    , hasql-transaction
     , hspec
     , http-types
     , postgresql-binary
