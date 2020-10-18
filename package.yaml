@@ -38,6 +38,15 @@ ghc-options:
   - -Wincomplete-uni-patterns
   - -Wredundant-constraints
 
+default-extensions:
+  - OverloadedStrings
+  - BangPatterns
+  - LambdaCase
+  - NamedFieldPuns
+  - GeneralizedNewtypeDeriving
+  - DerivingStrategies
+  - StandaloneDeriving
+
 library:
   source-dirs: src
 

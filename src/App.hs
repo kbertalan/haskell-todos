@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, DeriveGeneric, DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 module App
   ( app
   , App.Options(..)
@@ -36,5 +36,6 @@ app opts = do
 
 newtype Error = Error
   { message :: Text
-  } deriving (Generic, ToJSON)
+  } deriving stock (Generic)
+  deriving anyclass (ToJSON)
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, QuasiQuotes, TemplateHaskell, LambdaCase #-}
+{-# LANGUAGE QuasiQuotes, TemplateHaskell #-}
 
 module Health
   ( healthApi
