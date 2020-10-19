@@ -32,6 +32,9 @@ dependencies:
 - aeson
 - mtl
 - uuid
+- profunctors
+- tuple
+- vector
 
 ghc-options:
   - -Werror

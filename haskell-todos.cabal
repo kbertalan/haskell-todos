@@ -45,9 +45,12 @@ library
     , hasql-transaction
     , http-types
     , mtl
+    , profunctors
     , scotty
     , text
+    , tuple
     , uuid
+    , vector
   default-language: Haskell2010
 
 executable haskell-todos-exe
@@ -71,9 +74,12 @@ executable haskell-todos-exe
     , http-types
     , mtl
     , optparse-applicative
+    , profunctors
     , scotty
     , text
+    , tuple
     , uuid
+    , vector
   default-language: Haskell2010
 
 test-suite haskell-todos-test
@@ -97,7 +103,10 @@ test-suite haskell-todos-test
     , hspec
     , http-types
     , mtl
+    , profunctors
     , scotty
     , text
+    , tuple
     , uuid
+    , vector
   default-language: Haskell2010
