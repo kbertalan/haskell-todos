@@ -26,13 +26,14 @@ source-repository head
 library
   exposed-modules:
       App
+      Env
       Health
       Todo
   other-modules:
       Paths_haskell_todos
   hs-source-dirs:
       src
-  default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving
+  default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
   ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
   build-depends:
       aeson
@@ -43,9 +44,10 @@ library
     , hasql-th
     , hasql-transaction
     , http-types
-    , postgresql-binary
+    , mtl
     , scotty
     , text
+    , uuid
   default-language: Haskell2010
 
 executable haskell-todos-exe
@@ -54,7 +56,7 @@ executable haskell-todos-exe
       Paths_haskell_todos
   hs-source-dirs:
       app
-  default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving
+  default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
   ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -67,10 +69,11 @@ executable haskell-todos-exe
     , hasql-th
     , hasql-transaction
     , http-types
+    , mtl
     , optparse-applicative
-    , postgresql-binary
     , scotty
     , text
+    , uuid
   default-language: Haskell2010
 
 test-suite haskell-todos-test
@@ -80,7 +83,7 @@ test-suite haskell-todos-test
       Paths_haskell_todos
   hs-source-dirs:
       test
-  default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving
+  default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
   ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -93,7 +96,8 @@ test-suite haskell-todos-test
     , hasql-transaction
     , hspec
     , http-types
-    , postgresql-binary
+    , mtl
     , scotty
     , text
+    , uuid
   default-language: Haskell2010

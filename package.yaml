@@ -28,9 +28,10 @@ dependencies:
 - hasql-transaction
 - scotty
 - text
-- postgresql-binary
 - http-types
 - aeson
+- mtl
+- uuid
 
 ghc-options:
   - -Werror
@@ -48,6 +49,8 @@ default-extensions:
   - GeneralizedNewtypeDeriving
   - DerivingStrategies
   - StandaloneDeriving
+  - FlexibleContexts
+  - FlexibleInstances
 
 library:
   source-dirs: src

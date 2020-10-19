@@ -4,19 +4,21 @@ module Health
   ( healthApi
   ) where
 
-import Control.Monad.IO.Class
+import Control.Monad.Trans
 import Data.Int (Int64)
-import Hasql.Pool (use, Pool)
+import Data.Text.Lazy
 import Hasql.Session as DB
 import Hasql.TH as TH
 import Network.HTTP.Types.Status
-import Web.Scotty as S
+import Web.Scotty.Trans as S
 
-healthApi :: Pool -> ScottyM ()
-healthApi pool = get "/health" $ do
-  liftIO (use pool selectLiteral) >>= \case
+import Env
+
+healthApi :: (WithPool m, MonadIO m) => ScottyT Text m ()
+healthApi = get "/health" $
+  usePool selectLiteral >>= \case
     Right _ -> text "OK"
-    Left e -> liftIO (print e) >> status status503 >> text "Error"
+    Left  e -> liftIO (print e) >> status status503 >> text "Error"
 
 selectLiteral :: DB.Session Int64
 selectLiteral = DB.statement () [TH.singletonStatement|

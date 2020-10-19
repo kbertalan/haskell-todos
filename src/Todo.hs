@@ -3,10 +3,12 @@ module Todo
   , todoApi
   ) where
 
-import Data.Text
-import Hasql.Pool as DB
-import PostgreSQL.Binary.Data
-import Web.Scotty
+import Control.Monad.Reader
+import Data.Text.Lazy
+import Data.UUID
+import Web.Scotty.Trans
+
+import Env
 
 data Todo = Todo
   { description :: !Text
@@ -14,6 +16,6 @@ data Todo = Todo
   , completed :: !Bool
   } deriving (Show)
 
-todoApi :: DB.Pool -> ScottyM ()
-todoApi _pool = get "/todo" $ raise "OK"
+todoApi :: (MonadReader Env m, MonadIO m) => ScottyT Text m ()
+todoApi = get "/todo" $ raise "OK"
 
