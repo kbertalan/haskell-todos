@@ -1,8 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
+--
+-- hash: eb9f784c605f03767a13d1b07159a6b6498fc5b34b253dda93f3a1669ae84f0d
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -67,7 +69,6 @@ executable haskell-todos-exe
     , haskell-todos
     , hasql
     , hasql-migration
-    , hasql-optparse-applicative
     , hasql-pool
     , hasql-th
     , hasql-transaction

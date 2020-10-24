@@ -69,7 +69,6 @@ executables:
     dependencies:
     - haskell-todos
     - optparse-applicative
-    - hasql-optparse-applicative
 
 tests:
   haskell-todos-test:
