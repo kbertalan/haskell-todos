@@ -5,6 +5,7 @@ module App
   , App.Options(..)
   ) where
 
+import App.DB as DB
 import Data.Aeson.Types as A
 import Data.Text.Lazy as T
 import Control.Exception (bracket)
@@ -37,7 +38,7 @@ app opts = do
     let env = Env pool
     scottyT (port opts) (runAppWith env) routeDefs
 
-migrateDatabase :: Pool -> IO (Either UsageError ())
+migrateDatabase :: DB.Pool -> IO (PoolResult ())
 migrateDatabase pool = use pool $ do
   migrations <- liftIO $ M.loadMigrationsFromDirectory "./migrations"
   forM_ (M.MigrationInitialization : migrations) $ \m ->
@@ -63,9 +64,15 @@ newtype AppM a = AppM
   { runApp :: ReaderT Env IO a
   } deriving newtype (Applicative, Functor, Monad, MonadIO, MonadReader Env)
 
-instance WithPool AppM where
-  usePool session = ask >>= liftIO . flip Pool.use session . envPool
-
 runAppWith :: Env -> AppM a -> IO a
 runAppWith e a = runReaderT (runApp a) e
+
+instance WithEnv AppM where
+  getEnv = ask
+
+instance WithPool AppM where
+  getPool = envPool <$> getEnv
+
+instance UsePool AppM where
+  usePool session = getPool >>= liftIO . flip Pool.use session
 

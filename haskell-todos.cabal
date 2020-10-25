@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: eb9f784c605f03767a13d1b07159a6b6498fc5b34b253dda93f3a1669ae84f0d
+-- hash: 8af33dcc764598d605d935c69ebcde3857c8a750f8df659b773588d48254205c
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -28,6 +28,8 @@ source-repository head
 library
   exposed-modules:
       App
+      App.DB
+      App.Web
       Env
       Health
       Todo

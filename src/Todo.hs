@@ -14,13 +14,12 @@ import Data.Tuple.Curry (uncurryN)
 import Data.UUID
 import Data.Vector (toList)
 import GHC.Generics (Generic)
-import Hasql.Pool (UsageError)
-import Hasql.Session (statement)
 import Hasql.TH as TH
 import Network.HTTP.Types.Status
 import Web.Scotty.Trans
 
-import Env
+import App.DB as DB
+import App.Web as Web
 
 data Todo = Todo
   { uid :: UUID
@@ -31,7 +30,7 @@ data Todo = Todo
 asTuple :: Todo -> (UUID, T.Text, Bool)
 asTuple Todo {..} = (uid, description, completed)
 
-todoApi :: (WithPool m, MonadIO m) => ScottyT L.Text m ()
+todoApi :: (UsePool m, MonadIO m) => Scotty m ()
 todoApi = do
   get "/todo" $
     selectAllTodos >>= \case
@@ -42,13 +41,13 @@ todoApi = do
       Right _ -> status status201
       Left  e -> raise $ L.pack $ show e
 
-selectAllTodos :: (WithPool m) => m (Either UsageError [Todo])
+selectAllTodos :: (UsePool m) => m (PoolResult [Todo])
 selectAllTodos = usePool $ statement () $
   dimap id (toList . fmap (uncurryN Todo)) [TH.vectorStatement|
     select id :: uuid, description :: text, completed :: bool from todo
     |]
 
-insertTodo :: (WithPool m) => Todo -> m (Either UsageError ())
+insertTodo :: (UsePool m) => Todo -> m (PoolResult ())
 insertTodo todo = usePool $ statement (asTuple todo) [TH.resultlessStatement|
   insert into todo (id, description, completed) values
     ($1 :: uuid, $2 :: text, $3 :: bool)
