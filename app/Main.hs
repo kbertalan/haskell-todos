@@ -3,26 +3,37 @@ module Main where
 import App
 import Data.String (fromString)
 import Options.Applicative as O
-import Hasql.Connection as Connection
-import Hasql.Pool as Pool
+import App.Web as Web
+import App.DB as DB
 
 main :: IO ()
 main = execParser appInfo >>= app
 
-options :: O.Parser Options
-options = Options
-  <$> option auto
+appInfo :: ParserInfo App.Options
+appInfo = info (appOptions <**> helper)
+  $ fullDesc
+  <> progDesc "Simple ToDo web app"
+
+appOptions :: O.Parser App.Options
+appOptions = App.Options
+  <$> webOptions
+  <*> dbOptions
+
+webOptions :: Parser Web.Options
+webOptions =
+  Web.Options <$>
+    option auto
     ( long "http-port"
     <> help "Web server port"
     <> value 3000
     <> showDefault
     <> metavar "INT"
     )
-  <*> poolSettings
 
-poolSettings :: Parser Pool.Settings
-poolSettings =
-  (,,) <$> size <*> timeout <*> connectionSettings
+dbOptions :: Parser DB.Options
+dbOptions =
+  DB.Options <$> size <*> timeout <*> host <*> port <*> user <*> password <*> name
+
   where
     size =
       option auto $
@@ -37,11 +48,6 @@ poolSettings =
         value (10 :: Integer) <>
         showDefault <>
         help "Amount of seconds for which the unused connections are kept open"
-
-connectionSettings :: Parser Connection.Settings
-connectionSettings =
-  Connection.settings <$> host <*> port <*> user <*> password <*> name
-  where
     host =
       fmap fromString $ strOption $
         long ("db-host") <> 
@@ -72,9 +78,4 @@ connectionSettings =
         value "postgres" <>
         showDefault <>
         help "Database name"
-
-appInfo :: ParserInfo Options
-appInfo = info (options <**> helper)
-  $ fullDesc
-  <> progDesc "Simple ToDo web app"
 

@@ -5,10 +5,10 @@ module Env
   )
 where
 
-import App.DB (Pool)
+import App.DB (DB)
 
 data Env = Env
-  { envPool :: Pool
+  { envDB :: DB
   }
 
 class WithEnv m where

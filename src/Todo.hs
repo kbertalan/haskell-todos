@@ -31,7 +31,7 @@ data Todo = Todo
 asTuple :: Todo -> (UUID, T.Text, Bool)
 asTuple Todo {..} = (uid, description, completed)
 
-todoApi :: (UsePool m, MonadIO m) => Scotty m ()
+todoApi :: (WithDB m, MonadIO m) => Scotty m ()
 todoApi = do
   get "/todo" $
     selectAllTodos >>= \case
@@ -42,14 +42,14 @@ todoApi = do
       Right _ -> status status201
       Left  e -> raise $ L.pack $ show e
 
-selectAllTodos :: (Monad m, UsePool m) => Action m (PoolResult [Todo])
-selectAllTodos = lift . usePool $ statement () $
+selectAllTodos :: (MonadIO m, WithDB m) => Action m (DB.Result [Todo])
+selectAllTodos = lift . DB.run $ statement () $
   dimap id (toList . fmap (uncurryN Todo)) [TH.vectorStatement|
     select id :: uuid, description :: text, completed :: bool from todo
     |]
 
-insertTodo :: (Monad m, UsePool m) => Todo -> Action m (PoolResult ())
-insertTodo todo = lift . usePool $ statement (asTuple todo) [TH.resultlessStatement|
+insertTodo :: (MonadIO m, WithDB m) => Todo -> Action m (DB.Result ())
+insertTodo todo = lift . DB.run $ statement (asTuple todo) [TH.resultlessStatement|
   insert into todo (id, description, completed) values
     ($1 :: uuid, $2 :: text, $3 :: bool)
   |]
