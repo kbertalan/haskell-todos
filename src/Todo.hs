@@ -6,6 +6,7 @@ module Todo
   ) where
 
 import Control.Monad.IO.Class
+import Control.Monad.Trans
 import Data.Aeson (ToJSON, FromJSON)
 import Data.Profunctor (dimap)
 import Data.Text as T
@@ -41,14 +42,14 @@ todoApi = do
       Right _ -> status status201
       Left  e -> raise $ L.pack $ show e
 
-selectAllTodos :: (UsePool m) => m (PoolResult [Todo])
-selectAllTodos = usePool $ statement () $
+selectAllTodos :: (Monad m, UsePool m) => Action m (PoolResult [Todo])
+selectAllTodos = lift . usePool $ statement () $
   dimap id (toList . fmap (uncurryN Todo)) [TH.vectorStatement|
     select id :: uuid, description :: text, completed :: bool from todo
     |]
 
-insertTodo :: (UsePool m) => Todo -> m (PoolResult ())
-insertTodo todo = usePool $ statement (asTuple todo) [TH.resultlessStatement|
+insertTodo :: (Monad m, UsePool m) => Todo -> Action m (PoolResult ())
+insertTodo todo = lift . usePool $ statement (asTuple todo) [TH.resultlessStatement|
   insert into todo (id, description, completed) values
     ($1 :: uuid, $2 :: text, $3 :: bool)
   |]

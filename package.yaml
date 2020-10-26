@@ -35,6 +35,7 @@ dependencies:
 - profunctors
 - tuple
 - vector
+- wai
 
 ghc-options:
   - -Werror

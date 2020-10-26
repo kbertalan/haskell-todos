@@ -15,7 +15,7 @@ import App.Web as Web
 
 healthApi :: (UsePool m, MonadIO m) => Scotty m ()
 healthApi = get "/health" $
-  usePool selectLiteral >>= \case
+  (lift . usePool) selectLiteral >>= \case
     Right _ -> text "OK"
     Left  e -> liftIO (print e) >> status status503 >> text "Error"
 

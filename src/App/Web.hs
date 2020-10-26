@@ -1,19 +1,26 @@
-{-# OPTIONS_GHC -Wno-orphans #-}
-
 module App.Web
-  ( Scotty
+  ( Options(..)
+  , Scotty
   , Action
+  , run
   ) where
 
-import Control.Monad.Trans (lift)
+import Control.Monad.IO.Class
 import Data.Text.Lazy (Text)
-import Web.Scotty.Trans as S
+import Network.Wai (Response)
+import qualified Web.Scotty.Trans as S
 
-import App.DB as DB
+import App.Web.Error (errorHandler)
 
-type Scotty = ScottyT Text
-type Action = ActionT Text
+newtype Options = Options
+  { port :: Int
+  } deriving (Show, Read, Num)
 
-instance (Monad m, UsePool m) => UsePool (ActionT Text m) where
-  usePool = lift . usePool
+type Scotty = S.ScottyT Text
+type Action = S.ActionT Text
+
+run :: (Monad m, MonadIO n) => Options -> (m Response -> IO Response) -> Scotty m () -> n ()
+run opts runner routes = S.scottyT (port opts) runner $ do
+  errorHandler
+  routes
 

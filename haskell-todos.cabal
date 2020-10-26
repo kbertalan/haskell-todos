@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8af33dcc764598d605d935c69ebcde3857c8a750f8df659b773588d48254205c
+-- hash: cf7c6540b55d6fba888735d7a4988b057c4a45f6b637f16d18d8e7272ff01cfd
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -30,6 +30,7 @@ library
       App
       App.DB
       App.Web
+      App.Web.Error
       Env
       Health
       Todo
@@ -55,6 +56,7 @@ library
     , tuple
     , uuid
     , vector
+    , wai
   default-language: Haskell2010
 
 executable haskell-todos-exe
@@ -83,6 +85,7 @@ executable haskell-todos-exe
     , tuple
     , uuid
     , vector
+    , wai
   default-language: Haskell2010
 
 test-suite haskell-todos-test
@@ -112,4 +115,5 @@ test-suite haskell-todos-test
     , tuple
     , uuid
     , vector
+    , wai
   default-language: Haskell2010
