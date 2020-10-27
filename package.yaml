@@ -36,6 +36,7 @@ dependencies:
 - tuple
 - vector
 - wai
+- ekg
 
 ghc-options:
   - -Werror
@@ -67,6 +68,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -with-rtsopts=-T
     dependencies:
     - haskell-todos
     - optparse-applicative

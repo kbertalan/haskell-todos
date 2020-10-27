@@ -5,6 +5,7 @@ module App
 
 import Control.Monad.IO.Class
 import Control.Monad.Reader
+import System.Remote.Monitoring as EKG
 
 import App.DB as DB
 import App.Web as Web
@@ -20,6 +21,7 @@ data Options = Options
 
 app :: App.Options -> IO ()
 app opts = do
+  _ <- EKG.forkServer "localhost" 8000
   DB.runWithDB (db opts) $ \db -> do
     DB.migrate db >>= \case
       Right _ -> return ()

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cf7c6540b55d6fba888735d7a4988b057c4a45f6b637f16d18d8e7272ff01cfd
+-- hash: e5b60124068483e9d656a97e232310b4de0c115d3b315e2b37926e7c53d3ded0
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -43,6 +43,7 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
+    , ekg
     , hasql
     , hasql-migration
     , hasql-pool
@@ -66,10 +67,11 @@ executable haskell-todos-exe
   hs-source-dirs:
       app
   default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
-  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T
   build-depends:
       aeson
     , base >=4.7 && <5
+    , ekg
     , haskell-todos
     , hasql
     , hasql-migration
@@ -100,6 +102,7 @@ test-suite haskell-todos-test
   build-depends:
       aeson
     , base >=4.7 && <5
+    , ekg
     , haskell-todos
     , hasql
     , hasql-migration
