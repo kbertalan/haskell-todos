@@ -24,7 +24,6 @@ dependencies:
 - hasql
 - hasql-migration
 - hasql-pool
-- hasql-th
 - hasql-transaction
 - scotty
 - text
@@ -32,8 +31,6 @@ dependencies:
 - aeson
 - mtl
 - uuid
-- profunctors
-- tuple
 - vector
 - wai
 - ekg

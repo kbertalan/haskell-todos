@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass, QuasiQuotes, TemplateHaskell, RecordWildCards #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 
 module Todo
   ( Todo
@@ -8,14 +8,14 @@ module Todo
 import Control.Monad.IO.Class
 import Control.Monad.Trans
 import Data.Aeson (ToJSON, FromJSON)
-import Data.Profunctor (dimap)
+import Data.Functor.Contravariant ((>$<))
 import Data.Text as T
 import Data.Text.Lazy as L
-import Data.Tuple.Curry (uncurryN)
 import Data.UUID
-import Data.Vector (toList)
 import GHC.Generics (Generic)
-import Hasql.TH as TH
+import Hasql.Statement
+import qualified Hasql.Encoders as E
+import qualified Hasql.Decoders as D
 import Network.HTTP.Types.Status
 import Web.Scotty.Trans
 
@@ -27,9 +27,6 @@ data Todo = Todo
   , description :: !T.Text
   , completed :: !Bool
   } deriving (Show, Generic, ToJSON, FromJSON)
-
-asTuple :: Todo -> (UUID, T.Text, Bool)
-asTuple Todo {..} = (uid, description, completed)
 
 todoApi :: (WithDB m, MonadIO m) => Scotty m ()
 todoApi = do
@@ -44,14 +41,20 @@ todoApi = do
 
 selectAllTodos :: (MonadIO m, WithDB m) => Action m (DB.Result [Todo])
 selectAllTodos = lift . DB.run $ statement () $
-  dimap id (toList . fmap (uncurryN Todo)) [TH.vectorStatement|
-    select id :: uuid, description :: text, completed :: bool from todo
-    |]
+  Statement "select id, description, completed from todo" E.noParams decoder True
+  where
+    decoder = D.rowList row
+    row = Todo
+      <$> D.column (D.nonNullable D.uuid)
+      <*> D.column (D.nonNullable D.text)
+      <*> D.column (D.nonNullable D.bool)
 
 insertTodo :: (MonadIO m, WithDB m) => Todo -> Action m (DB.Result ())
-insertTodo todo = lift . DB.run $ statement (asTuple todo) [TH.resultlessStatement|
-  insert into todo (id, description, completed) values
-    ($1 :: uuid, $2 :: text, $3 :: bool)
-  |]
-
+insertTodo todo = lift . DB.run $ statement todo $
+  Statement "insert into todo (id, description, completed) values ($1, $2, $3)" encoder D.noResult True
+  where
+    encoder =
+      (uid >$< E.param (E.nonNullable E.uuid))
+      <> (description >$< E.param (E.nonNullable E.text))
+      <> (completed >$< E.param (E.nonNullable E.bool))
 

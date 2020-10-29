@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3b9b2ca13eac1357c2407f9bff7bafd74c82442093749c2a292017c49221b8f2
+-- hash: 3d3b965a068e7f9458887e9f8bd29872ffe27e74668444a86f28a1a9de3398ec
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -46,14 +46,11 @@ library
     , hasql
     , hasql-migration
     , hasql-pool
-    , hasql-th
     , hasql-transaction
     , http-types
     , mtl
-    , profunctors
     , scotty
     , text
-    , tuple
     , uuid
     , vector
     , wai
@@ -75,15 +72,12 @@ executable haskell-todos-exe
     , hasql
     , hasql-migration
     , hasql-pool
-    , hasql-th
     , hasql-transaction
     , http-types
     , mtl
     , optparse-applicative
-    , profunctors
     , scotty
     , text
-    , tuple
     , uuid
     , vector
     , wai
@@ -106,15 +100,12 @@ test-suite haskell-todos-test
     , hasql
     , hasql-migration
     , hasql-pool
-    , hasql-th
     , hasql-transaction
     , hspec
     , http-types
     , mtl
-    , profunctors
     , scotty
     , text
-    , tuple
     , uuid
     , vector
     , wai
