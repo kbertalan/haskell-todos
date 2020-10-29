@@ -7,7 +7,6 @@ module App.DB
   , DB
   , runWithDB
   , Result
-  , Statement
   , S.statement
   , run
   , migrate
@@ -16,7 +15,7 @@ module App.DB
 import Control.Monad (forM_)
 import Control.Monad.IO.Class
 import Control.Exception (bracket)
-import Data.String (fromString)
+import Data.ByteString
 import qualified Hasql.Connection as C
 import qualified Hasql.Pool as P
 import qualified Hasql.Session as S
@@ -26,15 +25,14 @@ import qualified Hasql.Transaction.Sessions as T
 data Options = Options
   { poolSize :: !Int
   , poolTimeout :: !Int
-  , dbHost :: !String
+  , dbHost :: !ByteString
   , dbPort :: !Int
-  , dbUser :: !String
-  , dbPassword :: !String
-  , dbName :: !String
+  , dbUser :: !ByteString
+  , dbPassword :: !ByteString
+  , dbName :: !ByteString
   } deriving (Show)
 
 type DB = P.Pool
-type Statement = S.Session
 type Result a = Either P.UsageError a
 
 class WithDB m where
@@ -43,18 +41,15 @@ class WithDB m where
 runWithDB :: Options -> (DB -> IO ()) -> IO ()
 runWithDB opts = bracket (P.acquire $ poolOpts opts) P.release
 
-run :: (MonadIO m, WithDB m) => Statement a -> m (Result a)
+run :: (MonadIO m, WithDB m) => S.Session a -> m (Result a)
 run statement = getDB >>= liftIO . flip P.use statement
 
 poolOpts :: Options -> P.Settings
-poolOpts Options{..} = (poolSize, fromIntegral poolTimeout,
-  C.settings host port user password name)
-  where
-    host = fromString dbHost
-    port = fromIntegral dbPort
-    user = fromString dbUser
-    password = fromString dbPassword 
-    name = fromString dbName
+poolOpts Options{..} =
+  ( poolSize
+  , fromIntegral poolTimeout
+  , C.settings dbHost (fromIntegral dbPort) dbUser dbPassword dbName
+  )
 
 migrate :: DB -> IO (Result ())
 migrate db = P.use db $ do

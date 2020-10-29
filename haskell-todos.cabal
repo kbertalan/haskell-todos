@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3d3b965a068e7f9458887e9f8bd29872ffe27e74668444a86f28a1a9de3398ec
+-- hash: 6110295793f29e1ad6da1a38ff30c35063abee29004bca4a836c9252a656d7a4
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -42,6 +42,7 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
+    , bytestring
     , ekg
     , hasql
     , hasql-migration
@@ -67,6 +68,7 @@ executable haskell-todos-exe
   build-depends:
       aeson
     , base >=4.7 && <5
+    , bytestring
     , ekg
     , haskell-todos
     , hasql
@@ -95,6 +97,7 @@ test-suite haskell-todos-test
   build-depends:
       aeson
     , base >=4.7 && <5
+    , bytestring
     , ekg
     , haskell-todos
     , hasql

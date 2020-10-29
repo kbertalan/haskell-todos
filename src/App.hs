@@ -20,7 +20,7 @@ data Options = Options
   deriving (Show)
 
 run :: App.Options -> IO ()
-run opts = do
+run opts =
   Ekg.runWithEkg (ekg opts) $ \ekg ->
     DB.runWithDB (db opts) $ \db -> do
       DB.migrate db >>= \case
