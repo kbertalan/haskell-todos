@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
+
 module App.Web
   ( Options(..)
   , Scotty
@@ -6,11 +8,12 @@ module App.Web
   ) where
 
 import Control.Monad.IO.Class
+import Data.Aeson (ToJSON)
 import Data.Text.Lazy (Text)
+import GHC.Generics (Generic)
+import Network.HTTP.Types.Status
 import Network.Wai (Response)
 import qualified Web.Scotty.Trans as S
-
-import App.Web.Error (errorHandler)
 
 newtype Options = Options
   { webPort :: Int
@@ -24,3 +27,13 @@ run opts runner routes = S.scottyT (webPort opts) runner $ do
   errorHandler
   routes
 
+errorHandler :: (Monad m) => Scotty m ()
+errorHandler =
+  S.defaultHandler $ \msg -> do
+    S.status status500
+    S.json $ Error msg
+
+newtype Error = Error
+  { message :: Text
+  } deriving stock (Generic)
+  deriving anyclass (ToJSON)
