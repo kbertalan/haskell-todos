@@ -8,7 +8,7 @@ import App.DB as DB
 import App.Ekg as Ekg
 
 main :: IO ()
-main = execParser appInfo >>= app
+main = execParser appInfo >>= App.run
 
 appInfo :: ParserInfo App.Options
 appInfo = info (appOptions <**> helper)

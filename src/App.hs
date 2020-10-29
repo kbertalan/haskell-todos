@@ -1,15 +1,14 @@
 module App
-  ( app
+  ( App.run
   , App.Options(..)
   ) where
 
-import Control.Monad.IO.Class
 import Control.Monad.Reader
 
 import App.DB as DB
 import App.Ekg as Ekg
 import App.Web as Web
-import Env
+
 import Health (healthApi)
 import Todo (todoApi)
 
@@ -20,29 +19,34 @@ data Options = Options
   }
   deriving (Show)
 
-app :: App.Options -> IO ()
-app opts = do
+run :: App.Options -> IO ()
+run opts = do
   Ekg.runWithEkg (ekg opts) $ \ekg ->
     DB.runWithDB (db opts) $ \db -> do
       DB.migrate db >>= \case
         Right _ -> return ()
         Left e -> error $ show e
-  
+
       let env = Env db ekg
       Web.run (web opts) (runAppWith env) $ do
         healthApi
         todoApi
 
+runAppWith :: Env -> AppM a -> IO a
+runAppWith e a = runReaderT (runApp a) e
+
 newtype AppM a = AppM
   { runApp :: ReaderT Env IO a
   } deriving newtype (Applicative, Functor, Monad, MonadIO, MonadReader Env)
 
-runAppWith :: Env -> AppM a -> IO a
-runAppWith e a = runReaderT (runApp a) e
-
-instance WithEnv AppM where
-  getEnv = ask
+data Env = Env
+  { envDB :: DB
+  , envEkg :: Ekg
+  }
 
 instance WithDB AppM where
-  getDB = envDB <$> getEnv
+  getDB = asks envDB
+
+instance WithEkg AppM where
+  getEkg = asks envEkg
 

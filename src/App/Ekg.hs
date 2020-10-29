@@ -3,6 +3,8 @@
 module App.Ekg
   ( Options(..)
   , Ekg
+  , WithEkg
+  , getEkg
   , runWithEkg
   ) where
 
@@ -23,3 +25,7 @@ runWithEkg :: Options -> (Ekg -> IO ()) -> IO ()
 runWithEkg Options {..} = bracket
   (EKG.forkServer (encodeUtf8 $ toStrict host) port)
   (killThread . serverThreadId)
+
+class WithEkg m where
+  getEkg :: m Ekg
+
