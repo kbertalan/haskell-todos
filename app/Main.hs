@@ -5,6 +5,7 @@ import Data.String (fromString)
 import Options.Applicative as O
 import App.Web as Web
 import App.DB as DB
+import App.Ekg as Ekg
 
 main :: IO ()
 main = execParser appInfo >>= app
@@ -18,6 +19,7 @@ appOptions :: O.Parser App.Options
 appOptions = App.Options
   <$> webOptions
   <*> dbOptions
+  <*> ekgOptions
 
 webOptions :: Parser Web.Options
 webOptions =
@@ -78,4 +80,23 @@ dbOptions =
         value "postgres" <>
         showDefault <>
         help "Database name"
+
+ekgOptions :: O.Parser Ekg.Options
+ekgOptions = Ekg.Options
+  <$> host
+  <*> port
+  where
+    host =
+      fmap fromString $ strOption $
+        long "ekg-host" <>
+        value "localhost" <>
+        showDefault <>
+        help "ekg host to bind"
+    port =
+      option auto $
+        long ("ekg-port") <>
+        value 8000 <>
+        showDefault <>
+        help "Ekg port"
+
 

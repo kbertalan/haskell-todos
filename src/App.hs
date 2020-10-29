@@ -5,9 +5,9 @@ module App
 
 import Control.Monad.IO.Class
 import Control.Monad.Reader
-import System.Remote.Monitoring as EKG
 
 import App.DB as DB
+import App.Ekg as Ekg
 import App.Web as Web
 import Env
 import Health (healthApi)
@@ -16,21 +16,22 @@ import Todo (todoApi)
 data Options = Options
   { web :: !Web.Options
   , db :: !DB.Options
+  , ekg :: !Ekg.Options
   }
   deriving (Show)
 
 app :: App.Options -> IO ()
 app opts = do
-  _ <- EKG.forkServer "localhost" 8000
-  DB.runWithDB (db opts) $ \db -> do
-    DB.migrate db >>= \case
-      Right _ -> return ()
-      Left e -> error $ show e
-
-    let env = Env db
-    Web.run (web opts) (runAppWith env) $ do
-      healthApi
-      todoApi
+  Ekg.runWithEkg (ekg opts) $ \ekg ->
+    DB.runWithDB (db opts) $ \db -> do
+      DB.migrate db >>= \case
+        Right _ -> return ()
+        Left e -> error $ show e
+  
+      let env = Env db ekg
+      Web.run (web opts) (runAppWith env) $ do
+        healthApi
+        todoApi
 
 newtype AppM a = AppM
   { runApp :: ReaderT Env IO a
