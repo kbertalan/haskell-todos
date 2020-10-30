@@ -10,7 +10,7 @@ import App.Ekg as Ekg
 import App.Web as Web
 
 import Health (healthApi)
-import Todo (todoApi)
+import Todo
 
 data Options = Options
   { web :: !Web.Options
@@ -49,4 +49,12 @@ instance WithDB AppM where
 
 instance WithEkg AppM where
   getEkg = asks envEkg
+
+instance TodoActions AppM where
+  showAll = Todo.all
+  createNew = createNewAction
+
+instance TodoRepo AppM where
+  all = selectAllTodos
+  add = insertTodo
 

@@ -1,13 +1,25 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass, RecordWildCards #-}
 
 module Todo
   ( Todo
   , todoApi
+  , TodoActions
+  , showAll
+  , createNew
+  , TodoRepo
+  , Todo.all
+  , add
+  -- implementations
+  , createNewAction
+  -- repo implementations
+  , selectAllTodos
+  , insertTodo
   ) where
 
 import Control.Monad.IO.Class
 import Control.Monad.Trans
-import Data.Aeson (ToJSON, FromJSON)
+import Data.Aeson (FromJSON, ToJSON, toJSON, parseJSON, object, withObject, (.=), (.:))
+import Data.Bifunctor (first)
 import Data.Functor.Contravariant ((>$<))
 import Data.Text as T
 import Data.Text.Lazy as L
@@ -28,33 +40,83 @@ data Todo = Todo
   , completed :: !Bool
   } deriving (Show, Generic, ToJSON, FromJSON)
 
-todoApi :: (WithDB m, MonadIO m) => Scotty m ()
+newtype CreateTodoRequest = CreateTodoRequest
+  { ctrDescription :: T.Text
+  } deriving (Show, Generic)
+
+instance ToJSON CreateTodoRequest where
+  toJSON CreateTodoRequest {..} = object
+    [ "description" .= ctrDescription ]
+
+instance FromJSON CreateTodoRequest where
+  parseJSON = withObject "CreateTodoRequest" $ \v -> CreateTodoRequest
+    <$> v .: "description"
+
+todoApi :: (MonadIO m, TodoActions m) => Scotty m ()
 todoApi = do
   get "/todo" $
-    selectAllTodos >>= \case
+    lift showAll >>= \case
       Right r -> json r
       Left  e -> raise $ L.pack $ show e
-  post "/todo" $ do
-    jsonData >>= insertTodo >>= \case
-      Right _ -> status status201
+  post "/todo" $
+    jsonData >>= lift . createNew >>= \case
+      Right r -> do
+        status status201
+        json r
       Left  e -> raise $ L.pack $ show e
 
-selectAllTodos :: (MonadIO m, WithDB m) => Action m (DB.Result [Todo])
-selectAllTodos = lift . DB.run $ statement () $
-  Statement "select id, description, completed from todo" E.noParams decoder True
+newtype Error = Error L.Text
+  deriving (Show)
+
+type Result a = Either Error a
+
+class TodoActions m where
+  showAll :: m (Todo.Result [Todo])
+  createNew :: CreateTodoRequest -> m (Todo.Result Todo)
+
+class TodoRepo m where
+  all :: m (Todo.Result [Todo])
+  add :: Todo -> m (Todo.Result Todo)
+
+createNewAction :: (TodoRepo m) => CreateTodoRequest -> m (Todo.Result Todo)
+createNewAction req =
+  let todo = Todo { uid = nil -- TODO generate random id here and remove postgresql random generation
+    , description = ctrDescription req
+    , completed = False
+    }
+  in
+    add todo
+
+selectAllTodos :: (MonadIO m, WithDB m) => m (Todo.Result [Todo])
+selectAllTodos = convertError $ DB.run $ statement () $
+  Statement
+    "select id, description, completed from todo order by created_at asc"
+    E.noParams
+    decoder
+    True
   where
     decoder = D.rowList row
-    row = Todo
-      <$> D.column (D.nonNullable D.uuid)
-      <*> D.column (D.nonNullable D.text)
-      <*> D.column (D.nonNullable D.bool)
 
-insertTodo :: (MonadIO m, WithDB m) => Todo -> Action m (DB.Result ())
-insertTodo todo = lift . DB.run $ statement todo $
-  Statement "insert into todo (id, description, completed) values ($1, $2, $3)" encoder D.noResult True
+insertTodo :: (MonadIO m, WithDB m) => Todo -> m (Todo.Result Todo)
+insertTodo todo = convertError $ DB.run $ statement todo $
+  Statement
+    "insert into todo (id, description, completed, created_at, last_updated_at)\
+    \ values (uuid_generate_v4(), $1, $2, now(), now())\
+    \ returning id, description, completed"
+    encoder
+    decoder
+    True
   where
     encoder =
-      (uid >$< E.param (E.nonNullable E.uuid))
-      <> (description >$< E.param (E.nonNullable E.text))
+      (description >$< E.param (E.nonNullable E.text))
       <> (completed >$< E.param (E.nonNullable E.bool))
+    decoder = D.singleRow row
 
+convertError :: (Monad m) => m (DB.Result a) -> m (Todo.Result a)
+convertError = fmap (first $ Error . L.pack . show)
+
+row :: D.Row Todo
+row = Todo
+  <$> D.column (D.nonNullable D.uuid)
+  <*> D.column (D.nonNullable D.text)
+  <*> D.column (D.nonNullable D.bool)
