@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
+
 module Todo 
   ( todoApi
   ) where
@@ -15,6 +16,6 @@ instance TodoLogic AppM where
   createNew = createNewAction
 
 instance TodoRepo AppM where
-  all = selectAllTodos
-  add = insertTodo
+  all = selectAll
+  add = insert
 

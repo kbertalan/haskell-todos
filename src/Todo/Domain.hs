@@ -11,8 +11,7 @@ module Todo.Domain
   ) where
 
 import Data.Aeson (FromJSON, ToJSON, toJSON, parseJSON, object, withObject, (.=), (.:))
-import Data.Text (Text)
-import qualified Data.Text.Lazy as L (Text)
+import Data.Text.Lazy
 import Data.UUID (UUID)
 import GHC.Generics (Generic)
 
@@ -34,7 +33,7 @@ instance FromJSON CreateTodoRequest where
   parseJSON = withObject "CreateTodoRequest" $ \v -> CreateTodoRequest
     <$> v .: "description"
 
-newtype Error = Error L.Text
+newtype Error = Error Text
   deriving (Show)
 
 type Result a = Either Error a
