@@ -1,6 +1,6 @@
 module Main where
 
-import App
+import Run
 import Data.String (fromString)
 import Options.Applicative as O
 import App.Web as Web
@@ -8,15 +8,15 @@ import App.DB as DB
 import App.Ekg as Ekg
 
 main :: IO ()
-main = execParser appInfo >>= App.run
+main = execParser appInfo >>= Run.run
 
-appInfo :: ParserInfo App.Options
+appInfo :: ParserInfo Run.Options
 appInfo = info (appOptions <**> helper)
   $ fullDesc
   <> progDesc "Simple ToDo web app"
 
-appOptions :: O.Parser App.Options
-appOptions = App.Options
+appOptions :: O.Parser Run.Options
+appOptions = Run.Options
   <$> webOptions
   <*> dbOptions
   <*> ekgOptions

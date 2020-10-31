@@ -4,16 +4,18 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6110295793f29e1ad6da1a38ff30c35063abee29004bca4a836c9252a656d7a4
+-- hash: 8adc201f16c41603080d5d7e859cb82a90082e328605c254cef8ede6d285c6c6
 
 name:           haskell-todos
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/haskell-todos#readme>
-homepage:       https://github.com/githubuser/haskell-todos#readme
-bug-reports:    https://github.com/githubuser/haskell-todos/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2020 Author name here
+synopsis:       A sample web application in Haskell
+description:    Please see the README on GitHub at <https://github.com/kbertalan/haskell-todos#readme>
+category:       Web
+homepage:       https://github.com/kbertalan/haskell-todos#readme
+bug-reports:    https://github.com/kbertalan/haskell-todos/issues
+author:         Bertalan Kis
+maintainer:     kbertalan@gmail.com
+copyright:      2020 Bertalan Kis
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -23,7 +25,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/haskell-todos
+  location: https://github.com/kbertalan/haskell-todos
 
 library
   exposed-modules:
@@ -32,7 +34,12 @@ library
       App.Ekg
       App.Web
       Health
+      Run
       Todo
+      Todo.DB
+      Todo.Domain
+      Todo.Logic
+      Todo.Web
   other-modules:
       Paths_haskell_todos
   hs-source-dirs:
@@ -93,7 +100,7 @@ test-suite haskell-todos-test
   hs-source-dirs:
       test
   default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
-  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T
   build-depends:
       aeson
     , base >=4.7 && <5
