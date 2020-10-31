@@ -2,13 +2,13 @@ module Todo.Web
   ( todoApi
   ) where
 
-import Control.Monad.Trans
-import qualified Data.Text.Lazy as L
-import Network.HTTP.Types.Status
-import Web.Scotty.Trans
+import           Control.Monad.Trans
+import qualified Data.Text.Lazy            as L
+import           Network.HTTP.Types.Status
+import           Web.Scotty.Trans
 
-import App.Web
-import Todo.Domain
+import           App.Web
+import           Todo.Domain
 
 todoApi :: (MonadIO m, TodoLogic m) => Scotty m ()
 todoApi = do

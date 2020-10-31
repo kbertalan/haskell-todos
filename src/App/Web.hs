@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric  #-}
 
 module App.Web
   ( Options(..)
@@ -7,13 +8,13 @@ module App.Web
   , run
   ) where
 
-import Control.Monad.IO.Class
-import Data.Aeson (ToJSON)
-import Data.Text.Lazy (Text)
-import GHC.Generics (Generic)
-import Network.HTTP.Types.Status
-import Network.Wai (Response)
-import qualified Web.Scotty.Trans as S
+import           Control.Monad.IO.Class
+import           Data.Aeson                (ToJSON)
+import           Data.Text.Lazy            (Text)
+import           GHC.Generics              (Generic)
+import           Network.HTTP.Types.Status
+import           Network.Wai               (Response)
+import qualified Web.Scotty.Trans          as S
 
 newtype Options = Options
   { webPort :: Int

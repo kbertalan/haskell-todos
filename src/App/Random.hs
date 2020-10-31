@@ -17,6 +17,6 @@ newtype Options = Options
 
 configure :: Options -> IO ()
 configure opts = case seed opts of
-  New -> newStdGen >>= setStdGen
+  New        -> newStdGen >>= setStdGen
   Fixed seed -> setStdGen $ mkStdGen seed
 

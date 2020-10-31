@@ -12,24 +12,24 @@ module App.DB
   , migrate
   ) where
 
-import Control.Monad (forM_)
-import Control.Monad.IO.Class
-import Control.Exception (bracket)
-import Data.ByteString
-import qualified Hasql.Connection as C
-import qualified Hasql.Pool as P
-import qualified Hasql.Session as S
-import qualified Hasql.Migration as M
+import           Control.Exception          (bracket)
+import           Control.Monad              (forM_)
+import           Control.Monad.IO.Class
+import           Data.ByteString
+import qualified Hasql.Connection           as C
+import qualified Hasql.Migration            as M
+import qualified Hasql.Pool                 as P
+import qualified Hasql.Session              as S
 import qualified Hasql.Transaction.Sessions as T
 
 data Options = Options
-  { poolSize :: !Int
+  { poolSize    :: !Int
   , poolTimeout :: !Int
-  , dbHost :: !ByteString
-  , dbPort :: !Int
-  , dbUser :: !ByteString
-  , dbPassword :: !ByteString
-  , dbName :: !ByteString
+  , dbHost      :: !ByteString
+  , dbPort      :: !Int
+  , dbUser      :: !ByteString
+  , dbPassword  :: !ByteString
+  , dbName      :: !ByteString
   } deriving (Show)
 
 type DB = P.Pool

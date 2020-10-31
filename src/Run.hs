@@ -1,18 +1,18 @@
 module Run where
 
 import App
-import App.DB as DB
-import App.Ekg as Ekg
+import App.DB     as DB
+import App.Ekg    as Ekg
 import App.Random as Random
-import App.Web as Web
+import App.Web    as Web
 
-import Health (healthApi)
-import Todo (todoApi)
+import Health     (healthApi)
+import Todo       (todoApi)
 
 data Options = Options
-  { web :: !Web.Options
-  , db :: !DB.Options
-  , ekg :: !Ekg.Options
+  { web    :: !Web.Options
+  , db     :: !DB.Options
+  , ekg    :: !Ekg.Options
   , random :: !Random.Options
   }
   deriving (Show)

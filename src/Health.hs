@@ -2,16 +2,16 @@ module Health
   ( healthApi
   ) where
 
-import Control.Monad.Trans
-import Data.Int (Int64)
-import Hasql.Statement
-import qualified Hasql.Encoders as E
-import qualified Hasql.Decoders as D
-import Network.HTTP.Types.Status
-import Web.Scotty.Trans as S
+import           Control.Monad.Trans
+import           Data.Int                  (Int64)
+import qualified Hasql.Decoders            as D
+import qualified Hasql.Encoders            as E
+import           Hasql.Statement
+import           Network.HTTP.Types.Status
+import           Web.Scotty.Trans          as S
 
-import App.DB as DB
-import App.Web as Web
+import           App.DB                    as DB
+import           App.Web                   as Web
 
 healthApi :: (WithDB m, MonadIO m) => Scotty m ()
 healthApi = get "/health" $

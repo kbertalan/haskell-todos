@@ -4,18 +4,18 @@ module App
   , runAppWith
   ) where
 
-import Control.Monad.Reader
 import Control.Monad.Random.Class
+import Control.Monad.Reader
 
-import App.DB (DB, WithDB, getDB)
-import App.Ekg (Ekg, WithEkg, getEkg)
+import App.DB                     (DB, WithDB, getDB)
+import App.Ekg                    (Ekg, WithEkg, getEkg)
 
 newtype AppM a = AppM
   { runApp :: ReaderT Env IO a
   } deriving newtype (Applicative, Functor, Monad, MonadIO, MonadReader Env, MonadRandom)
 
 data Env = Env
-  { envDB :: DB
+  { envDB  :: DB
   , envEkg :: Ekg
   }
 

@@ -8,10 +8,10 @@ module App.Ekg
   , runWithEkg
   ) where
 
-import Control.Concurrent (killThread)
-import Control.Exception (bracket)
-import Data.Text.Lazy (Text, toStrict)
-import Data.Text.Encoding (encodeUtf8)
+import Control.Concurrent       (killThread)
+import Control.Exception        (bracket)
+import Data.Text.Encoding       (encodeUtf8)
+import Data.Text.Lazy           (Text, toStrict)
 import System.Remote.Monitoring as EKG
 
 data Options = Options

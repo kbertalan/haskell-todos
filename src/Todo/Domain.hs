@@ -1,4 +1,6 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass, RecordWildCards #-}
+{-# LANGUAGE DeriveAnyClass  #-}
+{-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Todo.Domain
   ( Todo(..)
@@ -10,15 +12,15 @@ module Todo.Domain
   , createNew
   ) where
 
-import Data.Aeson (FromJSON, ToJSON, toJSON, parseJSON, object, withObject, (.=), (.:))
+import Data.Aeson     (FromJSON, ToJSON, object, parseJSON, toJSON, withObject, (.:), (.=))
 import Data.Text.Lazy
-import Data.UUID (UUID)
-import GHC.Generics (Generic)
+import Data.UUID      (UUID)
+import GHC.Generics   (Generic)
 
 data Todo = Todo
-  { id :: UUID
+  { id          :: !UUID
   , description :: !Text
-  , completed :: !Bool
+  , completed   :: !Bool
   } deriving (Show, Generic, ToJSON, FromJSON)
 
 newtype CreateTodoRequest = CreateTodoRequest

@@ -1,15 +1,15 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Todo 
+module Todo
   ( todoApi
   ) where
 
-import Todo.Web
 import Todo.DB
+import Todo.Web
 
+import App
 import Todo.Domain
 import Todo.Logic
-import App
 
 instance TodoLogic AppM where
   showAll = Todo.Logic.all

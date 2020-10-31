@@ -3,16 +3,16 @@ module Todo.DB
   , insert
   ) where
 
-import Control.Monad.IO.Class
-import Data.Bifunctor (first, second)
-import Data.Functor.Contravariant ((>$<))
-import Data.Text.Lazy as L
-import Hasql.Statement
-import qualified Hasql.Encoders as E
-import qualified Hasql.Decoders as D
+import           Control.Monad.IO.Class
+import           Data.Bifunctor             (first, second)
+import           Data.Functor.Contravariant ((>$<))
+import           Data.Text.Lazy             as L
+import qualified Hasql.Decoders             as D
+import qualified Hasql.Encoders             as E
+import           Hasql.Statement
 
-import App.DB as DB
-import Todo.Domain as Todo
+import           App.DB                     as DB
+import           Todo.Domain                as Todo
 
 selectAll:: (MonadIO m, WithDB m) => m (Todo.Result [Todo])
 selectAll = convertError $ DB.run $ statement () $
