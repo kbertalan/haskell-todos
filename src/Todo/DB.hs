@@ -35,7 +35,7 @@ insert todo =
       True
   where
     encoder =
-      (uid >$< E.param (E.nonNullable E.uuid))
+      (Todo.id >$< E.param (E.nonNullable E.uuid))
       <> (toStrict . description >$< E.param (E.nonNullable E.text))
       <> (completed >$< E.param (E.nonNullable E.bool))
 

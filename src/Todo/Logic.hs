@@ -15,7 +15,8 @@ class TodoRepo m where
 createNewAction :: (TodoRepo m, MonadRandom m) => CreateTodoRequest -> m (Result Todo)
 createNewAction req = do
   newId <- getRandom
-  let todo = Todo { uid = newId
+  let todo = Todo {
+      Todo.Domain.id = newId
     , description = ctrDescription req
     , completed = False
     }

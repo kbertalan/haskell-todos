@@ -16,7 +16,7 @@ import Data.UUID (UUID)
 import GHC.Generics (Generic)
 
 data Todo = Todo
-  { uid :: UUID
+  { id :: UUID
   , description :: !Text
   , completed :: !Bool
   } deriving (Show, Generic, ToJSON, FromJSON)
