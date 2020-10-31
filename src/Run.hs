@@ -3,6 +3,7 @@ module Run where
 import App
 import App.DB as DB
 import App.Ekg as Ekg
+import App.Random as Random
 import App.Web as Web
 
 import Health (healthApi)
@@ -12,6 +13,7 @@ data Options = Options
   { web :: !Web.Options
   , db :: !DB.Options
   , ekg :: !Ekg.Options
+  , random :: !Random.Options
   }
   deriving (Show)
 
@@ -19,6 +21,7 @@ run :: Run.Options -> IO ()
 run opts =
   Ekg.runWithEkg (ekg opts) $ \ekg ->
     DB.runWithDB (db opts) $ \db -> do
+      Random.configure $ random opts
       DB.migrate db >>= \case
         Right _ -> return ()
         Left e -> error $ show e

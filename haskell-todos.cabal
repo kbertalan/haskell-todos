@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8adc201f16c41603080d5d7e859cb82a90082e328605c254cef8ede6d285c6c6
+-- hash: f5163f6580c3f12a0f7b326570c14f6754346ddf15315f0951003c0c86bae842
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -32,6 +32,7 @@ library
       App
       App.DB
       App.Ekg
+      App.Random
       App.Web
       Health
       Run
@@ -47,7 +48,8 @@ library
   default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
   ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
   build-depends:
-      aeson
+      MonadRandom
+    , aeson
     , base >=4.7 && <5
     , bytestring
     , ekg
@@ -57,6 +59,7 @@ library
     , hasql-transaction
     , http-types
     , mtl
+    , random
     , scotty
     , text
     , uuid
@@ -73,7 +76,8 @@ executable haskell-todos-exe
   default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
   ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T
   build-depends:
-      aeson
+      MonadRandom
+    , aeson
     , base >=4.7 && <5
     , bytestring
     , ekg
@@ -85,6 +89,7 @@ executable haskell-todos-exe
     , http-types
     , mtl
     , optparse-applicative
+    , random
     , scotty
     , text
     , uuid
@@ -102,7 +107,8 @@ test-suite haskell-todos-test
   default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
   ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T
   build-depends:
-      aeson
+      MonadRandom
+    , aeson
     , base >=4.7 && <5
     , bytestring
     , ekg
@@ -114,6 +120,7 @@ test-suite haskell-todos-test
     , hspec
     , http-types
     , mtl
+    , random
     , scotty
     , text
     , uuid

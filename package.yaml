@@ -35,6 +35,8 @@ dependencies:
 - wai
 - ekg
 - bytestring
+- random
+- MonadRandom
 
 ghc-options:
   - -Werror

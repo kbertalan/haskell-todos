@@ -5,6 +5,7 @@ import Data.String (fromString)
 import Options.Applicative as O
 import App.Web as Web
 import App.DB as DB
+import App.Random as Random
 import App.Ekg as Ekg
 
 main :: IO ()
@@ -20,6 +21,7 @@ appOptions = Run.Options
   <$> webOptions
   <*> dbOptions
   <*> ekgOptions
+  <*> randomOptions
 
 webOptions :: Parser Web.Options
 webOptions =
@@ -98,5 +100,14 @@ ekgOptions = Ekg.Options
         value 8000 <>
         showDefault <>
         help "Ekg port"
+
+randomOptions :: O.Parser Random.Options
+randomOptions = Random.Options
+  <$> seed
+  where
+    seed = fmap (maybe New Fixed) $ optional $
+      option auto $
+        long "random-seed" <>
+        help "Seed for random number generator"
 
 

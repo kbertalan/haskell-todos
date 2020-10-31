@@ -5,19 +5,19 @@ module Todo.Logic
   , createNewAction
   ) where
 
-import Data.UUID (nil)
+import Control.Monad.Random.Class
 import Todo.Domain
 
 class TodoRepo m where
   all :: m (Result [Todo])
   add :: Todo -> m (Result Todo)
 
-createNewAction :: (TodoRepo m) => CreateTodoRequest -> m (Result Todo)
-createNewAction req =
-  let todo = Todo { uid = nil -- TODO generate random id here and remove postgresql random generation
+createNewAction :: (TodoRepo m, MonadRandom m) => CreateTodoRequest -> m (Result Todo)
+createNewAction req = do
+  newId <- getRandom
+  let todo = Todo { uid = newId
     , description = ctrDescription req
     , completed = False
     }
-  in
-    add todo
+  add todo
 

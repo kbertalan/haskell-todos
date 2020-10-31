@@ -4,7 +4,7 @@ module Todo.DB
   ) where
 
 import Control.Monad.IO.Class
-import Data.Bifunctor (first)
+import Data.Bifunctor (first, second)
 import Data.Functor.Contravariant ((>$<))
 import Data.Text.Lazy as L
 import Hasql.Statement
@@ -25,19 +25,19 @@ selectAll = convertError $ DB.run $ statement () $
     decoder = D.rowList row
 
 insert :: (MonadIO m, WithDB m) => Todo -> m (Todo.Result Todo)
-insert todo = convertError $ DB.run $ statement todo $
-  Statement
-    "insert into todo (id, description, completed, created_at, last_updated_at)\
-    \ values (uuid_generate_v4(), $1, $2, now(), now())\
-    \ returning id, description, completed"
-    encoder
-    decoder
-    True
+insert todo =
+  fmap (second $ const todo) $ convertError $ DB.run $ statement todo $
+    Statement
+      "insert into todo (id, description, completed, created_at, last_updated_at)\
+      \ values ($1, $2, $3, now(), now())"
+      encoder
+      D.noResult
+      True
   where
     encoder =
-      (toStrict . description >$< E.param (E.nonNullable E.text))
+      (uid >$< E.param (E.nonNullable E.uuid))
+      <> (toStrict . description >$< E.param (E.nonNullable E.text))
       <> (completed >$< E.param (E.nonNullable E.bool))
-    decoder = D.singleRow row
 
 convertError :: (Monad m) => m (DB.Result a) -> m (Todo.Result a)
 convertError = fmap (first $ Error . L.pack . show)
