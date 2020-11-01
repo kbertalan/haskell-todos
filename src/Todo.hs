@@ -7,7 +7,7 @@ module Todo
 import Todo.DB
 import Todo.Web
 
-import App
+import App.Monad
 import Todo.Domain
 import Todo.Logic
 

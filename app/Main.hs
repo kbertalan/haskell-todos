@@ -1,23 +1,23 @@
 module Main where
 
+import App
 import App.DB              as DB
 import App.Ekg             as Ekg
 import App.Random          as Random
 import App.Web             as Web
 import Data.String         (fromString)
 import Options.Applicative as O
-import Run
 
 main :: IO ()
-main = execParser appInfo >>= Run.run
+main = execParser appInfo >>= App.run
 
-appInfo :: ParserInfo Run.Options
+appInfo :: ParserInfo App.Options
 appInfo = info (appOptions <**> helper)
   $ fullDesc
   <> progDesc "Simple ToDo web app"
 
-appOptions :: O.Parser Run.Options
-appOptions = Run.Options
+appOptions :: O.Parser App.Options
+appOptions = App.Options
   <$> webOptions
   <*> dbOptions
   <*> ekgOptions
@@ -49,8 +49,8 @@ dbOptions = DB.Options
       <> value 2
       <> showDefault
       <> help "Amount of connections in the pool"
-    timeout = fmap fromIntegral 
-      $ option auto 
+    timeout = fmap fromIntegral
+      $ option auto
       $ long "pool-timeout"
       <> value (10 :: Integer)
       <> showDefault
