@@ -1,6 +1,7 @@
 module Todo.DB
   ( selectAll
   , insert
+  , Todo.DB.update
   ) where
 
 import           Control.Monad.IO.Class
@@ -33,6 +34,23 @@ insert todo =
       encoder
       D.noResult
       True
+  where
+    encoder =
+      (Todo.id >$< E.param (E.nonNullable E.uuid))
+      <> (toStrict . description >$< E.param (E.nonNullable E.text))
+      <> (completed >$< E.param (E.nonNullable E.bool))
+
+update :: (MonadIO m, WithDB m) => Todo -> m (Todo.Result Todo)
+update todo = fmap (second $ const todo) $ convertError $ DB.run $ statement todo $
+  Statement
+    "update todo set\
+    \ description = $2,\
+    \ completed = $3,\
+    \ last_updated_at = now()\
+    \ where id = $1"
+    encoder
+    D.noResult
+    True
   where
     encoder =
       (Todo.id >$< E.param (E.nonNullable E.uuid))

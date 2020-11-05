@@ -3,6 +3,7 @@ module Todo.Logic
   , Todo.Logic.all
   , add
   , createNewAction
+  , change
   ) where
 
 import Control.Monad.Random.Class
@@ -11,6 +12,7 @@ import Todo.Domain
 class TodoRepo m where
   all :: m (Result [Todo])
   add :: Todo -> m (Result Todo)
+  change :: Todo -> m (Result Todo)
 
 createNewAction :: (TodoRepo m, MonadRandom m) => CreateTodoRequest -> m (Result Todo)
 createNewAction req = do

@@ -22,4 +22,9 @@ todoApi = do
         status status201
         json r
       Left  e -> raise $ L.pack $ show e
+  put "/todo" $
+    jsonData >>= lift . update >>= \case
+      Right r -> json r
+      Left  e -> raise $ L.pack $ show e
+
 
