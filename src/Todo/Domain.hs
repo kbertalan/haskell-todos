@@ -7,10 +7,10 @@ module Todo.Domain
   , CreateTodoRequest(..)
   , Result
   , Error(..)
-  , TodoLogic
+  , Logic
   , showAll
-  , createNew
-  , update
+  , create
+  , modify
   ) where
 
 import Data.Aeson     (FromJSON, ToJSON, object, parseJSON, toJSON, withObject, (.:), (.=))
@@ -41,9 +41,9 @@ newtype Error = Error Text
 
 type Result a = Either Error a
 
-class TodoLogic m where
+class Logic m where
   showAll :: m (Result [Todo])
-  createNew :: CreateTodoRequest -> m (Result Todo)
-  update :: Todo -> m (Result Todo)
+  create :: CreateTodoRequest -> m (Result Todo)
+  modify :: Todo -> m (Result Todo)
 
 

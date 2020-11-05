@@ -1,26 +1,26 @@
 module Todo.Logic
-  ( TodoRepo
-  , Todo.Logic.all
-  , add
-  , createNewAction
-  , change
+  ( Repo
+  , selectAll
+  , insert
+  , update
+  , logicCreate
   ) where
 
 import Control.Monad.Random.Class
 import Todo.Domain
 
-class TodoRepo m where
-  all :: m (Result [Todo])
-  add :: Todo -> m (Result Todo)
-  change :: Todo -> m (Result Todo)
+class Repo m where
+  selectAll :: m (Result [Todo])
+  insert :: Todo -> m (Result Todo)
+  update :: Todo -> m (Result Todo)
 
-createNewAction :: (TodoRepo m, MonadRandom m) => CreateTodoRequest -> m (Result Todo)
-createNewAction req = do
+logicCreate :: (Repo m, MonadRandom m) => CreateTodoRequest -> m (Result Todo)
+logicCreate req = do
   newId <- getRandom
   let todo = Todo {
       Todo.Domain.id = newId
     , description = ctrDescription req
     , completed = False
     }
-  add todo
+  insert todo
 
