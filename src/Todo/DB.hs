@@ -1,5 +1,6 @@
 module Todo.DB
-  ( dbSelectAll
+  ( dbGetById
+  , dbSelectAll
   , dbInsert
   , dbUpdate
   ) where
@@ -8,12 +9,24 @@ import           Control.Monad.IO.Class
 import           Data.Bifunctor             (first, second)
 import           Data.Functor.Contravariant ((>$<))
 import           Data.Text.Lazy             as L
+import           Data.UUID                  (UUID)
 import qualified Hasql.Decoders             as D
 import qualified Hasql.Encoders             as E
 import           Hasql.Statement
 
 import           App.DB                     as DB
 import           Todo.Domain                as Todo
+
+dbGetById :: (MonadIO m, WithDB m) => UUID -> m (Maybe Todo)
+dbGetById identifier = fmap (either (const Nothing) Prelude.id) $ DB.run $ statement identifier $
+  Statement
+    "select id, description, completed from todo where id = $1"
+    encoder
+    decoder
+    True
+  where
+    encoder = E.param (E.nonNullable E.uuid)
+    decoder = D.rowMaybe row
 
 dbSelectAll:: (MonadIO m, WithDB m) => m (Todo.Result [Todo])
 dbSelectAll = convertError $ DB.run $ statement () $
