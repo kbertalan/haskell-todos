@@ -11,13 +11,13 @@ module Todo.Domain
   , fromTodo
   , toTodo
   , CreateTodoRequest(..)
-  , Result
-  , Error(..)
   , Logic
   , showAll
   , create
   , modify
   , patch
+  , ModifyError(..)
+  , PatchError (..)
   ) where
 
 import Data.Aeson     (FromJSON, ToJSON, object, parseJSON, toJSON, withObject, (.:), (.:?), (.=))
@@ -76,14 +76,19 @@ instance FromJSON CreateTodoRequest where
   parseJSON = withObject "CreateTodoRequest" $ \v -> CreateTodoRequest
     <$> v .: "description"
 
-newtype Error = Error Text
+data ModifyError
+  = ModifyNotExists
   deriving (Show)
 
-type Result a = Either Error a
+data PatchError
+  = MissingId
+  | MissingFields
+  | PatchNotExists
+  deriving Show
 
 class Logic m where
-  showAll :: m (Result [Todo])
-  create :: CreateTodoRequest -> m (Result Todo)
-  modify :: Todo -> m (Result Todo)
-  patch :: TodoMaybe -> m (Result Todo)
+  showAll :: m [Todo]
+  create :: CreateTodoRequest -> m Todo
+  modify :: Todo -> m (Either ModifyError Todo)
+  patch :: TodoMaybe -> m (Either PatchError Todo)
 

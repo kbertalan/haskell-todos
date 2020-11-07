@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass  #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module App.DB
@@ -6,13 +7,12 @@ module App.DB
   , getDB
   , DB
   , runWithDB
-  , Result
   , S.statement
   , run
   , migrate
   ) where
 
-import           Control.Exception          (bracket)
+import           Control.Exception          (Exception, bracket, throwIO)
 import           Control.Monad              (forM_)
 import           Control.Monad.IO.Class
 import           Data.ByteString
@@ -33,7 +33,9 @@ data Options = Options
   } deriving (Show)
 
 type DB = P.Pool
-type Result a = Either P.UsageError a
+newtype DBException = DBException P.UsageError
+  deriving (Show)
+  deriving anyclass (Exception)
 
 class WithDB m where
   getDB :: m DB
@@ -41,8 +43,10 @@ class WithDB m where
 runWithDB :: Options -> (DB -> IO ()) -> IO ()
 runWithDB opts = bracket (P.acquire $ poolOpts opts) P.release
 
-run :: (MonadIO m, WithDB m) => S.Session a -> m (Result a)
-run statement = getDB >>= liftIO . flip P.use statement
+run :: (MonadIO m, WithDB m) => S.Session a -> m a
+run statement = getDB >>= liftIO . flip P.use statement >>= \case
+  Left e  -> liftIO . throwIO $ DBException e
+  Right r -> return r
 
 poolOpts :: Options -> P.Settings
 poolOpts Options{..} =
@@ -51,7 +55,7 @@ poolOpts Options{..} =
   , C.settings dbHost (fromIntegral dbPort) dbUser dbPassword dbName
   )
 
-migrate :: DB -> IO (Result ())
+migrate :: DB -> IO (Either P.UsageError ())
 migrate db = P.use db $ do
   migrations <- liftIO $ M.loadMigrationsFromDirectory "./migrations"
   forM_ (M.MigrationInitialization : migrations) $ \m ->

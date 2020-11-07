@@ -15,7 +15,7 @@ import Todo.Web
 instance Logic AppM where
   showAll = selectAll
   create = logicCreate
-  modify = update
+  modify = fmap runExceptT logicUpdate
   patch  = fmap runExceptT logicPatch
 
 instance Repo AppM where
@@ -24,7 +24,7 @@ instance Repo AppM where
   update = dbUpdate
   getById = dbGetById
 
-instance Repo (ExceptT Error AppM) where
+instance Repo (ExceptT e AppM) where
   selectAll = lift selectAll
   insert = lift . insert
   update = lift . update

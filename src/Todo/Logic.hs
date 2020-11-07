@@ -5,6 +5,7 @@ module Todo.Logic
   , update
   , getById
   , logicCreate
+  , logicUpdate
   , logicPatch
   ) where
 
@@ -16,12 +17,12 @@ import Data.UUID                  (UUID)
 import Todo.Domain
 
 class Repo m where
-  selectAll :: m (Result [Todo])
-  insert :: Todo -> m (Result Todo)
-  update :: Todo -> m (Result Todo)
+  selectAll :: m [Todo]
+  insert :: Todo -> m Todo
+  update :: Todo -> m Todo
   getById :: UUID -> m (Maybe Todo)
 
-logicCreate :: (Repo m, MonadRandom m) => CreateTodoRequest -> m (Result Todo)
+logicCreate :: (Repo m, MonadRandom m) => CreateTodoRequest -> m Todo
 logicCreate req = do
   newId <- getRandom
   let todo = Todo {
@@ -31,17 +32,20 @@ logicCreate req = do
     }
   insert todo
 
-logicPatch :: (Repo m, MonadError Error m) => TodoMaybe -> m Todo
+logicUpdate :: (Repo m, MonadError ModifyError m) => Todo -> m Todo
+logicUpdate todo = do
+  getById (Todo.Domain.id todo) >>= \case
+    Nothing -> throwError ModifyNotExists
+    Just  _ -> update todo
+
+
+logicPatch :: (Repo m, MonadError PatchError m) => TodoMaybe -> m Todo
 logicPatch req = do
-  existingId <- maybe (throwError $ Error "No id is present in the request") return $ mId req
+  existingId <- maybe (throwError MissingId) return $ mId req
   maybeExisting <- getById existingId
-  existing <- maybe (throwError $ Error "Could not find Todo record with id") return maybeExisting
+  existing <- maybe (throwError PatchNotExists) return maybeExisting
   let existingLast = fromTodo (Last . Just) existing
   let todoLast = coerce req
-  todo <- maybe (throwError $ Error "Could not construct Todo record") return $ toTodo getLast $ existingLast <> todoLast
-  updated <- update todo
-  case updated of
-    Left e  -> throwError e
-    Right t -> return t
-
+  todo <- maybe (throwError MissingFields) return $ toTodo getLast $ existingLast <> todoLast
+  update todo
 
