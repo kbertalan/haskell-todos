@@ -14,7 +14,6 @@ import qualified Hasql.Encoders             as E
 import           Hasql.Statement
 
 import           App.DB                     as DB
-import           App.Log                    as Log
 import           Todo.Domain                as Todo
 
 dbGetById :: (MonadIO m, WithDB m) => UUID -> m (Maybe Todo)
@@ -28,9 +27,8 @@ dbGetById identifier = DB.run $ statement identifier $
     encoder = E.param (E.nonNullable E.uuid)
     decoder = D.rowMaybe row
 
-dbSelectAll:: (MonadIO m, WithDB m, WithLog env m) => m [Todo]
+dbSelectAll:: (MonadIO m, WithDB m) => m [Todo]
 dbSelectAll = do
-  logDebug "selecting all todos"
   DB.run $ statement () $
     Statement
       "select id, description, completed from todo order by created_at asc"

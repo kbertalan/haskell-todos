@@ -16,13 +16,13 @@ import App.Ekg                    (Ekg, WithEkg, getEkg)
 import App.Log                    (Log)
 
 newtype AppM a = AppM
-  { runApp :: ReaderT (Env AppM) IO a
-  } deriving newtype (Applicative, Functor, Monad, MonadIO, MonadReader (Env AppM), MonadRandom)
+  { runApp :: ReaderT Env IO a
+  } deriving newtype (Applicative, Functor, Monad, MonadIO, MonadReader Env, MonadRandom)
 
-data Env m = Env
+data Env = Env
   { envDB  :: DB
   , envEkg :: Ekg
-  , envLog :: Log m
+  , envLog :: Log AppM
   }
 
 instance WithDB AppM where
@@ -31,15 +31,15 @@ instance WithDB AppM where
 instance WithEkg AppM where
   getEkg = asks envEkg
 
-instance HasLog (Env m) Message m where
-  getLogAction :: Env m -> LogAction m Message
+instance HasLog Env Message AppM where
+  getLogAction :: Env -> LogAction AppM Message
   getLogAction = envLog
   {-# INLINE getLogAction #-}
 
-  setLogAction :: LogAction m Message -> Env m -> Env m
+  setLogAction :: LogAction AppM Message -> Env -> Env
   setLogAction newLogAction env = env { envLog = newLogAction }
   {-# INLINE setLogAction #-}
 
-runAppWith :: Env AppM -> AppM a -> IO a
+runAppWith :: Env -> AppM a -> IO a
 runAppWith e a = runReaderT (runApp a) e
 
