@@ -9,12 +9,15 @@ module Todo.Logic
   , logicPatch
   ) where
 
-import Control.Monad.Except
-import Control.Monad.Random.Class
+import Control.Monad.Except       (MonadError)
+import Control.Monad.Random.Class (MonadRandom, getRandom)
 import Data.Coerce                (coerce)
 import Data.Monoid                (Last (Last), getLast)
 import Data.UUID                  (UUID)
-import Todo.Domain
+
+import App.Error                  (throwIfNothing)
+import Todo.Domain                (CreateTodoRequest (..), ModifyError (..), PatchError (..), Todo (..), TodoM (..),
+                                   TodoMaybe, fromTodo, toTodo)
 
 class Repo m where
   selectAll :: m [Todo]
@@ -33,19 +36,16 @@ logicCreate req = do
   insert todo
 
 logicUpdate :: (Repo m, MonadError ModifyError m) => Todo -> m Todo
-logicUpdate todo = do
-  getById (Todo.Domain.id todo) >>= \case
-    Nothing -> throwError ModifyNotExists
-    Just  _ -> update todo
-
+logicUpdate todo =
+  getById (Todo.Domain.id todo)
+    >>= throwIfNothing ModifyNotExists
+    >> update todo
 
 logicPatch :: (Repo m, MonadError PatchError m) => TodoMaybe -> m Todo
 logicPatch req = do
-  existingId <- maybe (throwError MissingId) return $ mId req
-  maybeExisting <- getById existingId
-  existing <- maybe (throwError PatchNotExists) return maybeExisting
+  existingId <- throwIfNothing MissingId $ mId req
+  existing <- getById existingId >>= throwIfNothing PatchNotExists
   let existingLast = fromTodo (Last . Just) existing
-  let todoLast = coerce req
-  todo <- maybe (throwError MissingFields) return $ toTodo getLast $ existingLast <> todoLast
+  todo <- throwIfNothing MissingFields $ toTodo getLast $ existingLast <> coerce req
   update todo
 
