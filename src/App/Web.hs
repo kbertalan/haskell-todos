@@ -6,15 +6,16 @@ module App.Web
   , Scotty
   , Action
   , run
+  , jsonError
   ) where
 
 import Control.Monad.IO.Class    (MonadIO)
 import Data.Aeson                (ToJSON)
 import Data.Text.Lazy            (Text)
 import GHC.Generics              (Generic)
-import Network.HTTP.Types.Status (status500)
+import Network.HTTP.Types.Status (Status)
 import Network.Wai               (Response)
-import Web.Scotty.Trans          (ActionT, ScottyT, defaultHandler, json, scottyT, status)
+import Web.Scotty.Trans          (ActionT, ScottyT, defaultHandler, finish, json, scottyT, status)
 
 newtype Options = Options
   { webPort :: Int
@@ -30,9 +31,12 @@ run opts runner routes = scottyT (webPort opts) runner $ do
 
 errorHandler :: (Monad m) => Scotty m ()
 errorHandler =
-  defaultHandler $ \msg -> do
-    status status500
-    json $ Error msg
+  defaultHandler $ \_ -> do
+    json $ Error "Something went wrong"
+
+jsonError :: (Monad m) => Status -> Text -> Action m a
+jsonError code msg =
+  status code >> json (Error msg) >> finish
 
 newtype Error = Error
   { message :: Text
