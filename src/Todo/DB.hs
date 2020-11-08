@@ -5,16 +5,17 @@ module Todo.DB
   , dbUpdate
   ) where
 
-import           Control.Monad.IO.Class
+import           Control.Monad.IO.Class     (MonadIO)
 import           Data.Functor.Contravariant ((>$<))
-import           Data.Text.Lazy             as L
+import           Data.Text.Lazy             as L (fromStrict, toStrict)
 import           Data.UUID                  (UUID)
-import qualified Hasql.Decoders             as D
-import qualified Hasql.Encoders             as E
-import           Hasql.Statement
+import qualified Hasql.Decoders             as D (Row, bool, column, noResult, nonNullable, rowList, rowMaybe, text,
+                                                  uuid)
+import qualified Hasql.Encoders             as E (bool, noParams, nonNullable, param, text, uuid)
+import           Hasql.Statement            (Statement (..))
 
-import           App.DB                     as DB
-import           Todo.Domain                as Todo
+import           App.DB                     as DB (WithDB, run, statement)
+import           Todo.Domain                as Todo (Todo (..))
 
 dbGetById :: (MonadIO m, WithDB m) => UUID -> m (Maybe Todo)
 dbGetById identifier = DB.run $ statement identifier $

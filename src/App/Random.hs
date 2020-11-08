@@ -4,7 +4,7 @@ module App.Random
   , configure
   ) where
 
-import System.Random
+import System.Random (mkStdGen, newStdGen, setStdGen)
 
 data Seed
   = New

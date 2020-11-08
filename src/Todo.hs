@@ -4,13 +4,14 @@ module Todo
   ( todoApi
   ) where
 
-import App.Monad
 import Control.Monad.Except (ExceptT, runExceptT)
 import Control.Monad.Trans  (lift)
-import Todo.DB
-import Todo.Domain
-import Todo.Logic
-import Todo.Web
+
+import App.Monad            (AppM)
+import Todo.DB              (dbGetById, dbInsert, dbSelectAll, dbUpdate)
+import Todo.Domain          (Logic, create, modify, patch, showAll)
+import Todo.Logic           (Repo, getById, insert, logicCreate, logicPatch, logicUpdate, selectAll, update)
+import Todo.Web             (todoApi)
 
 instance Logic AppM where
   showAll = selectAll

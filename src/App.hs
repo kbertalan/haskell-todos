@@ -2,12 +2,12 @@ module App where
 
 import Prelude    hiding (log)
 
-import App.DB     as DB
-import App.Ekg    as Ekg
-import App.Log    as Log
+import App.DB     as DB (Options, migrate, runWithDB)
+import App.Ekg    as Ekg (Options, runWithEkg)
+import App.Log    as Log (runWithLog)
 import App.Monad  (Env (Env), runAppWith)
-import App.Random as Random
-import App.Web    as Web
+import App.Random as Random (Options, configure)
+import App.Web    as Web (Options, run)
 
 import Health     (healthApi)
 import Todo       (todoApi)
@@ -21,11 +21,11 @@ data Options = Options
 
 run :: App.Options -> IO ()
 run opts =
-  Log.runWithLog $ \log ->
-    Ekg.runWithEkg (ekg opts) $ \ekg ->
-      DB.runWithDB (db opts) $ \db -> do
+  runWithLog $ \log ->
+    runWithEkg (ekg opts) $ \ekg ->
+      runWithDB (db opts) $ \db -> do
         Random.configure $ random opts
-        DB.migrate db >>= \case
+        migrate db >>= \case
           Right _ -> return ()
           Left e -> error $ show e
 

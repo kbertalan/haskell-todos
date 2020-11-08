@@ -4,14 +4,16 @@ module App.Log
   ( runWithLog
   , Log
   , App.Log.WithLog
-  , logInfo
   , logDebug
+  , logInfo
+  , logWarning
   , logError
   , logException
   ) where
 
-import Colog
-import Control.Monad.IO.Class
+import Colog                  (LogAction, Message, WithLog, logDebug, logError, logException, logInfo, logWarning,
+                               richMessageAction)
+import Control.Monad.IO.Class (MonadIO)
 
 type Log m = LogAction m Message
 type WithLog env m = Colog.WithLog env Message m

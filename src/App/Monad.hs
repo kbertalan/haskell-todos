@@ -7,9 +7,9 @@ module App.Monad
   , runAppWith
   ) where
 
-import Colog
-import Control.Monad.Random.Class
-import Control.Monad.Reader
+import Colog                      (HasLog, LogAction, Message, getLogAction, setLogAction)
+import Control.Monad.Random.Class (MonadRandom)
+import Control.Monad.Reader       (MonadIO, MonadReader, ReaderT, asks, runReaderT)
 
 import App.DB                     (DB, WithDB, getDB)
 import App.Ekg                    (Ekg, WithEkg, getEkg)

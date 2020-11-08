@@ -14,13 +14,13 @@ module App.DB
 
 import           Control.Exception          (Exception, bracket, throwIO)
 import           Control.Monad              (forM_)
-import           Control.Monad.IO.Class
-import           Data.ByteString
-import qualified Hasql.Connection           as C
-import qualified Hasql.Migration            as M
-import qualified Hasql.Pool                 as P
-import qualified Hasql.Session              as S
-import qualified Hasql.Transaction.Sessions as T
+import           Control.Monad.IO.Class     (MonadIO, liftIO)
+import           Data.ByteString            (ByteString)
+import qualified Hasql.Connection           as C (settings)
+import qualified Hasql.Migration            as M (MigrationCommand (..), loadMigrationsFromDirectory, runMigration)
+import qualified Hasql.Pool                 as P (Pool, Settings, UsageError, acquire, release, use)
+import qualified Hasql.Session              as S (Session, statement)
+import qualified Hasql.Transaction.Sessions as T (IsolationLevel (Serializable), Mode (Write), transaction)
 
 data Options = Options
   { poolSize    :: !Int

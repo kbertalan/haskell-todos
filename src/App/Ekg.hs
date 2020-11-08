@@ -12,7 +12,7 @@ import Control.Concurrent       (killThread)
 import Control.Exception        (bracket)
 import Data.Text.Encoding       (encodeUtf8)
 import Data.Text.Lazy           (Text, toStrict)
-import System.Remote.Monitoring as EKG
+import System.Remote.Monitoring as EKG (Server, forkServer, serverThreadId)
 
 data Options = Options
   { host :: !Text

@@ -22,7 +22,7 @@ module Todo.Domain
 
 import Data.Aeson     (FromJSON, ToJSON, object, parseJSON, toJSON, withObject, (.:), (.:?), (.=))
 import Data.Monoid    (Last)
-import Data.Text.Lazy
+import Data.Text.Lazy (Text)
 import Data.UUID      (UUID)
 import GHC.Generics   (Generic)
 import Prelude        hiding (id)

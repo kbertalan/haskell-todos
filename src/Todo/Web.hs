@@ -2,9 +2,9 @@ module Todo.Web
   ( todoApi
   ) where
 
-import Control.Monad.Trans
-import Network.HTTP.Types.Status
-import Web.Scotty.Trans          as W
+import Control.Monad.Trans       (MonadIO, lift)
+import Network.HTTP.Types.Status (status201, status400, status404)
+import Web.Scotty.Trans          as W (get, json, jsonData, patch, post, put, raiseStatus, status)
 
 import App.Web
 import Todo.Domain
