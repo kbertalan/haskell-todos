@@ -3,6 +3,7 @@ module Todo.DB
   , dbSelectAll
   , dbInsert
   , dbUpdate
+  , dbDeleteById
   ) where
 
 import           Control.Monad.IO.Class     (MonadIO)
@@ -73,6 +74,18 @@ dbUpdate todo = do
       (Todo.id >$< E.param (E.nonNullable E.uuid))
       <> (toStrict . description >$< E.param (E.nonNullable E.text))
       <> (completed >$< E.param (E.nonNullable E.bool))
+
+dbDeleteById :: (MonadIO m, WithDB m) => UUID -> m ()
+dbDeleteById identifier = do
+  DB.run $ statement identifier $
+    Statement
+      "delete from todo where id = $1"
+      encoder
+      D.noResult
+      True
+  return ()
+  where
+    encoder = E.param (E.nonNullable E.uuid)
 
 row :: D.Row Todo
 row = Todo

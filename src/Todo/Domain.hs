@@ -16,11 +16,13 @@ module Todo.Domain
   , create
   , modify
   , patch
+  , delete
   , ModifyError(..)
   , PatchError (..)
+  , DeleteError (..)
   ) where
 
-import Data.Aeson     (FromJSON, ToJSON, object, parseJSON, toJSON, withObject, (.:), (.:?), (.=))
+import Data.Aeson     (FromJSON, ToJSON, parseJSON, withObject, (.:), (.:?))
 import Data.Monoid    (Last)
 import Data.Text.Lazy (Text)
 import Data.UUID      (UUID)
@@ -37,7 +39,7 @@ data TodoM m = TodoM
   { mId          :: m UUID
   , mDescription :: m Text
   , mCompleted   :: m Bool
-  } deriving (Generic)
+  }
 
 type TodoLast = TodoM Last
 type TodoMaybe = TodoM Maybe
@@ -68,10 +70,6 @@ newtype CreateTodoRequest = CreateTodoRequest
   { ctrDescription :: Text
   } deriving (Show, Generic)
 
-instance ToJSON CreateTodoRequest where
-  toJSON CreateTodoRequest {..} = object
-    [ "description" .= ctrDescription ]
-
 instance FromJSON CreateTodoRequest where
   parseJSON = withObject "CreateTodoRequest" $ \v -> CreateTodoRequest
     <$> v .: "description"
@@ -86,9 +84,14 @@ data PatchError
   | PatchNotExists
   deriving Show
 
+data DeleteError
+  = DeleteNotExists
+  deriving Show
+
 class Logic m where
   showAll :: m [Todo]
   create :: CreateTodoRequest -> m Todo
   modify :: Todo -> m (Either ModifyError Todo)
   patch :: TodoMaybe -> m (Either PatchError Todo)
+  delete :: UUID -> m (Either DeleteError ())
 

@@ -4,9 +4,11 @@ module Todo.Logic
   , insert
   , update
   , getById
+  , delete
   , logicCreate
   , logicUpdate
   , logicPatch
+  , logicDelete
   ) where
 
 import Control.Monad.Except       (MonadError)
@@ -16,14 +18,15 @@ import Data.Monoid                (Last (Last), getLast)
 import Data.UUID                  (UUID)
 
 import App.Error                  (throwIfNothing)
-import Todo.Domain                (CreateTodoRequest (..), ModifyError (..), PatchError (..), Todo (..), TodoM (..),
-                                   TodoMaybe, fromTodo, toTodo)
+import Todo.Domain                (CreateTodoRequest (..), DeleteError (..), ModifyError (..), PatchError (..),
+                                   Todo (..), TodoM (..), TodoMaybe, fromTodo, toTodo)
 
 class Repo m where
   selectAll :: m [Todo]
   insert :: Todo -> m Todo
   update :: Todo -> m Todo
   getById :: UUID -> m (Maybe Todo)
+  delete :: UUID -> m ()
 
 logicCreate :: (Repo m, MonadRandom m) => CreateTodoRequest -> m Todo
 logicCreate req = do
@@ -48,4 +51,9 @@ logicPatch req = do
   let existingLast = fromTodo (Last . Just) existing
   todo <- throwIfNothing MissingFields $ toTodo getLast $ existingLast <> coerce req
   update todo
+
+logicDelete :: (Repo m, MonadError DeleteError m) => UUID -> m ()
+logicDelete identifier = do
+  _existing <- getById identifier >>= throwIfNothing DeleteNotExists
+  delete identifier
 
