@@ -20,14 +20,28 @@ module Todo.Domain
   , ModifyError(..)
   , PatchError (..)
   , DeleteError (..)
+  , repoGetById
+  , repoUpdate
+  , repoSelectAll
+  , repoInsert
+  , repoDelete
+  , logicCreate
+  , logicUpdate
+  , logicPatch
+  , logicDelete
+  , Repo
   ) where
 
-import Data.Aeson     (FromJSON, ToJSON, parseJSON, withObject, (.:), (.:?))
-import Data.Monoid    (Last)
-import Data.Text.Lazy (Text)
-import Data.UUID      (UUID)
-import GHC.Generics   (Generic)
-import Prelude        hiding (id)
+import App.Error            (throwIfNothing)
+import Control.Monad.Except (MonadError)
+import Control.Monad.Random (MonadRandom, getRandom)
+import Data.Aeson           (FromJSON, ToJSON, parseJSON, withObject, (.:), (.:?))
+import Data.Coerce          (coerce)
+import Data.Monoid          (Last (..), getLast)
+import Data.Text.Lazy       (Text)
+import Data.UUID            (UUID)
+import GHC.Generics         (Generic)
+import Prelude              hiding (id)
 
 data Todo = Todo
   { id          :: !UUID
@@ -94,4 +108,40 @@ class Logic m where
   modify :: Todo -> m (Either ModifyError Todo)
   patch :: TodoMaybe -> m (Either PatchError Todo)
   delete :: UUID -> m (Either DeleteError ())
+
+class Repo m where
+  repoSelectAll :: m [Todo]
+  repoInsert :: Todo -> m Todo
+  repoUpdate :: Todo -> m Todo
+  repoGetById :: UUID -> m (Maybe Todo)
+  repoDelete :: UUID -> m ()
+
+logicCreate :: (Repo m, MonadRandom m) => CreateTodoRequest -> m Todo
+logicCreate req = do
+  newId <- getRandom
+  let todo = Todo {
+      Todo.Domain.id = newId
+    , description = ctrDescription req
+    , completed = False
+    }
+  repoInsert todo
+
+logicUpdate :: (Repo m, MonadError ModifyError m) => Todo -> m Todo
+logicUpdate todo =
+  repoGetById (Todo.Domain.id todo)
+    >>= throwIfNothing ModifyNotExists
+    >> repoUpdate todo
+
+logicPatch :: (Repo m, MonadError PatchError m) => TodoMaybe -> m Todo
+logicPatch req = do
+  existingId <- throwIfNothing MissingId $ mId req
+  existing <- repoGetById existingId >>= throwIfNothing PatchNotExists
+  let existingLast = fromTodo (Last . Just) existing
+  todo <- throwIfNothing MissingFields $ toTodo getLast $ existingLast <> coerce req
+  repoUpdate todo
+
+logicDelete :: (Repo m, MonadError DeleteError m) => UUID -> m ()
+logicDelete identifier = do
+  _existing <- repoGetById identifier >>= throwIfNothing DeleteNotExists
+  repoDelete identifier
 
