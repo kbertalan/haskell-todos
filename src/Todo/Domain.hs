@@ -33,7 +33,8 @@ module Todo.Domain
   ) where
 
 import App.Error            (throwIfNothing)
-import Control.Monad.Except (MonadError)
+import Control.Monad        (when)
+import Control.Monad.Except (MonadError, throwError)
 import Control.Monad.Random (MonadRandom, getRandom)
 import Data.Aeson           (FromJSON, ToJSON, parseJSON, withObject, (.:), (.:?))
 import Data.Coerce          (coerce)
@@ -90,12 +91,14 @@ instance FromJSON CreateTodoRequest where
 
 data ModifyError
   = ModifyNotExists
+  | ModifyIdentifierMismatch
   deriving (Show)
 
 data PatchError
   = MissingId
   | MissingFields
   | PatchNotExists
+  | PatchIdentifierMismatch
   deriving Show
 
 data DeleteError
@@ -105,8 +108,8 @@ data DeleteError
 class Logic m where
   showAll :: m [Todo]
   create :: CreateTodoRequest -> m Todo
-  modify :: Todo -> m (Either ModifyError Todo)
-  patch :: TodoMaybe -> m (Either PatchError Todo)
+  modify :: UUID -> Todo -> m (Either ModifyError Todo)
+  patch :: UUID -> TodoMaybe -> m (Either PatchError Todo)
   delete :: UUID -> m (Either DeleteError ())
 
 class Repo m where
@@ -126,15 +129,17 @@ logicCreate req = do
     }
   repoInsert todo
 
-logicUpdate :: (Repo m, MonadError ModifyError m) => Todo -> m Todo
-logicUpdate todo =
+logicUpdate :: (Repo m, MonadError ModifyError m) => UUID -> Todo -> m Todo
+logicUpdate identifier todo = do
+  when (identifier /= Todo.Domain.id todo) $ throwError ModifyIdentifierMismatch
   repoGetById (Todo.Domain.id todo)
     >>= throwIfNothing ModifyNotExists
     >> repoUpdate todo
 
-logicPatch :: (Repo m, MonadError PatchError m) => TodoMaybe -> m Todo
-logicPatch req = do
+logicPatch :: (Repo m, MonadError PatchError m) => UUID -> TodoMaybe -> m Todo
+logicPatch identifier req = do
   existingId <- throwIfNothing MissingId $ mId req
+  when (identifier /= existingId) $ throwError PatchIdentifierMismatch
   existing <- repoGetById existingId >>= throwIfNothing PatchNotExists
   let existingLast = fromTodo (Last . Just) existing
   todo <- throwIfNothing MissingFields $ toTodo getLast $ existingLast <> coerce req

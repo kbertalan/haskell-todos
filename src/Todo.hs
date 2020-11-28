@@ -16,8 +16,8 @@ import Todo.Web             (todoApi)
 instance Logic AppM where
   showAll = repoSelectAll
   create = logicCreate
-  modify = fmap runExceptT logicUpdate
-  patch  = fmap runExceptT logicPatch
+  modify = fmap runExceptT . logicUpdate
+  patch  = fmap runExceptT . logicPatch
   delete = fmap runExceptT logicDelete
 
 instance Repo AppM where
