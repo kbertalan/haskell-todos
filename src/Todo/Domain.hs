@@ -48,7 +48,7 @@ data Todo = Todo
   { id          :: !UUID
   , description :: !Text
   , completed   :: !Bool
-  } deriving (Show, Generic, ToJSON, FromJSON)
+  } deriving (Show, Generic, ToJSON, FromJSON, Eq)
 
 data TodoM m = TodoM
   { mId          :: m UUID
@@ -92,18 +92,18 @@ instance FromJSON CreateTodoRequest where
 data ModifyError
   = ModifyNotExists
   | ModifyIdentifierMismatch
-  deriving (Show)
+  deriving (Show, Eq)
 
 data PatchError
   = MissingId
   | MissingFields
   | PatchNotExists
   | PatchIdentifierMismatch
-  deriving Show
+  deriving (Show, Eq)
 
 data DeleteError
   = DeleteNotExists
-  deriving Show
+  deriving (Show, Eq)
 
 class Logic m where
   showAll :: m [Todo]

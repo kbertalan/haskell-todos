@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 08720273d52d963cf7fbd96f8bc41570ce91728a3c9388232c8429cfb352d902
+-- hash: 01ccf403d0d4cc5e8434300f69c4ec5645a2234416a10daa5198cd9b11e8659d
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -104,6 +104,8 @@ test-suite haskell-todos-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      TestTodoApp
+      TodoSpec
       Paths_haskell_todos
   hs-source-dirs:
       test
@@ -121,7 +123,9 @@ test-suite haskell-todos-test
     , hasql-migration
     , hasql-pool
     , hasql-transaction
+    , hedgehog
     , hspec
+    , hspec-hedgehog
     , http-types
     , mtl
     , random
