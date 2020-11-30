@@ -1,5 +1,3 @@
-{-# LANGUAGE InstanceSigs #-}
-
 module TestTodoApp where
 
 import           Control.Monad.Except        (ExceptT, runExceptT)

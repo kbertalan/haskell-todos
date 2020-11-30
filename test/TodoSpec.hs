@@ -17,12 +17,14 @@ testUUID = fromJust $ fromString "fffd04bd-0ede-42e0-8088-a28c5fba9949"
 
 spec :: Spec
 spec = do
+
   describe "Create" $
     it "should accept simple description" $
       let
         request = CreateTodoRequest "desc"
         expectedTodo = Todo testUUID "desc" False
       in testTodoWithSeed (create request) 0 [] `shouldBe` (expectedTodo, [expectedTodo])
+
 
   describe "Modify" $ do
     let
@@ -40,6 +42,7 @@ spec = do
       in
         testTodoWithSeed (modify testUUID modifiedTodo) 0 [existingTodo] `shouldBe` (Right modifiedTodo, [modifiedTodo])
 
+
   describe "Delete" $ do
     it "should fail on missing todo" $
       testTodoWithSeed (delete testUUID) 0 [] `shouldBe` (Left DeleteNotExists, [])
@@ -49,6 +52,7 @@ spec = do
         existingTodo = Todo testUUID "other" True
       in
         testTodoWithSeed (delete testUUID) 0 [existingTodo] `shouldBe` (Right (), [])
+
 
   describe "Patch" $ do
     let
@@ -63,11 +67,13 @@ spec = do
             (fromJust (fmap fromStrict txt <|> Just (description existingTodo)))
             (fromJust (done <|> Just (completed existingTodo)))
       testTodoWithSeed (patch testUUID patchTodo) 0 [existingTodo] === (Right savedTodo, [savedTodo])
+
     it "should fail on missing id" $
       let
         patchTodo = TodoM Nothing Nothing Nothing
       in
         testTodoWithSeed (patch testUUID patchTodo) 0 [] `shouldBe` (Left MissingId, [])
+
     it "should fail on not matching ids" $
       let
         patchTodo = TodoM (Just nil) Nothing Nothing
