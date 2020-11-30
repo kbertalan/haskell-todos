@@ -22,15 +22,15 @@ data Options = Options
 run :: App.Options -> IO ()
 run opts =
   runWithLog $ \log ->
-    runWithEkg (ekg opts) $ \ekg ->
-      runWithDB (db opts) $ \db -> do
-        Random.configure $ random opts
-        migrate db >>= \case
-          Right _ -> return ()
-          Left e -> error $ show e
+  runWithEkg (ekg opts) $ \ekg ->
+  runWithDB (db opts) $ \db -> do
+    Random.configure $ random opts
+    migrate db >>= \case
+      Right _ -> return ()
+      Left e -> error $ show e
 
-        let env = Env db ekg log
-        Web.run (web opts) (runAppWith env) $ do
-          healthApi
-          todoApi
+    let env = Env db ekg log
+    Web.run (web opts) (runAppWith env) $ do
+      healthApi
+      todoApi
 

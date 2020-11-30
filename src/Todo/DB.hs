@@ -12,77 +12,61 @@ import           Data.Text.Lazy             as L (fromStrict, toStrict)
 import           Data.UUID                  (UUID)
 import qualified Hasql.Decoders             as D (Row, bool, column, noResult, nonNullable, rowList, rowMaybe, text,
                                                   uuid)
-import qualified Hasql.Encoders             as E (bool, noParams, nonNullable, param, text, uuid)
-import           Hasql.Statement            (Statement (..))
+import qualified Hasql.Encoders             as E (Params, bool, noParams, nonNullable, param, text, uuid)
 
-import           App.DB                     as DB (WithDB, run, statement)
+import           App.DB                     as DB (WithDB, execute, statement)
 import           Todo.Domain                as Todo (Todo (..))
 
 dbGetById :: (MonadIO m, WithDB m) => UUID -> m (Maybe Todo)
-dbGetById identifier = DB.run $ statement identifier $
-  Statement
+dbGetById identifier = DB.execute $ statement
     "select id, description, completed from todo where id = $1"
     encoder
     decoder
-    True
+    identifier
   where
     encoder = E.param (E.nonNullable E.uuid)
     decoder = D.rowMaybe row
 
 dbSelectAll:: (MonadIO m, WithDB m) => m [Todo]
 dbSelectAll = do
-  DB.run $ statement () $
-    Statement
+  DB.execute $ statement
       "select id, description, completed from todo order by created_at asc"
       E.noParams
       decoder
-      True
+      ()
     where
       decoder = D.rowList row
 
 dbInsert :: (MonadIO m, WithDB m) => Todo -> m Todo
 dbInsert todo = do
-  DB.run $ statement todo $
-    Statement
+  DB.execute $ statement
       "insert into todo (id, description, completed, created_at, last_updated_at)\
       \ values ($1, $2, $3, now(), now())"
-      encoder
+      todoEncoder
       D.noResult
-      True
+      todo
   return todo
-  where
-    encoder =
-      (Todo.id >$< E.param (E.nonNullable E.uuid))
-      <> (toStrict . description >$< E.param (E.nonNullable E.text))
-      <> (completed >$< E.param (E.nonNullable E.bool))
 
 dbUpdate :: (MonadIO m, WithDB m) => Todo -> m Todo
 dbUpdate todo = do
-  DB.run $ statement todo $
-    Statement
+  DB.execute $ statement
       "update todo set\
       \ description = $2,\
       \ completed = $3,\
       \ last_updated_at = now()\
       \ where id = $1"
-      encoder
+      todoEncoder
       D.noResult
-      True
+      todo
   return todo
-  where
-    encoder =
-      (Todo.id >$< E.param (E.nonNullable E.uuid))
-      <> (toStrict . description >$< E.param (E.nonNullable E.text))
-      <> (completed >$< E.param (E.nonNullable E.bool))
 
 dbDeleteById :: (MonadIO m, WithDB m) => UUID -> m ()
 dbDeleteById identifier = do
-  DB.run $ statement identifier $
-    Statement
+  DB.execute $ statement
       "delete from todo where id = $1"
       encoder
       D.noResult
-      True
+      identifier
   return ()
   where
     encoder = E.param (E.nonNullable E.uuid)
@@ -93,3 +77,8 @@ row = Todo
   <*> fmap fromStrict (D.column (D.nonNullable D.text))
   <*> D.column (D.nonNullable D.bool)
 
+todoEncoder :: E.Params Todo
+todoEncoder =
+  (Todo.id >$< E.param (E.nonNullable E.uuid))
+  <> (toStrict . description >$< E.param (E.nonNullable E.text))
+  <> (completed >$< E.param (E.nonNullable E.bool))
