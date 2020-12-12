@@ -30,7 +30,7 @@ dbGetById identifier = DB.execute $ statement
 dbSelectAll:: (MonadIO m, WithDB m) => m [Todo]
 dbSelectAll = do
   DB.execute $ statement
-      "select id, description, completed from todo order by created_at asc"
+      "select id, description, completed from todo order by last_updated_at desc limit 20"
       E.noParams
       decoder
       ()

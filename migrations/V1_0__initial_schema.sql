@@ -8,6 +8,8 @@ create table if not exists todo (
   last_updated_at timestamptz not null
 );
 
+create index if not exists todo_last_updated_at_idx on todo (last_updated_at desc);
+
 insert into todo values
   (uuid_generate_v4(), 'First', false, now(), now()),
   (uuid_generate_v4(), 'Second', false, now(), now())

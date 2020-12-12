@@ -1,0 +1,485 @@
+2020-12-12 20:35:01,868 INFO o.a.j.u.JMeterUtils: Setting Locale to en_EN
+2020-12-12 20:35:01,902 INFO o.a.j.JMeter: Loading user properties from: /opt/jmeter/bin/user.properties
+2020-12-12 20:35:01,903 INFO o.a.j.JMeter: Loading system properties from: /opt/jmeter/bin/system.properties
+2020-12-12 20:35:01,913 INFO o.a.j.JMeter: Copyright (c) 1998-2020 The Apache Software Foundation
+2020-12-12 20:35:01,914 INFO o.a.j.JMeter: Version 5.4
+2020-12-12 20:35:01,914 INFO o.a.j.JMeter: java.version=15.0.1
+2020-12-12 20:35:01,914 INFO o.a.j.JMeter: java.vm.name=OpenJDK 64-Bit Server VM
+2020-12-12 20:35:01,914 INFO o.a.j.JMeter: os.name=Linux
+2020-12-12 20:35:01,914 INFO o.a.j.JMeter: os.arch=amd64
+2020-12-12 20:35:01,914 INFO o.a.j.JMeter: os.version=5.9.13-arch1-1
+2020-12-12 20:35:01,914 INFO o.a.j.JMeter: file.encoding=UTF-8
+2020-12-12 20:35:01,915 INFO o.a.j.JMeter: java.awt.headless=null
+2020-12-12 20:35:01,915 INFO o.a.j.JMeter: Max memory     =1073741824
+2020-12-12 20:35:01,915 INFO o.a.j.JMeter: Available Processors =6
+2020-12-12 20:35:01,931 INFO o.a.j.JMeter: Default Locale=English (EN)
+2020-12-12 20:35:01,931 INFO o.a.j.JMeter: JMeter  Locale=English (EN)
+2020-12-12 20:35:01,931 INFO o.a.j.JMeter: JMeterHome=/opt/jmeter
+2020-12-12 20:35:01,932 INFO o.a.j.JMeter: user.dir  =/home/kbertalan/projects/own/haskell-todos
+2020-12-12 20:35:01,932 INFO o.a.j.JMeter: PWD       =/home/kbertalan/projects/own/haskell-todos
+2020-12-12 20:35:01,932 INFO o.a.j.JMeter: IP: 127.0.1.1 Name: kb-lenovo FullName: kb-lenovo.localdomain
+2020-12-12 20:35:02,179 INFO o.a.j.JMeter: Setting LAF to: com.github.weisj.darklaf.DarkLaf:com.github.weisj.darklaf.theme.DarculaTheme
+2020-12-12 20:35:02,552 INFO o.a.j.JMeter: Loaded icon properties from org/apache/jmeter/images/icon.properties
+2020-12-12 20:35:26,021 INFO o.a.j.s.FileServer: Default base='/home/kbertalan/projects/own/haskell-todos'
+2020-12-12 20:35:26,027 INFO o.a.j.g.a.Load: Loading file: /home/kbertalan/projects/own/todos-backend.jmx
+2020-12-12 20:35:26,028 INFO o.a.j.s.FileServer: Set new base='/home/kbertalan/projects/own'
+2020-12-12 20:35:26,245 INFO o.a.j.s.SaveService: Testplan (JMX) version: 2.2. Testlog (JTL) version: 2.2
+2020-12-12 20:35:26,272 INFO o.a.j.s.SaveService: Using SaveService properties version 5.0
+2020-12-12 20:35:26,275 INFO o.a.j.s.SaveService: Using SaveService properties file encoding UTF-8
+2020-12-12 20:35:26,277 INFO o.a.j.s.SaveService: Loading file: /home/kbertalan/projects/own/todos-backend.jmx
+2020-12-12 20:35:26,309 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/html is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2020-12-12 20:35:26,309 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xhtml+xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2020-12-12 20:35:26,309 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for application/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2020-12-12 20:35:26,309 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/xml is org.apache.jmeter.protocol.http.parser.LagartoBasedHtmlParser
+2020-12-12 20:35:26,310 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/vnd.wap.wml is org.apache.jmeter.protocol.http.parser.RegexpHTMLParser
+2020-12-12 20:35:26,310 INFO o.a.j.p.h.s.HTTPSamplerBase: Parser for text/css is org.apache.jmeter.protocol.http.parser.CssParser
+2020-12-12 20:35:26,614 WARN o.a.j.g.a.Load: Unexpected error. java.lang.NullPointerException
+java.lang.NullPointerException: null
+	at java.util.ArrayDeque.addLast(ArrayDeque.java:303) ~[?:?]
+	at java.util.ArrayDeque.add(ArrayDeque.java:494) ~[?:?]
+	at org.apache.jmeter.gui.action.LoadRecentProject.updateRecentFileMenuItems(LoadRecentProject.java:125) ~[ApacheJMeter_core.jar:5.4]
+	at org.apache.jmeter.gui.util.JMeterMenuBar.setProjectFileLoaded(JMeterMenuBar.java:144) ~[ApacheJMeter_core.jar:5.4]
+	at org.apache.jmeter.gui.MainFrame.setProjectFileLoaded(MainFrame.java:330) ~[ApacheJMeter_core.jar:5.4]
+	at org.apache.jmeter.gui.GuiPackage.setTestPlanFile(GuiPackage.java:732) ~[ApacheJMeter_core.jar:5.4]
+	at org.apache.jmeter.gui.action.Load.loadProjectFile(Load.java:136) ~[ApacheJMeter_core.jar:5.4]
+	at org.apache.jmeter.gui.action.Load.loadProjectFile(Load.java:101) ~[ApacheJMeter_core.jar:5.4]
+	at org.apache.jmeter.gui.action.Load.doActionAfterCheck(Load.java:88) ~[ApacheJMeter_core.jar:5.4]
+	at org.apache.jmeter.gui.action.AbstractActionWithNoRunningTest.doAction(AbstractActionWithNoRunningTest.java:44) ~[ApacheJMeter_core.jar:5.4]
+	at org.apache.jmeter.gui.action.ActionRouter.performAction(ActionRouter.java:87) ~[ApacheJMeter_core.jar:5.4]
+	at org.apache.jmeter.gui.action.ActionRouter.lambda$actionPerformed$0(ActionRouter.java:69) ~[ApacheJMeter_core.jar:5.4]
+	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:316) ~[?:?]
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:770) ~[?:?]
+	at java.awt.EventQueue$4.run(EventQueue.java:721) ~[?:?]
+	at java.awt.EventQueue$4.run(EventQueue.java:715) ~[?:?]
+	at java.security.AccessController.doPrivileged(AccessController.java:391) [?:?]
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:85) [?:?]
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:740) [?:?]
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203) [?:?]
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124) [?:?]
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113) [?:?]
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109) [?:?]
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101) [?:?]
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:90) [?:?]
+2020-12-12 20:35:26,626 ERROR o.a.j.u.JMeterUtils: Unexpected error - see log for details
+2020-12-12 20:35:51,746 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2020-12-12 20:35:51,747 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2020-12-12 20:35:51,748 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2020-12-12 20:35:51,749 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must contain the string: '.functions.'
+2020-12-12 20:35:51,749 INFO o.a.j.e.u.CompoundVariable: Note: Function class names must not contain the string: '.gui.'
+2020-12-12 20:35:51,785 INFO o.a.j.g.u.JMeterMenuBar: setRunning(true, *local*)
+2020-12-12 20:35:51,804 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : User
+2020-12-12 20:35:51,805 INFO o.a.j.e.StandardJMeterEngine: Starting 10 threads for group User.
+2020-12-12 20:35:51,805 INFO o.a.j.e.StandardJMeterEngine: Thread will start next loop on error
+2020-12-12 20:35:51,805 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=10 ramp-up=1 delayedStart=false
+2020-12-12 20:35:51,813 INFO o.a.j.t.JMeterThread: Thread started: User 1-1
+2020-12-12 20:35:51,826 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2020-12-12 20:35:51,828 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2020-12-12 20:35:51,837 INFO o.a.j.p.h.s.HTTPHCAbstractImpl: Local host = kb-lenovo
+2020-12-12 20:35:51,847 INFO o.a.j.p.h.s.HTTPHC4Impl: HTTP request retry count = 0
+2020-12-12 20:35:51,849 INFO o.a.j.s.SampleResult: Note: Sample TimeStamps are START times
+2020-12-12 20:35:51,850 INFO o.a.j.s.SampleResult: sampleresult.default.encoding is set to ISO-8859-1
+2020-12-12 20:35:51,850 INFO o.a.j.s.SampleResult: sampleresult.useNanoTime=true
+2020-12-12 20:35:51,850 INFO o.a.j.s.SampleResult: sampleresult.nanoThreadSleep=5000
+2020-12-12 20:35:51,908 INFO o.a.j.t.JMeterThread: Thread started: User 1-2
+2020-12-12 20:35:52,007 INFO o.a.j.t.JMeterThread: Thread started: User 1-3
+2020-12-12 20:35:52,107 INFO o.a.j.t.JMeterThread: Thread started: User 1-4
+2020-12-12 20:35:52,208 INFO o.a.j.t.JMeterThread: Thread started: User 1-5
+2020-12-12 20:35:52,310 INFO o.a.j.t.JMeterThread: Thread started: User 1-6
+2020-12-12 20:35:52,407 INFO o.a.j.t.JMeterThread: Thread started: User 1-7
+2020-12-12 20:35:52,508 INFO o.a.j.t.JMeterThread: Thread started: User 1-8
+2020-12-12 20:35:52,607 INFO o.a.j.t.JMeterThread: Thread started: User 1-9
+2020-12-12 20:35:52,707 INFO o.a.j.t.JMeterThread: Thread started: User 1-10
+2020-12-12 20:36:51,813 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-1
+2020-12-12 20:36:51,813 INFO o.a.j.t.JMeterThread: Thread finished: User 1-1
+2020-12-12 20:36:51,819 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-5
+2020-12-12 20:36:51,819 INFO o.a.j.t.JMeterThread: Thread finished: User 1-5
+2020-12-12 20:36:51,823 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-2
+2020-12-12 20:36:51,823 INFO o.a.j.t.JMeterThread: Thread finished: User 1-2
+2020-12-12 20:36:51,824 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-6
+2020-12-12 20:36:51,824 INFO o.a.j.t.JMeterThread: Thread finished: User 1-6
+2020-12-12 20:36:51,826 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-3
+2020-12-12 20:36:51,826 INFO o.a.j.t.JMeterThread: Thread finished: User 1-3
+2020-12-12 20:36:51,827 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-8
+2020-12-12 20:36:51,828 INFO o.a.j.t.JMeterThread: Thread finished: User 1-8
+2020-12-12 20:36:51,828 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-4
+2020-12-12 20:36:51,828 INFO o.a.j.t.JMeterThread: Thread finished: User 1-4
+2020-12-12 20:36:51,833 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-10
+2020-12-12 20:36:51,833 INFO o.a.j.t.JMeterThread: Thread finished: User 1-10
+2020-12-12 20:36:51,834 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-7
+2020-12-12 20:36:51,834 INFO o.a.j.t.JMeterThread: Thread finished: User 1-7
+2020-12-12 20:36:51,835 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-9
+2020-12-12 20:36:51,835 INFO o.a.j.t.JMeterThread: Thread finished: User 1-9
+2020-12-12 20:36:51,835 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2020-12-12 20:36:51,836 INFO o.a.j.g.u.JMeterMenuBar: setRunning(false, *local*)
+2020-12-12 20:37:09,315 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2020-12-12 20:37:09,316 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2020-12-12 20:37:09,319 INFO o.a.j.g.u.JMeterMenuBar: setRunning(true, *local*)
+2020-12-12 20:37:09,327 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : User
+2020-12-12 20:37:09,328 INFO o.a.j.e.StandardJMeterEngine: Starting 10 threads for group User.
+2020-12-12 20:37:09,328 INFO o.a.j.e.StandardJMeterEngine: Thread will start next loop on error
+2020-12-12 20:37:09,328 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=10 ramp-up=1 delayedStart=false
+2020-12-12 20:37:09,330 INFO o.a.j.t.JMeterThread: Thread started: User 1-1
+2020-12-12 20:37:09,342 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2020-12-12 20:37:09,343 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2020-12-12 20:37:09,430 INFO o.a.j.t.JMeterThread: Thread started: User 1-2
+2020-12-12 20:37:09,533 INFO o.a.j.t.JMeterThread: Thread started: User 1-3
+2020-12-12 20:37:09,631 INFO o.a.j.t.JMeterThread: Thread started: User 1-4
+2020-12-12 20:37:09,730 INFO o.a.j.t.JMeterThread: Thread started: User 1-5
+2020-12-12 20:37:09,830 INFO o.a.j.t.JMeterThread: Thread started: User 1-6
+2020-12-12 20:37:09,932 INFO o.a.j.t.JMeterThread: Thread started: User 1-7
+2020-12-12 20:37:10,029 INFO o.a.j.t.JMeterThread: Thread started: User 1-8
+2020-12-12 20:37:10,134 INFO o.a.j.t.JMeterThread: Thread started: User 1-9
+2020-12-12 20:37:10,235 INFO o.a.j.t.JMeterThread: Thread started: User 1-10
+2020-12-12 20:38:09,330 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-3
+2020-12-12 20:38:09,330 INFO o.a.j.t.JMeterThread: Thread finished: User 1-3
+2020-12-12 20:38:09,333 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-4
+2020-12-12 20:38:09,333 INFO o.a.j.t.JMeterThread: Thread finished: User 1-4
+2020-12-12 20:38:09,338 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-1
+2020-12-12 20:38:09,339 INFO o.a.j.t.JMeterThread: Thread finished: User 1-1
+2020-12-12 20:38:09,343 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-2
+2020-12-12 20:38:09,343 INFO o.a.j.t.JMeterThread: Thread finished: User 1-2
+2020-12-12 20:38:09,349 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-7
+2020-12-12 20:38:09,349 INFO o.a.j.t.JMeterThread: Thread finished: User 1-7
+2020-12-12 20:38:09,350 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-10
+2020-12-12 20:38:09,351 INFO o.a.j.t.JMeterThread: Thread finished: User 1-10
+2020-12-12 20:38:09,351 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-5
+2020-12-12 20:38:09,351 INFO o.a.j.t.JMeterThread: Thread finished: User 1-5
+2020-12-12 20:38:09,354 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-8
+2020-12-12 20:38:09,354 INFO o.a.j.t.JMeterThread: Thread finished: User 1-8
+2020-12-12 20:38:09,356 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-6
+2020-12-12 20:38:09,356 INFO o.a.j.t.JMeterThread: Thread finished: User 1-6
+2020-12-12 20:38:09,361 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-9
+2020-12-12 20:38:09,361 INFO o.a.j.t.JMeterThread: Thread finished: User 1-9
+2020-12-12 20:38:09,362 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2020-12-12 20:38:09,362 INFO o.a.j.g.u.JMeterMenuBar: setRunning(false, *local*)
+2020-12-12 20:52:57,476 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2020-12-12 20:52:57,476 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2020-12-12 20:52:57,478 INFO o.a.j.g.u.JMeterMenuBar: setRunning(true, *local*)
+2020-12-12 20:52:57,479 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : User
+2020-12-12 20:52:57,480 INFO o.a.j.e.StandardJMeterEngine: Starting 10 threads for group User.
+2020-12-12 20:52:57,480 INFO o.a.j.e.StandardJMeterEngine: Thread will start next loop on error
+2020-12-12 20:52:57,480 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=10 ramp-up=1 delayedStart=false
+2020-12-12 20:52:57,482 INFO o.a.j.t.JMeterThread: Thread started: User 1-1
+2020-12-12 20:52:57,490 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2020-12-12 20:52:57,491 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2020-12-12 20:52:57,581 INFO o.a.j.t.JMeterThread: Thread started: User 1-2
+2020-12-12 20:52:57,687 INFO o.a.j.t.JMeterThread: Thread started: User 1-3
+2020-12-12 20:52:57,781 INFO o.a.j.t.JMeterThread: Thread started: User 1-4
+2020-12-12 20:52:57,881 INFO o.a.j.t.JMeterThread: Thread started: User 1-5
+2020-12-12 20:52:57,981 INFO o.a.j.t.JMeterThread: Thread started: User 1-6
+2020-12-12 20:52:58,081 INFO o.a.j.t.JMeterThread: Thread started: User 1-7
+2020-12-12 20:52:58,181 INFO o.a.j.t.JMeterThread: Thread started: User 1-8
+2020-12-12 20:52:58,280 INFO o.a.j.t.JMeterThread: Thread started: User 1-9
+2020-12-12 20:52:58,381 INFO o.a.j.t.JMeterThread: Thread started: User 1-10
+2020-12-12 20:53:57,481 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-1
+2020-12-12 20:53:57,481 INFO o.a.j.t.JMeterThread: Thread finished: User 1-1
+2020-12-12 20:53:57,486 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-2
+2020-12-12 20:53:57,487 INFO o.a.j.t.JMeterThread: Thread finished: User 1-2
+2020-12-12 20:53:57,487 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-3
+2020-12-12 20:53:57,487 INFO o.a.j.t.JMeterThread: Thread finished: User 1-3
+2020-12-12 20:53:57,489 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-5
+2020-12-12 20:53:57,489 INFO o.a.j.t.JMeterThread: Thread finished: User 1-5
+2020-12-12 20:53:57,489 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-6
+2020-12-12 20:53:57,489 INFO o.a.j.t.JMeterThread: Thread finished: User 1-6
+2020-12-12 20:53:57,490 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-10
+2020-12-12 20:53:57,490 INFO o.a.j.t.JMeterThread: Thread finished: User 1-10
+2020-12-12 20:53:57,491 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-7
+2020-12-12 20:53:57,491 INFO o.a.j.t.JMeterThread: Thread finished: User 1-7
+2020-12-12 20:53:57,492 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-9
+2020-12-12 20:53:57,493 INFO o.a.j.t.JMeterThread: Thread finished: User 1-9
+2020-12-12 20:53:57,495 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-4
+2020-12-12 20:53:57,495 INFO o.a.j.t.JMeterThread: Thread finished: User 1-4
+2020-12-12 20:53:57,500 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-8
+2020-12-12 20:53:57,500 INFO o.a.j.t.JMeterThread: Thread finished: User 1-8
+2020-12-12 20:53:57,500 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2020-12-12 20:53:57,500 INFO o.a.j.g.u.JMeterMenuBar: setRunning(false, *local*)
+2020-12-12 20:55:18,082 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2020-12-12 20:55:18,083 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2020-12-12 20:55:18,084 INFO o.a.j.g.u.JMeterMenuBar: setRunning(true, *local*)
+2020-12-12 20:55:18,153 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : User
+2020-12-12 20:55:18,153 INFO o.a.j.e.StandardJMeterEngine: Starting 10 threads for group User.
+2020-12-12 20:55:18,153 INFO o.a.j.e.StandardJMeterEngine: Thread will start next loop on error
+2020-12-12 20:55:18,154 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=10 ramp-up=1 delayedStart=false
+2020-12-12 20:55:18,155 INFO o.a.j.t.JMeterThread: Thread started: User 1-1
+2020-12-12 20:55:18,162 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2020-12-12 20:55:18,163 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2020-12-12 20:55:18,255 INFO o.a.j.t.JMeterThread: Thread started: User 1-2
+2020-12-12 20:55:18,356 INFO o.a.j.t.JMeterThread: Thread started: User 1-3
+2020-12-12 20:55:18,456 INFO o.a.j.t.JMeterThread: Thread started: User 1-4
+2020-12-12 20:55:18,560 INFO o.a.j.t.JMeterThread: Thread started: User 1-5
+2020-12-12 20:55:18,655 INFO o.a.j.t.JMeterThread: Thread started: User 1-6
+2020-12-12 20:55:18,754 INFO o.a.j.t.JMeterThread: Thread started: User 1-7
+2020-12-12 20:55:18,856 INFO o.a.j.t.JMeterThread: Thread started: User 1-8
+2020-12-12 20:55:18,956 INFO o.a.j.t.JMeterThread: Thread started: User 1-9
+2020-12-12 20:55:19,058 INFO o.a.j.t.JMeterThread: Thread started: User 1-10
+2020-12-12 20:56:18,156 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-2
+2020-12-12 20:56:18,156 INFO o.a.j.t.JMeterThread: Thread finished: User 1-2
+2020-12-12 20:56:18,156 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-1
+2020-12-12 20:56:18,157 INFO o.a.j.t.JMeterThread: Thread finished: User 1-1
+2020-12-12 20:56:18,160 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-5
+2020-12-12 20:56:18,161 INFO o.a.j.t.JMeterThread: Thread finished: User 1-5
+2020-12-12 20:56:18,161 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-4
+2020-12-12 20:56:18,161 INFO o.a.j.t.JMeterThread: Thread finished: User 1-4
+2020-12-12 20:56:18,162 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-9
+2020-12-12 20:56:18,163 INFO o.a.j.t.JMeterThread: Thread finished: User 1-9
+2020-12-12 20:56:18,165 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-6
+2020-12-12 20:56:18,165 INFO o.a.j.t.JMeterThread: Thread finished: User 1-6
+2020-12-12 20:56:18,165 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-8
+2020-12-12 20:56:18,165 INFO o.a.j.t.JMeterThread: Thread finished: User 1-8
+2020-12-12 20:56:18,165 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-7
+2020-12-12 20:56:18,165 INFO o.a.j.t.JMeterThread: Thread finished: User 1-7
+2020-12-12 20:56:18,167 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-10
+2020-12-12 20:56:18,167 INFO o.a.j.t.JMeterThread: Thread finished: User 1-10
+2020-12-12 20:56:18,168 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-3
+2020-12-12 20:56:18,168 INFO o.a.j.t.JMeterThread: Thread finished: User 1-3
+2020-12-12 20:56:18,168 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2020-12-12 20:56:18,168 INFO o.a.j.g.u.JMeterMenuBar: setRunning(false, *local*)
+2020-12-12 20:58:04,674 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2020-12-12 20:58:04,675 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2020-12-12 20:58:04,676 INFO o.a.j.g.u.JMeterMenuBar: setRunning(true, *local*)
+2020-12-12 20:58:04,678 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : User
+2020-12-12 20:58:04,679 INFO o.a.j.e.StandardJMeterEngine: Starting 10 threads for group User.
+2020-12-12 20:58:04,679 INFO o.a.j.e.StandardJMeterEngine: Thread will start next loop on error
+2020-12-12 20:58:04,679 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=10 ramp-up=1 delayedStart=false
+2020-12-12 20:58:04,681 INFO o.a.j.t.JMeterThread: Thread started: User 1-1
+2020-12-12 20:58:04,702 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2020-12-12 20:58:04,703 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2020-12-12 20:58:04,781 INFO o.a.j.t.JMeterThread: Thread started: User 1-2
+2020-12-12 20:58:04,887 INFO o.a.j.t.JMeterThread: Thread started: User 1-3
+2020-12-12 20:58:04,986 INFO o.a.j.t.JMeterThread: Thread started: User 1-4
+2020-12-12 20:58:05,080 INFO o.a.j.t.JMeterThread: Thread started: User 1-5
+2020-12-12 20:58:05,180 INFO o.a.j.t.JMeterThread: Thread started: User 1-6
+2020-12-12 20:58:05,289 INFO o.a.j.t.JMeterThread: Thread started: User 1-7
+2020-12-12 20:58:05,381 INFO o.a.j.t.JMeterThread: Thread started: User 1-8
+2020-12-12 20:58:05,481 INFO o.a.j.t.JMeterThread: Thread started: User 1-9
+2020-12-12 20:58:05,582 INFO o.a.j.t.JMeterThread: Thread started: User 1-10
+2020-12-12 20:59:04,680 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-1
+2020-12-12 20:59:04,680 INFO o.a.j.t.JMeterThread: Thread finished: User 1-1
+2020-12-12 20:59:04,686 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-2
+2020-12-12 20:59:04,686 INFO o.a.j.t.JMeterThread: Thread finished: User 1-2
+2020-12-12 20:59:04,689 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-4
+2020-12-12 20:59:04,689 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-3
+2020-12-12 20:59:04,689 INFO o.a.j.t.JMeterThread: Thread finished: User 1-4
+2020-12-12 20:59:04,689 INFO o.a.j.t.JMeterThread: Thread finished: User 1-3
+2020-12-12 20:59:04,691 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-7
+2020-12-12 20:59:04,691 INFO o.a.j.t.JMeterThread: Thread finished: User 1-7
+2020-12-12 20:59:04,694 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-5
+2020-12-12 20:59:04,694 INFO o.a.j.t.JMeterThread: Thread finished: User 1-5
+2020-12-12 20:59:04,697 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-6
+2020-12-12 20:59:04,697 INFO o.a.j.t.JMeterThread: Thread finished: User 1-6
+2020-12-12 20:59:04,701 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-9
+2020-12-12 20:59:04,701 INFO o.a.j.t.JMeterThread: Thread finished: User 1-9
+2020-12-12 20:59:04,703 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-8
+2020-12-12 20:59:04,703 INFO o.a.j.t.JMeterThread: Thread finished: User 1-8
+2020-12-12 20:59:04,703 INFO o.a.j.t.JMeterThread: Stopping because end time detected by thread: User 1-10
+2020-12-12 20:59:04,703 INFO o.a.j.t.JMeterThread: Thread finished: User 1-10
+2020-12-12 20:59:04,704 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2020-12-12 20:59:04,704 INFO o.a.j.g.u.JMeterMenuBar: setRunning(false, *local*)
+2020-12-12 21:06:48,461 ERROR o.a.j.g.a.Save: Could not backup file! Backup directory does not exist, is not a directory or could not be created ! </opt/jmeter/backups>
+2020-12-12 21:06:48,469 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2020-12-12 21:06:48,470 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2020-12-12 21:06:48,471 INFO o.a.j.g.u.JMeterMenuBar: setRunning(true, *local*)
+2020-12-12 21:06:48,473 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : User
+2020-12-12 21:06:48,473 INFO o.a.j.e.StandardJMeterEngine: Starting 10 threads for group User.
+2020-12-12 21:06:48,477 INFO o.a.j.e.StandardJMeterEngine: Thread will start next loop on error
+2020-12-12 21:06:48,477 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=10 ramp-up=1 delayedStart=false
+2020-12-12 21:06:48,479 INFO o.a.j.t.JMeterThread: Thread started: User 1-1
+2020-12-12 21:06:48,491 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2020-12-12 21:06:48,492 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2020-12-12 21:06:48,580 INFO o.a.j.t.JMeterThread: Thread started: User 1-2
+2020-12-12 21:06:48,680 INFO o.a.j.t.JMeterThread: Thread started: User 1-3
+2020-12-12 21:06:48,777 INFO o.a.j.t.JMeterThread: Thread started: User 1-4
+2020-12-12 21:06:48,878 INFO o.a.j.t.JMeterThread: Thread started: User 1-5
+2020-12-12 21:06:48,981 INFO o.a.j.t.JMeterThread: Thread started: User 1-6
+2020-12-12 21:06:49,085 INFO o.a.j.t.JMeterThread: Thread started: User 1-7
+2020-12-12 21:06:49,179 INFO o.a.j.t.JMeterThread: Thread started: User 1-8
+2020-12-12 21:06:49,278 INFO o.a.j.t.JMeterThread: Thread started: User 1-9
+2020-12-12 21:06:49,379 INFO o.a.j.t.JMeterThread: Thread started: User 1-10
+2020-12-12 21:12:25,587 INFO o.a.j.g.a.Start: Stopping test
+2020-12-12 21:12:25,592 INFO o.a.j.t.JMeterThread: Stopping: User 1-2
+2020-12-12 21:12:25,592 WARN o.a.j.t.JMeterThread: Interrupting: User 1-2 sampler: Get todos
+2020-12-12 21:12:25,593 INFO o.a.j.t.JMeterThread: Stopping: User 1-6
+2020-12-12 21:12:25,593 WARN o.a.j.t.JMeterThread: Interrupting: User 1-6 sampler: Add todo
+2020-12-12 21:12:25,593 INFO o.a.j.t.JMeterThread: Stopping: User 1-10
+2020-12-12 21:12:25,593 WARN o.a.j.t.JMeterThread: Interrupting: User 1-10 sampler: Get todos
+2020-12-12 21:12:25,593 INFO o.a.j.t.JMeterThread: Stopping: User 1-3
+2020-12-12 21:12:25,593 WARN o.a.j.t.JMeterThread: Interrupting: User 1-3 sampler: Get todos
+2020-12-12 21:12:25,593 INFO o.a.j.t.JMeterThread: Stopping: User 1-5
+2020-12-12 21:12:25,593 WARN o.a.j.t.JMeterThread: Interrupting: User 1-5 sampler: Add todo
+2020-12-12 21:12:25,593 INFO o.a.j.t.JMeterThread: Stopping: User 1-1
+2020-12-12 21:12:25,593 WARN o.a.j.t.JMeterThread: Interrupting: User 1-1 sampler: Get todos
+2020-12-12 21:12:25,593 INFO o.a.j.t.JMeterThread: Stopping: User 1-7
+2020-12-12 21:12:25,593 WARN o.a.j.t.JMeterThread: Interrupting: User 1-7 sampler: Get todos
+2020-12-12 21:12:25,593 INFO o.a.j.t.JMeterThread: Stopping: User 1-4
+2020-12-12 21:12:25,593 WARN o.a.j.t.JMeterThread: Interrupting: User 1-4 sampler: Get todos
+2020-12-12 21:12:25,594 INFO o.a.j.t.JMeterThread: Stopping: User 1-8
+2020-12-12 21:12:25,594 WARN o.a.j.t.JMeterThread: Interrupting: User 1-8 sampler: Get todos
+2020-12-12 21:12:25,594 INFO o.a.j.t.JMeterThread: Stopping: User 1-9
+2020-12-12 21:12:25,594 WARN o.a.j.t.JMeterThread: Interrupting: User 1-9 sampler: Get todos
+2020-12-12 21:12:25,595 INFO o.a.j.t.JMeterThread: Thread finished: User 1-9
+2020-12-12 21:12:25,595 INFO o.a.j.t.JMeterThread: Thread finished: User 1-7
+2020-12-12 21:12:25,596 INFO o.a.j.t.JMeterThread: Thread finished: User 1-10
+2020-12-12 21:12:25,596 INFO o.a.j.t.JMeterThread: Thread finished: User 1-3
+2020-12-12 21:12:25,597 INFO o.a.j.t.JMeterThread: Thread finished: User 1-8
+2020-12-12 21:12:25,598 INFO o.a.j.t.JMeterThread: Thread finished: User 1-5
+2020-12-12 21:12:25,598 INFO o.a.j.t.JMeterThread: Thread finished: User 1-2
+2020-12-12 21:12:25,599 INFO o.a.j.t.JMeterThread: Thread finished: User 1-4
+2020-12-12 21:12:25,599 INFO o.a.j.t.JMeterThread: Thread finished: User 1-6
+2020-12-12 21:12:25,600 INFO o.a.j.t.JMeterThread: Thread finished: User 1-1
+2020-12-12 21:12:25,602 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2020-12-12 21:12:25,602 INFO o.a.j.g.u.JMeterMenuBar: setRunning(false, *local*)
+2020-12-12 21:13:52,274 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2020-12-12 21:13:52,275 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2020-12-12 21:13:52,277 INFO o.a.j.g.u.JMeterMenuBar: setRunning(true, *local*)
+2020-12-12 21:13:52,340 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : User
+2020-12-12 21:13:52,341 INFO o.a.j.e.StandardJMeterEngine: Starting 10 threads for group User.
+2020-12-12 21:13:52,341 INFO o.a.j.e.StandardJMeterEngine: Thread will start next loop on error
+2020-12-12 21:13:52,341 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=10 ramp-up=1 delayedStart=false
+2020-12-12 21:13:52,342 INFO o.a.j.t.JMeterThread: Thread started: User 1-1
+2020-12-12 21:13:52,350 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2020-12-12 21:13:52,351 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2020-12-12 21:13:52,445 INFO o.a.j.t.JMeterThread: Thread started: User 1-2
+2020-12-12 21:13:52,542 INFO o.a.j.t.JMeterThread: Thread started: User 1-3
+2020-12-12 21:13:52,642 INFO o.a.j.t.JMeterThread: Thread started: User 1-4
+2020-12-12 21:13:52,742 INFO o.a.j.t.JMeterThread: Thread started: User 1-5
+2020-12-12 21:13:52,843 INFO o.a.j.t.JMeterThread: Thread started: User 1-6
+2020-12-12 21:13:52,944 INFO o.a.j.t.JMeterThread: Thread started: User 1-7
+2020-12-12 21:13:53,043 INFO o.a.j.t.JMeterThread: Thread started: User 1-8
+2020-12-12 21:13:53,142 INFO o.a.j.t.JMeterThread: Thread started: User 1-9
+2020-12-12 21:13:53,242 INFO o.a.j.t.JMeterThread: Thread started: User 1-10
+2020-12-12 21:19:25,586 INFO o.a.j.g.a.Start: Stopping test
+2020-12-12 21:19:25,589 INFO o.a.j.t.JMeterThread: Stopping: User 1-6
+2020-12-12 21:19:25,589 WARN o.a.j.t.JMeterThread: Interrupting: User 1-6 sampler: Get todos
+2020-12-12 21:19:25,589 INFO o.a.j.t.JMeterThread: Stopping: User 1-10
+2020-12-12 21:19:25,589 WARN o.a.j.t.JMeterThread: Interrupting: User 1-10 sampler: Get todos
+2020-12-12 21:19:25,590 INFO o.a.j.t.JMeterThread: Thread finished: User 1-6
+2020-12-12 21:19:25,590 INFO o.a.j.t.JMeterThread: Thread finished: User 1-10
+2020-12-12 21:19:25,590 INFO o.a.j.t.JMeterThread: Stopping: User 1-1
+2020-12-12 21:19:25,590 WARN o.a.j.t.JMeterThread: Interrupting: User 1-1 sampler: Get todos
+2020-12-12 21:19:25,590 INFO o.a.j.t.JMeterThread: Stopping: User 1-7
+2020-12-12 21:19:25,590 WARN o.a.j.t.JMeterThread: Interrupting: User 1-7 sampler: Get todos
+2020-12-12 21:19:25,591 INFO o.a.j.t.JMeterThread: Thread finished: User 1-7
+2020-12-12 21:19:25,591 INFO o.a.j.t.JMeterThread: Stopping: User 1-8
+2020-12-12 21:19:25,591 WARN o.a.j.t.JMeterThread: Interrupting: User 1-8 sampler: Get todos
+2020-12-12 21:19:25,592 INFO o.a.j.t.JMeterThread: Thread finished: User 1-8
+2020-12-12 21:19:25,592 INFO o.a.j.t.JMeterThread: Thread finished: User 1-1
+2020-12-12 21:19:25,592 INFO o.a.j.t.JMeterThread: Stopping: User 1-3
+2020-12-12 21:19:25,592 WARN o.a.j.t.JMeterThread: Interrupting: User 1-3 sampler: Get todos
+2020-12-12 21:19:25,592 INFO o.a.j.t.JMeterThread: Stopping: User 1-5
+2020-12-12 21:19:25,592 WARN o.a.j.t.JMeterThread: Interrupting: User 1-5 sampler: Add todo
+2020-12-12 21:19:25,592 INFO o.a.j.t.JMeterThread: Stopping: User 1-9
+2020-12-12 21:19:25,592 WARN o.a.j.t.JMeterThread: Interrupting: User 1-9 sampler: Get todos
+2020-12-12 21:19:25,592 INFO o.a.j.t.JMeterThread: Stopping: User 1-2
+2020-12-12 21:19:25,592 WARN o.a.j.t.JMeterThread: Interrupting: User 1-2 sampler: Get todos
+2020-12-12 21:19:25,593 INFO o.a.j.t.JMeterThread: Thread finished: User 1-2
+2020-12-12 21:19:25,593 INFO o.a.j.t.JMeterThread: Stopping: User 1-4
+2020-12-12 21:19:25,593 WARN o.a.j.t.JMeterThread: Interrupting: User 1-4 sampler: Get todos
+2020-12-12 21:19:25,593 INFO o.a.j.t.JMeterThread: Thread finished: User 1-9
+2020-12-12 21:19:25,595 INFO o.a.j.t.JMeterThread: Thread finished: User 1-5
+2020-12-12 21:19:25,594 INFO o.a.j.t.JMeterThread: Thread finished: User 1-3
+2020-12-12 21:19:25,594 INFO o.a.j.t.JMeterThread: Thread finished: User 1-4
+2020-12-12 21:19:25,596 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2020-12-12 21:19:25,596 INFO o.a.j.g.u.JMeterMenuBar: setRunning(false, *local*)
+2020-12-12 21:23:02,776 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2020-12-12 21:23:02,777 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2020-12-12 21:23:02,778 INFO o.a.j.g.u.JMeterMenuBar: setRunning(true, *local*)
+2020-12-12 21:23:02,780 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : User
+2020-12-12 21:23:02,780 INFO o.a.j.e.StandardJMeterEngine: Starting 10 threads for group User.
+2020-12-12 21:23:02,780 INFO o.a.j.e.StandardJMeterEngine: Thread will start next loop on error
+2020-12-12 21:23:02,780 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=10 ramp-up=1 delayedStart=false
+2020-12-12 21:23:02,781 INFO o.a.j.t.JMeterThread: Thread started: User 1-1
+2020-12-12 21:23:02,807 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2020-12-12 21:23:02,807 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2020-12-12 21:23:02,896 INFO o.a.j.t.JMeterThread: Thread started: User 1-2
+2020-12-12 21:23:03,005 INFO o.a.j.t.JMeterThread: Thread started: User 1-3
+2020-12-12 21:23:03,081 INFO o.a.j.t.JMeterThread: Thread started: User 1-4
+2020-12-12 21:23:03,180 INFO o.a.j.t.JMeterThread: Thread started: User 1-5
+2020-12-12 21:23:03,281 INFO o.a.j.t.JMeterThread: Thread started: User 1-6
+2020-12-12 21:23:03,381 INFO o.a.j.t.JMeterThread: Thread started: User 1-7
+2020-12-12 21:23:03,481 INFO o.a.j.t.JMeterThread: Thread started: User 1-8
+2020-12-12 21:23:03,581 INFO o.a.j.t.JMeterThread: Thread started: User 1-9
+2020-12-12 21:23:03,681 INFO o.a.j.t.JMeterThread: Thread started: User 1-10
+2020-12-12 21:28:14,924 INFO o.a.j.g.a.Start: Stopping test
+2020-12-12 21:28:14,927 INFO o.a.j.t.JMeterThread: Thread finished: User 1-4
+2020-12-12 21:28:14,928 INFO o.a.j.t.JMeterThread: Stopping: User 1-4
+2020-12-12 21:28:14,928 INFO o.a.j.t.JMeterThread: Stopping: User 1-5
+2020-12-12 21:28:14,928 WARN o.a.j.t.JMeterThread: Interrupting: User 1-5 sampler: Add todo
+2020-12-12 21:28:14,929 INFO o.a.j.t.JMeterThread: Stopping: User 1-8
+2020-12-12 21:28:14,929 WARN o.a.j.t.JMeterThread: Interrupting: User 1-8 sampler: Add todo
+2020-12-12 21:28:14,929 INFO o.a.j.t.JMeterThread: Stopping: User 1-1
+2020-12-12 21:28:14,929 WARN o.a.j.t.JMeterThread: Interrupting: User 1-1 sampler: Add todo
+2020-12-12 21:28:14,930 INFO o.a.j.t.JMeterThread: Thread finished: User 1-1
+2020-12-12 21:28:14,930 INFO o.a.j.t.JMeterThread: Thread finished: User 1-5
+2020-12-12 21:28:14,930 INFO o.a.j.t.JMeterThread: Thread finished: User 1-8
+2020-12-12 21:28:14,930 INFO o.a.j.t.JMeterThread: Stopping: User 1-6
+2020-12-12 21:28:14,930 WARN o.a.j.t.JMeterThread: Interrupting: User 1-6 sampler: Add todo
+2020-12-12 21:28:14,931 INFO o.a.j.t.JMeterThread: Thread finished: User 1-6
+2020-12-12 21:28:14,931 INFO o.a.j.t.JMeterThread: Stopping: User 1-7
+2020-12-12 21:28:14,931 WARN o.a.j.t.JMeterThread: Interrupting: User 1-7 sampler: Get todos
+2020-12-12 21:28:14,932 INFO o.a.j.t.JMeterThread: Stopping: User 1-2
+2020-12-12 21:28:14,932 WARN o.a.j.t.JMeterThread: Interrupting: User 1-2 sampler: Get todos
+2020-12-12 21:28:14,932 INFO o.a.j.t.JMeterThread: Thread finished: User 1-7
+2020-12-12 21:28:14,932 INFO o.a.j.t.JMeterThread: Stopping: User 1-10
+2020-12-12 21:28:14,932 WARN o.a.j.t.JMeterThread: Interrupting: User 1-10 sampler: Add todo
+2020-12-12 21:28:14,933 INFO o.a.j.t.JMeterThread: Thread finished: User 1-2
+2020-12-12 21:28:14,933 INFO o.a.j.t.JMeterThread: Stopping: User 1-9
+2020-12-12 21:28:14,933 INFO o.a.j.t.JMeterThread: Thread finished: User 1-10
+2020-12-12 21:28:14,933 WARN o.a.j.t.JMeterThread: Interrupting: User 1-9 sampler: Add todo
+2020-12-12 21:28:14,934 INFO o.a.j.t.JMeterThread: Stopping: User 1-3
+2020-12-12 21:28:14,934 WARN o.a.j.t.JMeterThread: Interrupting: User 1-3 sampler: Add todo
+2020-12-12 21:28:14,934 INFO o.a.j.t.JMeterThread: Thread finished: User 1-3
+2020-12-12 21:28:14,935 INFO o.a.j.t.JMeterThread: Thread finished: User 1-9
+2020-12-12 21:28:14,936 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2020-12-12 21:28:14,936 INFO o.a.j.g.u.JMeterMenuBar: setRunning(false, *local*)
+2020-12-12 21:30:38,490 INFO o.a.j.e.StandardJMeterEngine: Running the test!
+2020-12-12 21:30:38,491 INFO o.a.j.s.SampleEvent: List of sample_variables: []
+2020-12-12 21:30:38,492 INFO o.a.j.g.u.JMeterMenuBar: setRunning(true, *local*)
+2020-12-12 21:30:38,493 INFO o.a.j.e.StandardJMeterEngine: Starting ThreadGroup: 1 : User
+2020-12-12 21:30:38,493 INFO o.a.j.e.StandardJMeterEngine: Starting 10 threads for group User.
+2020-12-12 21:30:38,493 INFO o.a.j.e.StandardJMeterEngine: Thread will start next loop on error
+2020-12-12 21:30:38,494 INFO o.a.j.t.ThreadGroup: Starting thread group... number=1 threads=10 ramp-up=1 delayedStart=false
+2020-12-12 21:30:38,506 INFO o.a.j.t.JMeterThread: Thread started: User 1-1
+2020-12-12 21:30:38,514 INFO o.a.j.t.ThreadGroup: Started thread group number 1
+2020-12-12 21:30:38,515 INFO o.a.j.e.StandardJMeterEngine: All thread groups have been started
+2020-12-12 21:30:38,597 INFO o.a.j.t.JMeterThread: Thread started: User 1-2
+2020-12-12 21:30:38,695 INFO o.a.j.t.JMeterThread: Thread started: User 1-3
+2020-12-12 21:30:38,796 INFO o.a.j.t.JMeterThread: Thread started: User 1-4
+2020-12-12 21:30:38,895 INFO o.a.j.t.JMeterThread: Thread started: User 1-5
+2020-12-12 21:30:38,996 INFO o.a.j.t.JMeterThread: Thread started: User 1-6
+2020-12-12 21:30:39,100 INFO o.a.j.t.JMeterThread: Thread started: User 1-7
+2020-12-12 21:30:39,195 INFO o.a.j.t.JMeterThread: Thread started: User 1-8
+2020-12-12 21:30:39,296 INFO o.a.j.t.JMeterThread: Thread started: User 1-9
+2020-12-12 21:30:39,396 INFO o.a.j.t.JMeterThread: Thread started: User 1-10
+2020-12-12 21:39:51,695 INFO o.a.j.g.a.Start: Stopping test
+2020-12-12 21:39:51,698 INFO o.a.j.t.JMeterThread: Stopping: User 1-4
+2020-12-12 21:39:51,699 WARN o.a.j.t.JMeterThread: Interrupting: User 1-4 sampler: Get todos
+2020-12-12 21:39:51,700 INFO o.a.j.t.JMeterThread: Thread finished: User 1-4
+2020-12-12 21:39:51,701 INFO o.a.j.t.JMeterThread: Stopping: User 1-9
+2020-12-12 21:39:51,701 WARN o.a.j.t.JMeterThread: Interrupting: User 1-9 sampler: Get todos
+2020-12-12 21:39:51,707 INFO o.a.j.t.JMeterThread: Stopping: User 1-2
+2020-12-12 21:39:51,707 WARN o.a.j.t.JMeterThread: Interrupting: User 1-2 sampler: Get todos
+2020-12-12 21:39:51,707 INFO o.a.j.t.JMeterThread: Thread finished: User 1-9
+2020-12-12 21:39:51,707 INFO o.a.j.t.JMeterThread: Thread finished: User 1-2
+2020-12-12 21:39:51,711 INFO o.a.j.t.JMeterThread: Stopping: User 1-5
+2020-12-12 21:39:51,711 WARN o.a.j.t.JMeterThread: Interrupting: User 1-5 sampler: Get todos
+2020-12-12 21:39:51,711 INFO o.a.j.t.JMeterThread: Stopping: User 1-6
+2020-12-12 21:39:51,711 WARN o.a.j.t.JMeterThread: Interrupting: User 1-6 sampler: Get todos
+2020-12-12 21:39:51,711 INFO o.a.j.t.JMeterThread: Stopping: User 1-8
+2020-12-12 21:39:51,711 WARN o.a.j.t.JMeterThread: Interrupting: User 1-8 sampler: Get todos
+2020-12-12 21:39:51,711 INFO o.a.j.t.JMeterThread: Stopping: User 1-10
+2020-12-12 21:39:51,711 WARN o.a.j.t.JMeterThread: Interrupting: User 1-10 sampler: Get todos
+2020-12-12 21:39:51,711 INFO o.a.j.t.JMeterThread: Stopping: User 1-3
+2020-12-12 21:39:51,711 WARN o.a.j.t.JMeterThread: Interrupting: User 1-3 sampler: Get todos
+2020-12-12 21:39:51,711 INFO o.a.j.t.JMeterThread: Thread finished: User 1-8
+2020-12-12 21:39:51,711 INFO o.a.j.t.JMeterThread: Thread finished: User 1-3
+2020-12-12 21:39:51,711 INFO o.a.j.t.JMeterThread: Thread finished: User 1-10
+2020-12-12 21:39:51,712 INFO o.a.j.t.JMeterThread: Stopping: User 1-7
+2020-12-12 21:39:51,712 WARN o.a.j.t.JMeterThread: Interrupting: User 1-7 sampler: Get todos
+2020-12-12 21:39:51,712 INFO o.a.j.t.JMeterThread: Thread finished: User 1-5
+2020-12-12 21:39:51,712 INFO o.a.j.t.JMeterThread: Thread finished: User 1-7
+2020-12-12 21:39:51,712 INFO o.a.j.t.JMeterThread: Thread finished: User 1-6
+2020-12-12 21:39:51,713 INFO o.a.j.t.JMeterThread: Stopping: User 1-1
+2020-12-12 21:39:51,713 WARN o.a.j.t.JMeterThread: Interrupting: User 1-1 sampler: Get todos
+2020-12-12 21:39:51,713 INFO o.a.j.t.JMeterThread: Thread finished: User 1-1
+2020-12-12 21:39:51,715 INFO o.a.j.e.StandardJMeterEngine: Notifying test listeners of end of test
+2020-12-12 21:39:51,715 INFO o.a.j.g.u.JMeterMenuBar: setRunning(false, *local*)

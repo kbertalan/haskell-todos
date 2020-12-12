@@ -46,7 +46,7 @@ dbOptions = DB.Options
   where
     size = option auto
       $ long "pool-size"
-      <> value 2
+      <> value 10
       <> showDefault
       <> help "Amount of connections in the pool"
     timeout = fmap fromIntegral
