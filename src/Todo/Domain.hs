@@ -11,8 +11,11 @@ module Todo.Domain
   , fromTodo
   , toTodo
   , CreateTodoRequest(..)
+  , Page(Page)
+  , limit
+  , offset
   , Logic
-  , showAll
+  , showPage
   , create
   , modify
   , patch
@@ -22,7 +25,7 @@ module Todo.Domain
   , DeleteError (..)
   , repoGetById
   , repoUpdate
-  , repoSelectAll
+  , repoSelectPage
   , repoInsert
   , repoDelete
   , logicCreate
@@ -105,15 +108,20 @@ data DeleteError
   = DeleteNotExists
   deriving (Show, Eq)
 
+data Page = Page
+  { offset :: !Word
+  , limit  :: !Word
+  } deriving (Show, Eq)
+
 class Logic m where
-  showAll :: m [Todo]
+  showPage :: Page -> m [Todo]
   create :: CreateTodoRequest -> m Todo
   modify :: UUID -> Todo -> m (Either ModifyError Todo)
   patch :: UUID -> TodoMaybe -> m (Either PatchError Todo)
   delete :: UUID -> m (Either DeleteError ())
 
 class Repo m where
-  repoSelectAll :: m [Todo]
+  repoSelectPage :: Page -> m [Todo]
   repoInsert :: Todo -> m Todo
   repoUpdate :: Todo -> m Todo
   repoGetById :: UUID -> m (Maybe Todo)

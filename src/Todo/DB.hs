@@ -1,6 +1,6 @@
 module Todo.DB
   ( dbGetById
-  , dbSelectAll
+  , dbSelectPage
   , dbInsert
   , dbUpdate
   , dbDeleteById
@@ -12,10 +12,10 @@ import           Data.Text.Lazy             as L (fromStrict, toStrict)
 import           Data.UUID                  (UUID)
 import qualified Hasql.Decoders             as D (Row, bool, column, noResult, nonNullable, rowList, rowMaybe, text,
                                                   uuid)
-import qualified Hasql.Encoders             as E (Params, bool, noParams, nonNullable, param, text, uuid)
+import qualified Hasql.Encoders             as E (Params, bool, int8, nonNullable, param, text, uuid)
 
 import           App.DB                     as DB (WithDB, execute, statement)
-import           Todo.Domain                as Todo (Todo (..))
+import           Todo.Domain                as Todo (Page (..), Todo (..), limit, offset)
 
 dbGetById :: (MonadIO m, WithDB m) => UUID -> m (Maybe Todo)
 dbGetById identifier = DB.execute $ statement
@@ -27,14 +27,16 @@ dbGetById identifier = DB.execute $ statement
     encoder = E.param (E.nonNullable E.uuid)
     decoder = D.rowMaybe row
 
-dbSelectAll:: (MonadIO m, WithDB m) => m [Todo]
-dbSelectAll = do
+dbSelectPage:: (MonadIO m, WithDB m) => Page -> m [Todo]
+dbSelectPage page = do
   DB.execute $ statement
-      "select id, description, completed from todo order by last_updated_at desc limit 20"
-      E.noParams
+      "select id, description, completed from todo order by last_updated_at desc limit $2 offset $1"
+      encoder
       decoder
-      ()
+      page
     where
+      encoder = (fromIntegral . offset >$< E.param (E.nonNullable E.int8))
+        <> (fromIntegral . limit >$< E.param (E.nonNullable E.int8))
       decoder = D.rowList row
 
 dbInsert :: (MonadIO m, WithDB m) => Todo -> m Todo

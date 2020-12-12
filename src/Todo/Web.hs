@@ -10,16 +10,18 @@ import Data.UUID                 (UUID)
 import Network.HTTP.Types.Status (status201, status400, status404)
 import Text.Read                 (readMaybe)
 import Web.Scotty.Trans          as W (Parsable, delete, get, json, jsonData, param, parseParam, patch, post, put,
-                                       status)
+                                       rescue, status)
 
 import App.Web                   (Action, Scotty, jsonError)
-import Todo.Domain               (DeleteError (..), Logic, ModifyError (..), PatchError (..), create, delete, modify,
-                                  patch, showAll)
+import Todo.Domain               (DeleteError (..), Logic, ModifyError (..), Page (..), PatchError (..), create, delete,
+                                  modify, patch, showPage)
 
 todoApi :: (MonadIO m, Logic m) => Scotty m ()
 todoApi = do
-  get "/todo" $
-    lift showAll >>= json
+  get "/todo" $ do
+    offset <- param "offset" `rescue` const (return 0)
+    limit <- param "limit" `rescue` const (return 20)
+    lift (showPage (Page offset limit)) >>= json
   post "/todo" $ do
     jsonData >>= lift . create >>= \r -> do
       status status201

@@ -13,14 +13,14 @@ newtype TestTodoM a = TestTodoM
   } deriving newtype (Functor, Applicative, Monad, MonadRandom, MonadState [Todo])
 
 instance Logic TestTodoM where
-  showAll = repoSelectAll
+  showPage = repoSelectPage
   create = logicCreate
   modify = fmap runExceptT . logicUpdate
   patch = fmap runExceptT . logicPatch
   delete = fmap runExceptT logicDelete
 
 instance Repo TestTodoM where
-  repoSelectAll = State.get
+  repoSelectPage Page{offset,limit} = take (fromIntegral limit) . drop (fromIntegral offset) <$> State.get
 
   repoInsert todo = do
     State.modify (todo:)
@@ -41,7 +41,7 @@ instance Repo TestTodoM where
     return ()
 
 instance Repo (ExceptT e TestTodoM) where
-  repoSelectAll = lift repoSelectAll
+  repoSelectPage = lift . repoSelectPage
   repoInsert = lift . repoInsert
   repoUpdate = lift . repoUpdate
   repoGetById = lift . repoGetById
