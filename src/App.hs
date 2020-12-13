@@ -7,6 +7,7 @@ import App.Ekg    as Ekg (Options, runWithEkg)
 import App.Log    as Log (runWithLog)
 import App.Monad  (Env (Env), runAppWith)
 import App.Random as Random (Options, configure)
+import App.Time   as Time (diffTime, getTime, runWithStartupTime)
 import App.Web    as Web (Options, run)
 
 import Health     (healthApi)
@@ -21,15 +22,18 @@ data Options = Options
 
 run :: App.Options -> IO ()
 run opts =
+  runWithStartupTime $ \time ->
   runWithLog $ \log ->
   runWithEkg (ekg opts) $ \ekg ->
   runWithDB (db opts) $ \db -> do
     Random.configure $ random opts
     migrate db >>= \case
       Right _ -> return ()
-      Left e -> error $ show e
+      Left e  -> error $ show e
 
-    let env = Env db ekg log
+    let env = Env db ekg log time
+    currentTime <- getTime
+    putStrLn $ "Started up in " <> show (diffTime currentTime time) <> "s"
     Web.run (web opts) (runAppWith env) $ do
       healthApi
       todoApi

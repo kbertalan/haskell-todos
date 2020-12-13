@@ -14,15 +14,17 @@ import Control.Monad.Reader       (MonadIO, MonadReader, ReaderT, asks, runReade
 import App.DB                     (DB, WithDB, getDB)
 import App.Ekg                    (Ekg, WithEkg, getEkg)
 import App.Log                    (Log)
+import App.Time                   (Time)
 
 newtype AppM a = AppM
   { runApp :: ReaderT Env IO a
   } deriving newtype (Applicative, Functor, Monad, MonadIO, MonadReader Env, MonadRandom)
 
 data Env = Env
-  { envDB  :: DB
-  , envEkg :: Ekg
-  , envLog :: Log AppM
+  { envDB          :: DB
+  , envEkg         :: Ekg
+  , envLog         :: Log AppM
+  , envStartupTime :: Time
   }
 
 instance WithDB AppM where

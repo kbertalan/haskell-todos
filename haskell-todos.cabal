@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 01ccf403d0d4cc5e8434300f69c4ec5645a2234416a10daa5198cd9b11e8659d
+-- hash: 6a179b4849297bb59ffa6ddc4be17df1ccd0b8fd892918119e7a91e4f50fe110
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -36,6 +36,7 @@ library
       App.Log
       App.Monad
       App.Random
+      App.Time
       App.Web
       Health
       Todo
@@ -64,6 +65,7 @@ library
     , random
     , scotty
     , text
+    , time
     , uuid
     , vector
     , wai
@@ -95,6 +97,7 @@ executable haskell-todos-exe
     , random
     , scotty
     , text
+    , time
     , uuid
     , vector
     , wai
@@ -131,6 +134,7 @@ test-suite haskell-todos-test
     , random
     , scotty
     , text
+    , time
     , uuid
     , vector
     , wai

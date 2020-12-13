@@ -38,6 +38,7 @@ dependencies:
 - random
 - MonadRandom
 - co-log
+- time
 
 ghc-options:
   - -Werror
