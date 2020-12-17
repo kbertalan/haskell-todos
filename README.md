@@ -45,5 +45,4 @@ Modules:
 * _App.Log_: co-log settings.
 * _App.Random_: configuration for random numbers.
 * _App.Error_: a little utility module for error handling.
-* _App.Time_: hiding time behind this module (this seems an overkill however)
 

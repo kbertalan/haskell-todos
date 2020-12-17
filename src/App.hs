@@ -1,17 +1,17 @@
 module App where
 
-import Prelude    hiding (log)
+import Prelude         hiding (log)
 
-import App.DB     as DB (Options, migrate, runWithDB)
-import App.Ekg    as Ekg (Options, runWithEkg)
-import App.Log    as Log (runWithLog)
-import App.Monad  (Env (Env), runAppWith)
-import App.Random as Random (Options, configure)
-import App.Time   as Time (diffTime, getTime, runWithStartupTime)
-import App.Web    as Web (Options, run)
+import App.DB          as DB (Options, migrate, runWithDB)
+import App.Ekg         as Ekg (Options, runWithEkg)
+import App.Log         as Log (runWithLog)
+import App.Monad       (Env (Env), runAppWith)
+import App.Random      as Random (Options, configure)
+import App.Web         as Web (Options, run)
+import Data.Time.Clock as Time
 
-import Health     (healthApi)
-import Todo       (todoApi)
+import Health          (healthApi)
+import Todo            (todoApi)
 
 data Options = Options
   { web    :: !Web.Options
@@ -22,7 +22,7 @@ data Options = Options
 
 run :: App.Options -> IO ()
 run opts =
-  runWithStartupTime $ \time ->
+  Time.getCurrentTime >>= \time ->
   runWithLog $ \log ->
   runWithEkg (ekg opts) $ \ekg ->
   runWithDB (db opts) $ \db -> do
@@ -32,8 +32,9 @@ run opts =
       Left e  -> error $ show e
 
     let env = Env db ekg log time
-    currentTime <- getTime
-    putStrLn $ "Started up in " <> show (diffTime currentTime time) <> "s"
+    currentTime <- Time.getCurrentTime
+    putStrLn $ "Started up in " <> show (Time.diffUTCTime currentTime time)
+
     Web.run (web opts) (runAppWith env) $ do
       healthApi
       todoApi

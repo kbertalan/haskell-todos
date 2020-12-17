@@ -61,7 +61,7 @@ poolOpts Options{..} =
 migrate :: DB -> IO (Either P.UsageError ())
 migrate db = P.use db $ do
   migrations <- liftIO $ M.loadMigrationsFromDirectory "./migrations"
-  forM_ (M.MigrationInitialization : migrations) $ \m ->
+  forM_ (M.MigrationInitialization : migrations) $ \m -> do
     T.transaction T.Serializable T.Write $ M.runMigration m
 
 statement :: ByteString -> E.Params a -> D.Result b -> a -> S.Session b
