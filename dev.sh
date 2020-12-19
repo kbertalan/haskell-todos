@@ -12,5 +12,5 @@ trap cleanup EXIT
 
 docker-compose up -d
 sleep 1
-stack build --test --copy-bins --file-watch --exec "respawn.sh haskell-todos-exe" --exec "hlint src test"
+stack build --fast --test --copy-bins --file-watch --exec "respawn.sh haskell-todos-exe" --exec "hlint src test"
 
