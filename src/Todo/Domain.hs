@@ -1,15 +1,16 @@
-{-# LANGUAGE DeriveAnyClass  #-}
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE RankNTypes      #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Todo.Domain
-  ( Todo(..)
-  , TodoM(..)
+  ( TodoM(..)
+  , Todo
   , TodoMaybe
   , TodoLast
-  , fromTodo
-  , toTodo
+  , mkTodo
+  , identifier
+  , description
+  , completed
   , CreateTodoRequest(..)
   , Page(Page)
   , limit
@@ -35,54 +36,86 @@ module Todo.Domain
   , Repo
   ) where
 
-import App.Error            (throwIfNothing)
-import Control.Monad        (when)
-import Control.Monad.Except (MonadError, throwError)
-import Control.Monad.Random (MonadRandom, getRandom)
-import Data.Aeson           (FromJSON, ToJSON, parseJSON, withObject, (.:), (.:?))
-import Data.Coerce          (coerce)
-import Data.Monoid          (Last (..), getLast)
-import Data.Text.Lazy       (Text)
-import Data.UUID            (UUID)
-import GHC.Generics         (Generic)
-import Prelude              hiding (id)
-
-data Todo = Todo
-  { id          :: !UUID
-  , description :: !Text
-  , completed   :: !Bool
-  } deriving (Show, Generic, ToJSON, FromJSON, Eq)
+import App.Error              (throwIfNothing)
+import Control.Monad          (when)
+import Control.Monad.Except   (MonadError, throwError)
+import Control.Monad.Identity (Identity (Identity), runIdentity)
+import Control.Monad.Random   (MonadRandom, getRandom)
+import Data.Aeson             (FromJSON, Options (fieldLabelModifier), ToJSON, defaultOptions, genericToEncoding,
+                               parseJSON, toEncoding, withObject, (.:), (.:?))
+import Data.Char              (toLower)
+import Data.Coerce            (coerce)
+import Data.Monoid            (Last (..), getLast)
+import Data.Text.Lazy         (Text)
+import Data.UUID              (UUID)
+import GHC.Generics           (Generic)
+import Prelude                hiding (id)
 
 data TodoM m = TodoM
   { mId          :: m UUID
   , mDescription :: m Text
   , mCompleted   :: m Bool
   }
+  deriving Generic
 
+type Todo = TodoM Identity
 type TodoLast = TodoM Last
 type TodoMaybe = TodoM Maybe
 
-instance Semigroup (TodoM Last) where
+deriving instance Eq Todo
+deriving instance Show Todo
+
+instance ToJSON Todo where
+  toEncoding = genericToEncoding $ defaultOptions {
+    fieldLabelModifier = lowerFirst . drop 1
+    }
+      where
+        lowerFirst []     = []
+        lowerFirst (x:xs) = toLower x : xs
+
+instance FromJSON Todo where
+  parseJSON = withObject "Todo" $ \v -> mkTodo
+    <$> v .: "id"
+    <*> v .: "description"
+    <*> v .: "completed"
+
+instance Semigroup TodoLast where
   TodoM i1 d1 c1 <> TodoM i2 d2 c2 = TodoM (i1 <> i2) (d1 <> d2) (c1 <> c2)
 
-fromTodo :: (forall a. a -> m a) -> Todo -> TodoM m
-fromTodo f Todo{..} = TodoM
-  { mId = f id
-  , mDescription = f description
-  , mCompleted = f completed
-  }
-
-toTodo :: (forall a. m a -> Maybe a) -> TodoM m -> Maybe Todo
-toTodo f TodoM{..} = Todo
-  <$> f mId
-  <*> f mDescription
-  <*> f mCompleted
-
-instance FromJSON (TodoM Maybe) where
+instance FromJSON TodoMaybe where
   parseJSON = withObject "Todo" $ \v -> TodoM
     <$> v .:? "id"
     <*> v .:? "description"
     <*> v .:? "completed"
+
+mkTodo :: UUID -> Text -> Bool -> Todo
+mkTodo i d c = TodoM
+  { mId = Identity i
+  , mDescription = Identity d
+  , mCompleted = Identity c
+  }
+
+identifier :: Todo -> UUID
+identifier = runIdentity . mId
+
+description :: Todo -> Text
+description = runIdentity . mDescription
+
+completed :: Todo -> Bool
+completed = runIdentity . mCompleted
+
+fromTodo :: (forall a. Identity a -> f a) -> Todo -> TodoM f
+fromTodo f TodoM{..} = TodoM
+  { mId = f mId
+  , mDescription = f mDescription
+  , mCompleted = f mCompleted
+  }
+
+toTodo :: (forall a. f a -> Maybe a) -> TodoM f -> Maybe Todo
+toTodo f TodoM{..} = TodoM
+  <$> fmap Identity (f mId)
+  <*> fmap Identity (f mDescription)
+  <*> fmap Identity (f mCompleted)
 
 newtype CreateTodoRequest = CreateTodoRequest
   { ctrDescription :: Text
@@ -130,31 +163,31 @@ class Repo m where
 logicCreate :: (Repo m, MonadRandom m) => CreateTodoRequest -> m Todo
 logicCreate req = do
   newId <- getRandom
-  let todo = Todo {
-      Todo.Domain.id = newId
-    , description = ctrDescription req
-    , completed = False
+  let todo = TodoM {
+      mId = pure newId
+    , mDescription = pure $ ctrDescription req
+    , mCompleted = pure False
     }
   repoInsert todo
 
 logicUpdate :: (Repo m, MonadError ModifyError m) => UUID -> Todo -> m Todo
-logicUpdate identifier todo = do
-  when (identifier /= Todo.Domain.id todo) $ throwError ModifyIdentifierMismatch
-  repoGetById (Todo.Domain.id todo)
+logicUpdate i todo = do
+  when (i /= identifier todo) $ throwError ModifyIdentifierMismatch
+  repoGetById (identifier todo)
     >>= throwIfNothing ModifyNotExists
     >> repoUpdate todo
 
 logicPatch :: (Repo m, MonadError PatchError m) => UUID -> TodoMaybe -> m Todo
-logicPatch identifier req = do
+logicPatch i req = do
   existingId <- throwIfNothing MissingId $ mId req
-  when (identifier /= existingId) $ throwError PatchIdentifierMismatch
+  when (i /= existingId) $ throwError PatchIdentifierMismatch
   existing <- repoGetById existingId >>= throwIfNothing PatchNotExists
-  let existingLast = fromTodo (Last . Just) existing
+  let existingLast = fromTodo (Last . Just . runIdentity) existing
   todo <- throwIfNothing MissingFields $ toTodo getLast $ existingLast <> coerce req
   repoUpdate todo
 
 logicDelete :: (Repo m, MonadError DeleteError m) => UUID -> m ()
-logicDelete identifier = do
-  _existing <- repoGetById identifier >>= throwIfNothing DeleteNotExists
-  repoDelete identifier
+logicDelete i = do
+  _existing <- repoGetById i >>= throwIfNothing DeleteNotExists
+  repoDelete i
 

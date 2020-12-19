@@ -30,14 +30,14 @@ instance Repo TestTodoM where
     State.modify replace
     return todo
       where replace [] = []
-            replace (a:as) | Todo.Domain.id a == Todo.Domain.id todo = todo : as
+            replace (a:as) | identifier a == identifier todo = todo : as
                            | otherwise                               = replace as
 
-  repoGetById identifier =
-    find ((== identifier) . Todo.Domain.id) <$> State.get
+  repoGetById i =
+    find ((== i) . identifier) <$> State.get
 
-  repoDelete identifier = do
-    State.modify $ filter ((/=identifier) . Todo.Domain.id)
+  repoDelete i = do
+    State.modify $ filter ((/= i) . identifier)
     return ()
 
 instance Repo (ExceptT e TestTodoM) where

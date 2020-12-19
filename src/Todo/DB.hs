@@ -15,14 +15,15 @@ import qualified Hasql.Decoders             as D (Row, bool, column, noResult, n
 import qualified Hasql.Encoders             as E (Params, bool, int8, nonNullable, param, text, uuid)
 
 import           App.DB                     as DB (WithDB, execute, statement)
-import           Todo.Domain                as Todo (Page (..), Todo (..), limit, offset)
+import           Todo.Domain                as Todo (Page (..), Todo, completed, description, identifier, limit, mkTodo,
+                                                     offset)
 
 dbGetById :: (MonadIO m, WithDB m) => UUID -> m (Maybe Todo)
-dbGetById identifier = DB.execute $ statement
+dbGetById i = DB.execute $ statement
     "select id, description, completed from todo where id = $1"
     encoder
     decoder
-    identifier
+    i
   where
     encoder = E.param (E.nonNullable E.uuid)
     decoder = D.rowMaybe row
@@ -63,24 +64,24 @@ dbUpdate todo = do
   return todo
 
 dbDeleteById :: (MonadIO m, WithDB m) => UUID -> m ()
-dbDeleteById identifier = do
+dbDeleteById i = do
   DB.execute $ statement
       "delete from todo where id = $1"
       encoder
       D.noResult
-      identifier
+      i
   return ()
   where
     encoder = E.param (E.nonNullable E.uuid)
 
 row :: D.Row Todo
-row = Todo
+row = mkTodo
   <$> D.column (D.nonNullable D.uuid)
   <*> fmap fromStrict (D.column (D.nonNullable D.text))
   <*> D.column (D.nonNullable D.bool)
 
 todoEncoder :: E.Params Todo
 todoEncoder =
-  (Todo.id >$< E.param (E.nonNullable E.uuid))
+  (identifier >$< E.param (E.nonNullable E.uuid))
   <> (toStrict . description >$< E.param (E.nonNullable E.text))
   <> (completed >$< E.param (E.nonNullable E.bool))

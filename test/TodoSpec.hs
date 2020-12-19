@@ -1,6 +1,7 @@
 module TodoSpec where
 
 import           Control.Applicative ((<|>))
+import qualified Data.Aeson          as A
 import           Data.Maybe          (fromJust)
 import           Data.Text.Lazy      (fromStrict)
 import           Data.UUID           (UUID, fromString, nil)
@@ -22,13 +23,13 @@ spec = do
     it "should accept simple description" $
       let
         request = CreateTodoRequest "desc"
-        expectedTodo = Todo testUUID "desc" False
+        expectedTodo = mkTodo testUUID "desc" False
       in testTodoWithSeed (create request) 0 [] `shouldBe` (expectedTodo, [expectedTodo])
 
 
   describe "Modify" $ do
     let
-      modifiedTodo = Todo testUUID "desc" False
+      modifiedTodo = mkTodo testUUID "desc" False
 
     it "should fail on missing todo" $
       testTodoWithSeed (modify testUUID modifiedTodo) 0 [] `shouldBe` (Left ModifyNotExists, [])
@@ -38,7 +39,7 @@ spec = do
 
     it "should update existing todo" $
       let
-        existingTodo = Todo testUUID "other" True
+        existingTodo = mkTodo testUUID "other" True
       in
         testTodoWithSeed (modify testUUID modifiedTodo) 0 [existingTodo] `shouldBe` (Right modifiedTodo, [modifiedTodo])
 
@@ -49,20 +50,20 @@ spec = do
 
     it "should delete existing todo" $
       let
-        existingTodo = Todo testUUID "other" True
+        existingTodo = mkTodo testUUID "other" True
       in
         testTodoWithSeed (delete testUUID) 0 [existingTodo] `shouldBe` (Right (), [])
 
 
   describe "Patch" $ do
     let
-      existingTodo = Todo testUUID "description" False
+      existingTodo = mkTodo testUUID "description" False
 
     it "should patch existing todo" $ hedgehog $ do
       txt <- forAll $ Gen.maybe $ Gen.text (Range.linear 0 100) Gen.unicode
       done <- forAll $ Gen.maybe Gen.bool
       let patchTodo = TodoM (Just testUUID) (fromStrict <$> txt) done
-          savedTodo = Todo
+          savedTodo = mkTodo
             testUUID
             (fromJust (fmap fromStrict txt <|> Just (description existingTodo)))
             (fromJust (done <|> Just (completed existingTodo)))
@@ -86,4 +87,11 @@ spec = do
       in
         testTodoWithSeed (patch testUUID patchTodo) 0 [] `shouldBe` (Left PatchNotExists, [])
 
+  describe "json" $
+    it "should parse serialized todo" $ hedgehog $ do
+      desc <- forAll $ Gen.text (Range.linear 0 100) Gen.unicode
+      comp <- forAll Gen.bool
+      todo <- forAll $ Gen.constant $ mkTodo testUUID (fromStrict desc) comp
+      encoded <- forAll $ Gen.constant $ A.encode todo
+      Just todo === A.decode encoded
 
