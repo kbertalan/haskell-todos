@@ -1,5 +1,6 @@
 module TestTodoApp where
 
+import           App.Paging                  (Page (..))
 import           Control.Monad.Except        (ExceptT, runExceptT)
 import           Control.Monad.Random.Strict (MonadRandom, RandT, StdGen, evalRandT, mkStdGen)
 import           Control.Monad.State.Strict  (MonadState, State, runState)

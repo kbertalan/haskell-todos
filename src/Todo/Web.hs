@@ -12,9 +12,10 @@ import Text.Read                 (readMaybe)
 import Web.Scotty.Trans          as W (Parsable, delete, get, json, jsonData, param, parseParam, patch, post, put,
                                        rescue, status)
 
+import App.Paging                (Page (..))
 import App.Web                   (Action, Scotty, jsonError)
-import Todo.Domain               (DeleteError (..), Logic, ModifyError (..), Page (..), PatchError (..), create, delete,
-                                  modify, patch, showPage)
+import Todo.Domain               (DeleteError (..), Logic, ModifyError (..), PatchError (..), create, delete, modify,
+                                  patch, showPage)
 
 todoApi :: (MonadIO m, Logic m) => Scotty m ()
 todoApi = do

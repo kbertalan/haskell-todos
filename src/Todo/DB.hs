@@ -15,8 +15,8 @@ import qualified Hasql.Decoders             as D (Row, bool, column, noResult, n
 import qualified Hasql.Encoders             as E (Params, bool, int8, nonNullable, param, text, uuid)
 
 import           App.DB                     as DB (WithDB, execute, statement)
-import           Todo.Domain                as Todo (Page (..), Todo, completed, description, identifier, limit, mkTodo,
-                                                     offset)
+import           App.Paging                 (Page (..))
+import           Todo.Domain                as Todo (Todo, completed, description, identifier, mkTodo)
 
 dbGetById :: (MonadIO m, WithDB m) => UUID -> m (Maybe Todo)
 dbGetById i = DB.execute $ statement

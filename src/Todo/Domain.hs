@@ -12,9 +12,6 @@ module Todo.Domain
   , description
   , completed
   , CreateTodoRequest(..)
-  , Page(Page)
-  , limit
-  , offset
   , Logic
   , showPage
   , create
@@ -37,6 +34,7 @@ module Todo.Domain
   ) where
 
 import App.Error              (throwIfNothing)
+import App.Paging             (Page)
 import Control.Monad          (when)
 import Control.Monad.Except   (MonadError, throwError)
 import Control.Monad.Identity (Identity (Identity), runIdentity)
@@ -140,11 +138,6 @@ data PatchError
 data DeleteError
   = DeleteNotExists
   deriving (Show, Eq)
-
-data Page = Page
-  { offset :: !Word
-  , limit  :: !Word
-  } deriving (Show, Eq)
 
 class Logic m where
   showPage :: Page -> m [Todo]
