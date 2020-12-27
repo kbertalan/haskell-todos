@@ -16,7 +16,7 @@ import qualified Hasql.Encoders             as E (Params, bool, int8, nonNullabl
 
 import           App.DB                     as DB (WithDB, execute, statement)
 import           App.Paging                 (Page (..))
-import           Todo.Domain                as Todo (Todo, completed, description, identifier, mkTodo)
+import           Todo.Domain                as Todo (Todo, TodoM (..), completed, description, identifier)
 
 dbGetById :: (MonadIO m, WithDB m) => UUID -> m (Maybe Todo)
 dbGetById i = DB.execute $ statement
@@ -75,7 +75,7 @@ dbDeleteById i = do
     encoder = E.param (E.nonNullable E.uuid)
 
 row :: D.Row Todo
-row = mkTodo
+row = TodoM
   <$> D.column (D.nonNullable D.uuid)
   <*> fmap fromStrict (D.column (D.nonNullable D.text))
   <*> D.column (D.nonNullable D.bool)

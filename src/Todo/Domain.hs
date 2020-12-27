@@ -1,14 +1,15 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DeriveGeneric       #-}
+{-# LANGUAGE RankNTypes          #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE TypeFamilies        #-}
 
 module Todo.Domain
   ( TodoM(..)
   , Todo
   , TodoMaybe
   , TodoLast
-  , mkTodo
   , CreateTodoRequest(..)
   , Logic
   , showPage
@@ -37,8 +38,9 @@ import Control.Monad          (when)
 import Control.Monad.Except   (MonadError, throwError)
 import Control.Monad.Identity (Identity)
 import Control.Monad.Random   (MonadRandom, getRandom)
-import Data.Aeson             (FromJSON, ToJSON, defaultOptions, fieldLabelModifier, genericToEncoding,
-                               parseJSON, toEncoding, withObject, (.:), (.:?))
+import Data.Aeson             (FromJSON, ToJSON, defaultOptions, fieldLabelModifier, genericToEncoding, parseJSON,
+                               toEncoding, withObject, (.:), (.:?))
+import Data.Function          ((&))
 import Data.Monoid            (Last (..), getLast)
 import Data.Text.Lazy         (Text)
 import Data.UUID              (UUID)
@@ -67,7 +69,7 @@ instance ToJSON Todo where
   toEncoding = genericToEncoding defaultOptions {
     fieldLabelModifier = \case
       "identifier" -> "id"
-      a -> a
+      a            -> a
     }
 
 instance FromJSON Todo where
@@ -84,9 +86,6 @@ instance FromJSON TodoMaybe where
     <$> v .:? "id"
     <*> v .:? "description"
     <*> v .:? "completed"
-
-mkTodo :: UUID -> Text -> Bool -> Todo
-mkTodo = TodoM
 
 newtype CreateTodoRequest = CreateTodoRequest
   { ctrDescription :: Text
@@ -145,11 +144,14 @@ logicUpdate i todo = do
 
 logicPatch :: (Repo m, MonadError PatchError m) => UUID -> TodoMaybe -> m Todo
 logicPatch i req = do
-  existingId <- throwIfNothing MissingId $ identifier req
+  existingId <- identifier req & throwIfNothing MissingId
   when (i /= existingId) $ throwError PatchIdentifierMismatch
   existing <- repoGetById existingId >>= throwIfNothing PatchNotExists
-  let existingLast = fromTodo (Last . Just) existing
-  todo <- throwIfNothing MissingFields $ toTodo getLast $ existingLast <> convertTodo req
+  let existingLast = convertTodoM @Identity @Last (Last . Just) existing
+      reqLast = convertTodoM @Maybe @Last Last req
+  todo <- existingLast <> reqLast
+    & toTodo getLast
+    & throwIfNothing MissingFields
   repoUpdate todo
 
 logicDelete :: (Repo m, MonadError DeleteError m) => UUID -> m ()
@@ -157,23 +159,16 @@ logicDelete i = do
   _existing <- repoGetById i >>= throwIfNothing DeleteNotExists
   repoDelete i
 
-fromTodo :: (forall a. a -> Field g a) -> Todo -> TodoM g
-fromTodo f TodoM{..} = TodoM
-  { identifier = f identifier
-  , description = f description
-  , completed = f completed
-  }
-
-toTodo :: (forall a. Field f a -> Maybe a) -> TodoM f -> Maybe Todo
+toTodo :: (Applicative g) => (forall a. Field f a -> g a) -> TodoM f -> g Todo
 toTodo f TodoM{..} = TodoM
   <$> f identifier
   <*> f description
   <*> f completed
 
-convertTodo :: TodoMaybe -> TodoLast
-convertTodo TodoM{..} = TodoM
-  { identifier = Last identifier
-  , description = Last description
-  , completed = Last completed
+convertTodoM :: forall f g. (forall a. Field f a -> Field g a) -> TodoM f -> TodoM g
+convertTodoM f TodoM{..} = TodoM
+  { identifier = f @UUID identifier
+  , description = f @Text description
+  , completed = f @Bool completed
   }
 

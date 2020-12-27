@@ -1,15 +1,18 @@
+{-# LANGUAGE TypeApplications #-}
+
 module TodoSpec where
 
-import           Control.Applicative ((<|>))
-import qualified Data.Aeson          as A
-import           Data.Maybe          (fromJust)
-import           Data.Text.Lazy      (fromStrict)
-import           Data.UUID           (UUID, fromString, nil)
-import qualified Hedgehog.Gen        as Gen
-import qualified Hedgehog.Range      as Range
-import           Test.Hspec          (Spec, describe, it, shouldBe)
+import           Control.Applicative   ((<|>))
+import qualified Data.Aeson            as A
+import           Data.Functor.Identity (Identity)
+import           Data.Maybe            (fromJust)
+import           Data.Text.Lazy        (fromStrict)
+import           Data.UUID             (UUID, fromString, nil)
+import qualified Hedgehog.Gen          as Gen
+import qualified Hedgehog.Range        as Range
+import           Test.Hspec            (Spec, describe, it, shouldBe)
 import           Test.Hspec.Hedgehog
-import           TestTodoApp         (testTodoWithSeed)
+import           TestTodoApp           (testTodoWithSeed)
 import           Todo.Domain
 
 testUUID :: UUID
@@ -23,13 +26,13 @@ spec = do
     it "should accept simple description" $
       let
         request = CreateTodoRequest "desc"
-        expectedTodo = mkTodo testUUID "desc" False
+        expectedTodo = TodoM testUUID "desc" False
       in testTodoWithSeed (create request) 0 [] `shouldBe` (expectedTodo, [expectedTodo])
 
 
   describe "Modify" $ do
     let
-      modifiedTodo = mkTodo testUUID "desc" False
+      modifiedTodo = TodoM testUUID "desc" False
 
     it "should fail on missing todo" $
       testTodoWithSeed (modify testUUID modifiedTodo) 0 [] `shouldBe` (Left ModifyNotExists, [])
@@ -39,7 +42,7 @@ spec = do
 
     it "should update existing todo" $
       let
-        existingTodo = mkTodo testUUID "other" True
+        existingTodo = TodoM testUUID "other" True
       in
         testTodoWithSeed (modify testUUID modifiedTodo) 0 [existingTodo] `shouldBe` (Right modifiedTodo, [modifiedTodo])
 
@@ -50,20 +53,20 @@ spec = do
 
     it "should delete existing todo" $
       let
-        existingTodo = mkTodo testUUID "other" True
+        existingTodo = TodoM testUUID "other" True
       in
         testTodoWithSeed (delete testUUID) 0 [existingTodo] `shouldBe` (Right (), [])
 
 
   describe "Patch" $ do
     let
-      existingTodo = mkTodo testUUID "description" False
+      existingTodo = TodoM testUUID "description" False
 
     it "should patch existing todo" $ hedgehog $ do
       txt <- forAll $ Gen.maybe $ Gen.text (Range.linear 0 100) Gen.unicode
       done <- forAll $ Gen.maybe Gen.bool
       let patchTodo = TodoM (Just testUUID) (fromStrict <$> txt) done
-          savedTodo = mkTodo
+          savedTodo = TodoM
             testUUID
             (fromJust (fmap fromStrict txt <|> Just (description existingTodo)))
             (fromJust (done <|> Just (completed existingTodo)))
@@ -91,7 +94,7 @@ spec = do
     it "should parse serialized todo" $ hedgehog $ do
       desc <- forAll $ Gen.text (Range.linear 0 100) Gen.unicode
       comp <- forAll Gen.bool
-      todo <- forAll $ Gen.constant $ mkTodo testUUID (fromStrict desc) comp
+      todo <- forAll $ Gen.constant $ TodoM @Identity testUUID (fromStrict desc) comp
       encoded <- forAll $ Gen.constant $ A.encode todo
       Just todo === A.decode encoded
 
