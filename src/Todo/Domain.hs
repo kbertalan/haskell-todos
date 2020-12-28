@@ -17,9 +17,10 @@ module Todo.Domain
   , modify
   , patch
   , delete
-  , ModifyError(..)
+  , ModifyError
+  , NotExists (..)
   , PatchError (..)
-  , DeleteError (..)
+  , DeleteError
   , repoGetById
   , repoUpdate
   , repoSelectPage
@@ -94,9 +95,10 @@ instance FromJSON CreateTodoRequest where
   parseJSON = withObject "CreateTodoRequest" $ \v -> CreateTodoRequest
     <$> v .: "description"
 
-data ModifyError
-  = ModifyNotExists
+data NotExists = NotExists
   deriving (Show, Eq)
+
+type ModifyError = NotExists
 
 data PatchError
   = MissingId
@@ -104,9 +106,7 @@ data PatchError
   | PatchNotExists
   deriving (Show, Eq)
 
-data DeleteError
-  = DeleteNotExists
-  deriving (Show, Eq)
+type DeleteError = NotExists
 
 class Logic m where
   showPage :: Page -> m [Todo]
@@ -135,7 +135,7 @@ logicCreate req = do
 logicUpdate :: (Repo m, MonadError ModifyError m) => Todo -> m Todo
 logicUpdate todo = do
   repoGetById (identifier todo)
-    >>= throwIfNothing ModifyNotExists
+    >>= throwIfNothing NotExists
     >> repoUpdate todo
 
 logicPatch :: (Repo m, MonadError PatchError m) => TodoMaybe -> m Todo
@@ -151,7 +151,7 @@ logicPatch req = do
 
 logicDelete :: (Repo m, MonadError DeleteError m) => UUID -> m ()
 logicDelete i = do
-  _existing <- repoGetById i >>= throwIfNothing DeleteNotExists
+  _existing <- repoGetById i >>= throwIfNothing NotExists
   repoDelete i
 
 toTodo :: (Applicative g) => (forall a. Field f a -> g a) -> TodoM f -> g Todo

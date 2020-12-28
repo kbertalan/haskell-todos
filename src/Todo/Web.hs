@@ -15,7 +15,7 @@ import Web.Scotty.Trans          as W (Parsable, delete, get, json, jsonData, pa
 
 import App.Paging                (Page (..))
 import App.Web                   (Action, Scotty, jsonError)
-import Todo.Domain               (DeleteError (..), Logic, ModifyError (..), PatchError (..), create, delete,
+import Todo.Domain               (DeleteError, Logic, ModifyError, NotExists (..), PatchError (..), create, delete,
                                   identifier, modify, patch, showPage)
 
 todoApi :: (MonadIO m, Logic m) => Scotty m ()
@@ -44,8 +44,8 @@ todoApi = do
 handleModifyError :: Monad m => Either ModifyError a -> Action m a
 handleModifyError result =
   case result of
-    Right r              -> return r
-    Left ModifyNotExists -> jsonError status404 "Todo with provided identifier has not been found"
+    Right r        -> return r
+    Left NotExists -> jsonError status404 "Todo with provided identifier has not been found"
 
 handlePatchError :: Monad m => Either PatchError a -> Action m a
 handlePatchError result =
@@ -58,8 +58,8 @@ handlePatchError result =
 handleDeleteError :: Monad m => Either DeleteError a -> Action m a
 handleDeleteError result =
   case result of
-    Right r              -> return r
-    Left DeleteNotExists -> jsonError status404 "Todo with provided identifier has not been found"
+    Right r        -> return r
+    Left NotExists -> jsonError status404 "Todo with provided identifier has not been found"
 
 instance Parsable UUID where
   parseParam = maybe (Left "Invalid UUID") Right . readMaybe . unpack

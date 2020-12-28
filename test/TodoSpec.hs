@@ -35,7 +35,7 @@ spec = do
       modifiedTodo = TodoM testUUID "desc" False
 
     it "should fail on missing todo" $
-      testTodoWithSeed (modify modifiedTodo) 0 [] `shouldBe` (Left ModifyNotExists, [])
+      testTodoWithSeed (modify modifiedTodo) 0 [] `shouldBe` (Left NotExists, [])
 
     it "should update existing todo" $
       let
@@ -46,7 +46,7 @@ spec = do
 
   describe "Delete" $ do
     it "should fail on missing todo" $
-      testTodoWithSeed (delete testUUID) 0 [] `shouldBe` (Left DeleteNotExists, [])
+      testTodoWithSeed (delete testUUID) 0 [] `shouldBe` (Left NotExists, [])
 
     it "should delete existing todo" $
       let
