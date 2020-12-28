@@ -16,8 +16,8 @@ newtype TestTodoM a = TestTodoM
 instance Logic TestTodoM where
   showPage = repoSelectPage
   create = logicCreate
-  modify = fmap runExceptT . logicUpdate
-  patch = fmap runExceptT . logicPatch
+  modify = fmap runExceptT logicUpdate
+  patch = fmap runExceptT logicPatch
   delete = fmap runExceptT logicDelete
 
 instance Repo TestTodoM where

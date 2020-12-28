@@ -7,7 +7,7 @@ import qualified Data.Aeson            as A
 import           Data.Functor.Identity (Identity)
 import           Data.Maybe            (fromJust)
 import           Data.Text.Lazy        (fromStrict)
-import           Data.UUID             (UUID, fromString, nil)
+import           Data.UUID             (UUID, fromString)
 import qualified Hedgehog.Gen          as Gen
 import qualified Hedgehog.Range        as Range
 import           Test.Hspec            (Spec, describe, it, shouldBe)
@@ -35,16 +35,13 @@ spec = do
       modifiedTodo = TodoM testUUID "desc" False
 
     it "should fail on missing todo" $
-      testTodoWithSeed (modify testUUID modifiedTodo) 0 [] `shouldBe` (Left ModifyNotExists, [])
-
-    it "should fail on not matching ids" $
-      testTodoWithSeed (modify nil modifiedTodo) 0 [] `shouldBe` (Left ModifyIdentifierMismatch, [])
+      testTodoWithSeed (modify modifiedTodo) 0 [] `shouldBe` (Left ModifyNotExists, [])
 
     it "should update existing todo" $
       let
         existingTodo = TodoM testUUID "other" True
       in
-        testTodoWithSeed (modify testUUID modifiedTodo) 0 [existingTodo] `shouldBe` (Right modifiedTodo, [modifiedTodo])
+        testTodoWithSeed (modify modifiedTodo) 0 [existingTodo] `shouldBe` (Right modifiedTodo, [modifiedTodo])
 
 
   describe "Delete" $ do
@@ -70,25 +67,19 @@ spec = do
             testUUID
             (fromJust (fmap fromStrict txt <|> Just (description existingTodo)))
             (fromJust (done <|> Just (completed existingTodo)))
-      testTodoWithSeed (patch testUUID patchTodo) 0 [existingTodo] === (Right savedTodo, [savedTodo])
+      testTodoWithSeed (patch patchTodo) 0 [existingTodo] === (Right savedTodo, [savedTodo])
 
     it "should fail on missing id" $
       let
         patchTodo = TodoM Nothing Nothing Nothing
       in
-        testTodoWithSeed (patch testUUID patchTodo) 0 [] `shouldBe` (Left MissingId, [])
-
-    it "should fail on not matching ids" $
-      let
-        patchTodo = TodoM (Just nil) Nothing Nothing
-      in
-        testTodoWithSeed (patch testUUID patchTodo) 0 [] `shouldBe` (Left PatchIdentifierMismatch, [])
+        testTodoWithSeed (patch patchTodo) 0 [] `shouldBe` (Left MissingId, [])
 
     it "should fail on not existing todo" $
       let
         patchTodo = TodoM (Just testUUID) Nothing Nothing
       in
-        testTodoWithSeed (patch testUUID patchTodo) 0 [] `shouldBe` (Left PatchNotExists, [])
+        testTodoWithSeed (patch patchTodo) 0 [] `shouldBe` (Left PatchNotExists, [])
 
   describe "json" $
     it "should parse serialized todo" $ hedgehog $ do

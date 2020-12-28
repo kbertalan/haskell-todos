@@ -34,8 +34,7 @@ module Todo.Domain
 
 import App.Error              (throwIfNothing)
 import App.Paging             (Page)
-import Control.Monad          (when)
-import Control.Monad.Except   (MonadError, throwError)
+import Control.Monad.Except   (MonadError)
 import Control.Monad.Identity (Identity)
 import Control.Monad.Random   (MonadRandom, getRandom)
 import Data.Aeson             (FromJSON, ToJSON, defaultOptions, fieldLabelModifier, genericToEncoding, parseJSON,
@@ -97,14 +96,12 @@ instance FromJSON CreateTodoRequest where
 
 data ModifyError
   = ModifyNotExists
-  | ModifyIdentifierMismatch
   deriving (Show, Eq)
 
 data PatchError
   = MissingId
   | MissingFields
   | PatchNotExists
-  | PatchIdentifierMismatch
   deriving (Show, Eq)
 
 data DeleteError
@@ -114,8 +111,8 @@ data DeleteError
 class Logic m where
   showPage :: Page -> m [Todo]
   create :: CreateTodoRequest -> m Todo
-  modify :: UUID -> Todo -> m (Either ModifyError Todo)
-  patch :: UUID -> TodoMaybe -> m (Either PatchError Todo)
+  modify :: Todo -> m (Either ModifyError Todo)
+  patch :: TodoMaybe -> m (Either PatchError Todo)
   delete :: UUID -> m (Either DeleteError ())
 
 class Repo m where
@@ -135,17 +132,15 @@ logicCreate req = do
     }
   repoInsert todo
 
-logicUpdate :: (Repo m, MonadError ModifyError m) => UUID -> Todo -> m Todo
-logicUpdate i todo = do
-  when (i /= identifier todo) $ throwError ModifyIdentifierMismatch
+logicUpdate :: (Repo m, MonadError ModifyError m) => Todo -> m Todo
+logicUpdate todo = do
   repoGetById (identifier todo)
     >>= throwIfNothing ModifyNotExists
     >> repoUpdate todo
 
-logicPatch :: (Repo m, MonadError PatchError m) => UUID -> TodoMaybe -> m Todo
-logicPatch i req = do
+logicPatch :: (Repo m, MonadError PatchError m) => TodoMaybe -> m Todo
+logicPatch req = do
   existingId <- identifier req & throwIfNothing MissingId
-  when (i /= existingId) $ throwError PatchIdentifierMismatch
   existing <- repoGetById existingId >>= throwIfNothing PatchNotExists
   let existingLast = convertTodoM @Identity @Last (Last . Just) existing
       reqLast = convertTodoM @Maybe @Last Last req

@@ -4,6 +4,7 @@ module Todo.Web
   ( todoApi
   ) where
 
+import Control.Monad             (when)
 import Control.Monad.Trans       (MonadIO, lift)
 import Data.Text.Lazy            (unpack)
 import Data.UUID                 (UUID)
@@ -14,8 +15,8 @@ import Web.Scotty.Trans          as W (Parsable, delete, get, json, jsonData, pa
 
 import App.Paging                (Page (..))
 import App.Web                   (Action, Scotty, jsonError)
-import Todo.Domain               (DeleteError (..), Logic, ModifyError (..), PatchError (..), create, delete, modify,
-                                  patch, showPage)
+import Todo.Domain               (DeleteError (..), Logic, ModifyError (..), PatchError (..), create, delete,
+                                  identifier, modify, patch, showPage)
 
 todoApi :: (MonadIO m, Logic m) => Scotty m ()
 todoApi = do
@@ -28,29 +29,31 @@ todoApi = do
       status status201
       json r
   put "/todo/:id" $ do
-    identifier <- param "id"
-    jsonData >>= lift . modify identifier >>= handleModifyError >>= json
+    idValue <- param "id"
+    todo <- jsonData
+    when (idValue /= identifier todo) $ jsonError status400 "Identifiers in path and body are different"
+    lift (modify todo) >>= handleModifyError >>= json
   W.patch "/todo/:id" $ do
-    identifier <- param "id"
-    jsonData >>= lift . Todo.Domain.patch identifier >>= handlePatchError >>= json
+    idValue <- param "id"
+    todo <- jsonData
+    when (Just idValue /= identifier todo) $ jsonError status400 "Identifiers in path and body are different"
+    lift (Todo.Domain.patch todo) >>= handlePatchError >>= json
   W.delete "/todo/:id" $
     param "id" >>= lift . Todo.Domain.delete >>= handleDeleteError >>= json
 
 handleModifyError :: Monad m => Either ModifyError a -> Action m a
 handleModifyError result =
   case result of
-    Right r                       -> return r
-    Left ModifyNotExists          -> jsonError status404 "Todo with provided identifier has not been found"
-    Left ModifyIdentifierMismatch -> jsonError status400 "Identifiers in path and body are different"
+    Right r              -> return r
+    Left ModifyNotExists -> jsonError status404 "Todo with provided identifier has not been found"
 
 handlePatchError :: Monad m => Either PatchError a -> Action m a
 handlePatchError result =
   case result of
-    Right r                      -> return r
-    Left MissingId               -> jsonError status400 "No identifier has been provided"
-    Left MissingFields           -> jsonError status400 "Could not construct final Todo record"
-    Left PatchNotExists          -> jsonError status404 "Todo with provided identifier has not been found"
-    Left PatchIdentifierMismatch -> jsonError status400 "Identifiers in path and body are different"
+    Right r             -> return r
+    Left MissingId      -> jsonError status400 "No identifier has been provided"
+    Left MissingFields  -> jsonError status400 "Could not construct final Todo record"
+    Left PatchNotExists -> jsonError status404 "Todo with provided identifier has not been found"
 
 handleDeleteError :: Monad m => Either DeleteError a -> Action m a
 handleDeleteError result =
