@@ -1,4 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE ConstraintKinds     #-}
+{-# LANGUAGE DataKinds           #-}
 {-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE RankNTypes          #-}
 {-# LANGUAGE RecordWildCards     #-}
@@ -19,7 +21,9 @@ module Todo.Domain
   , delete
   , ModifyError
   , NotExists (..)
-  , PatchError (..)
+  , MissingId (..)
+  , MissingFields (..)
+  , PatchError
   , DeleteError
   , repoGetById
   , repoUpdate
@@ -33,7 +37,7 @@ module Todo.Domain
   , Repo
   ) where
 
-import App.Error              (throwIfNothing)
+import App.Error              (OneOf, throwIfNothing)
 import App.Paging             (Page)
 import Control.Monad.Except   (MonadError)
 import Control.Monad.Identity (Identity)
@@ -98,13 +102,15 @@ instance FromJSON CreateTodoRequest where
 data NotExists = NotExists
   deriving (Show, Eq)
 
+data MissingId = MissingId
+  deriving (Show, Eq)
+
+data MissingFields = MissingFields
+  deriving (Show, Eq)
+
 type ModifyError = NotExists
 
-data PatchError
-  = MissingId
-  | MissingFields
-  | PatchNotExists
-  deriving (Show, Eq)
+type PatchError e = OneOf e '[MissingId, MissingFields, NotExists]
 
 type DeleteError = NotExists
 
@@ -112,7 +118,7 @@ class Logic m where
   showPage :: Page -> m [Todo]
   create :: CreateTodoRequest -> m Todo
   modify :: Todo -> m (Either ModifyError Todo)
-  patch :: TodoMaybe -> m (Either PatchError Todo)
+  patch :: (PatchError e) => TodoMaybe -> m (Either e Todo)
   delete :: UUID -> m (Either DeleteError ())
 
 class Repo m where
@@ -138,10 +144,10 @@ logicUpdate todo = do
     >>= throwIfNothing NotExists
     >> repoUpdate todo
 
-logicPatch :: (Repo m, MonadError PatchError m) => TodoMaybe -> m Todo
+logicPatch :: (Repo m, MonadError e m, PatchError e) => TodoMaybe -> m Todo
 logicPatch req = do
   existingId <- identifier req & throwIfNothing MissingId
-  existing <- repoGetById existingId >>= throwIfNothing PatchNotExists
+  existing <- repoGetById existingId >>= throwIfNothing NotExists
   let existingLast = convertTodoM @Identity @Last (Last . Just) existing
       reqLast = convertTodoM @Maybe @Last Last req
   todo <- existingLast <> reqLast

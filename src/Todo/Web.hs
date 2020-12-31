@@ -13,10 +13,11 @@ import Text.Read                 (readMaybe)
 import Web.Scotty.Trans          as W (Parsable, delete, get, json, jsonData, param, parseParam, patch, post, put,
                                        rescue, status)
 
+import App.Error                 (catch, catchLast)
 import App.Paging                (Page (..))
 import App.Web                   (Action, Scotty, jsonError)
-import Todo.Domain               (DeleteError, Logic, ModifyError, NotExists (..), PatchError (..), create, delete,
-                                  identifier, modify, patch, showPage)
+import Todo.Domain               (DeleteError, Logic, MissingFields (..), MissingId (..), ModifyError, NotExists (..),
+                                  create, delete, identifier, modify, patch, showPage)
 
 todoApi :: (MonadIO m, Logic m) => Scotty m ()
 todoApi = do
@@ -47,13 +48,12 @@ handleModifyError result =
     Right r        -> return r
     Left NotExists -> jsonError status404 "Todo with provided identifier has not been found"
 
-handlePatchError :: Monad m => Either PatchError a -> Action m a
+handlePatchError :: Monad m => Either (Either MissingId (Either MissingFields NotExists)) a -> Action m a
 handlePatchError result =
-  case result of
-    Right r             -> return r
-    Left MissingId      -> jsonError status400 "No identifier has been provided"
-    Left MissingFields  -> jsonError status400 "Could not construct final Todo record"
-    Left PatchNotExists -> jsonError status404 "Todo with provided identifier has not been found"
+  fmap return result
+    `catch` (\case MissingId -> return $ jsonError status400 "No identifier has been provided")
+    `catch` (\case MissingFields -> return $ jsonError status400 "Could not construct final Todo record")
+    `catchLast` (\case NotExists -> jsonError status404 "Todo with provided identifier has not been found")
 
 handleDeleteError :: Monad m => Either DeleteError a -> Action m a
 handleDeleteError result =
