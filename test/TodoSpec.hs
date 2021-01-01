@@ -58,12 +58,8 @@ spec = do
   describe "Patch" $ do
     let
       existingTodo = TodoM testUUID "description" False
-      correct :: a -> Either (Either MissingId (Either MissingFields NotExists)) a
-      correct a = Right a
-      missingId :: Either (Either MissingId (Either MissingFields NotExists)) a
-      missingId = Left $ Left MissingId
-      notExists :: Either (Either MissingId (Either MissingFields NotExists)) a
-      notExists = Left $ Right $ Right NotExists
+      runPatch :: TodoMaybe -> [Todo] -> (Either (Either MissingId (Either MissingFields NotExists)) Todo, [Todo])
+      runPatch patchTodo db = testTodoWithSeed (patch patchTodo) 0 db
 
     it "should patch existing todo" $ hedgehog $ do
       txt <- forAll $ Gen.maybe $ Gen.text (Range.linear 0 100) Gen.unicode
@@ -73,19 +69,19 @@ spec = do
             testUUID
             (fromJust (fmap fromStrict txt <|> Just (description existingTodo)))
             (fromJust (done <|> Just (completed existingTodo)))
-      testTodoWithSeed (patch patchTodo) 0 [existingTodo] === (correct savedTodo, [savedTodo])
+      runPatch patchTodo [existingTodo] === (Right savedTodo, [savedTodo])
 
     it "should fail on missing id" $
       let
         patchTodo = TodoM Nothing Nothing Nothing
       in
-        testTodoWithSeed (patch patchTodo) 0 [] `shouldBe` (missingId, [])
+        runPatch patchTodo [] `shouldBe` (Left $ Left MissingId, [])
 
     it "should fail on not existing todo" $
       let
         patchTodo = TodoM (Just testUUID) Nothing Nothing
       in
-        testTodoWithSeed (patch patchTodo) 0 [] `shouldBe` (notExists, [])
+        runPatch patchTodo [] `shouldBe` (Left $ Right $ Right NotExists, [])
 
   describe "json" $
     it "should parse serialized todo" $ hedgehog $ do
