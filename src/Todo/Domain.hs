@@ -23,7 +23,6 @@ module Todo.Domain
     delete,
     ModifyError,
     NotExists (..),
-    MissingId (..),
     MissingFields (..),
     PatchError,
     DeleteError,
@@ -80,18 +79,18 @@ instance ToJSON Identifier where
 instance FromJSON Identifier where
   parseJSON v = Identifier <$> parseJSON v
 
-data TodoM m = TodoM
-  { identifier :: Field m Identifier,
+data TodoM i m = TodoM
+  { identifier :: Field i Identifier,
     description :: Field m Text,
     completed :: Field m Bool
   }
   deriving (Generic)
 
-type Todo = TodoM Identity
+type Todo = TodoM Identity Identity
 
-type TodoLast = TodoM Last
+type TodoLast = TodoM Identity Last
 
-type TodoMaybe = TodoM Maybe
+type TodoMaybe = TodoM Identity Maybe
 
 deriving instance Eq Todo
 
@@ -114,12 +113,12 @@ instance FromJSON Todo where
       <*> v .: "completed"
 
 instance Semigroup TodoLast where
-  TodoM i1 d1 c1 <> TodoM i2 d2 c2 = TodoM (i1 <> i2) (d1 <> d2) (c1 <> c2)
+  TodoM _i1 d1 c1 <> TodoM i2 d2 c2 = TodoM i2 (d1 <> d2) (c1 <> c2)
 
 instance FromJSON TodoMaybe where
   parseJSON = withObject "Todo" $ \v ->
     TodoM
-      <$> v .:? "id"
+      <$> v .: "id"
       <*> v .:? "description"
       <*> v .:? "completed"
 
@@ -136,15 +135,12 @@ instance FromJSON CreateTodoRequest where
 data NotExists = NotExists
   deriving (Show, Eq)
 
-data MissingId = MissingId
-  deriving (Show, Eq)
-
 data MissingFields = MissingFields
   deriving (Show, Eq)
 
 type ModifyError = NotExists
 
-type PatchError e = OneOf e '[MissingId, MissingFields, NotExists]
+type PatchError e = OneOf e '[MissingFields, NotExists]
 
 type DeleteError = NotExists
 
@@ -181,7 +177,7 @@ logicUpdate todo = do
 
 logicPatch :: (Repo m, MonadError e m, PatchError e) => TodoMaybe -> m Todo
 logicPatch req = do
-  existingId <- identifier req & throwIfNothing MissingId
+  let existingId = identifier req
   existing <- repoGetById existingId >>= throwIfNothing NotExists
   let existingLast = convertTodoM @Identity @Last (Last . Just) existing
       reqLast = convertTodoM @Maybe @Last Last req
@@ -196,17 +192,16 @@ logicDelete i = do
   _existing <- repoGetById i >>= throwIfNothing NotExists
   repoDelete i
 
-toTodo :: (Applicative g) => (forall a. Field f a -> g a) -> TodoM f -> g Todo
+toTodo :: (Applicative g) => (forall a. Field f a -> g a) -> TodoM Identity f -> g Todo
 toTodo f TodoM {..} =
-  TodoM
-    <$> f identifier
-    <*> f description
+  TodoM identifier
+    <$> f description
     <*> f completed
 
-convertTodoM :: forall f g. (forall a. Field f a -> Field g a) -> TodoM f -> TodoM g
+convertTodoM :: forall f g b. (forall a. Field f a -> Field g a) -> TodoM b f -> TodoM b g
 convertTodoM f TodoM {..} =
   TodoM
-    { identifier = f @Identifier identifier,
+    { identifier = identifier,
       description = f @Text description,
       completed = f @Bool completed
     }

@@ -18,7 +18,6 @@ import Todo.Domain
   ( Identifier (..),
     Logic,
     MissingFields (..),
-    MissingId (..),
     NotExists (..),
     create,
     delete,
@@ -63,7 +62,7 @@ todoApi = do
   W.patch "/todo/:id" $ do
     idValue <- Identifier <$> param "id"
     todo <- jsonData
-    when (Just idValue /= identifier todo) identifierError
+    when (idValue /= identifier todo) identifierError
     lift (Todo.Domain.patch todo) >>= handlePatchError >>= json
 
   W.delete "/todo/:id" $
@@ -71,12 +70,10 @@ todoApi = do
   where
     identifierError = jsonError status400 "Identifiers in path and body are different"
     notExistsError = jsonError status404 "Todo with provided identifier has not been found"
-    missingIdError = jsonError status400 "No identifier has been found in request"
     missingFieldsError = jsonError status400 "Could not construct final Todo record"
 
     handlePatchError result =
       fmap return result
-        `catch` \case MissingId -> return missingIdError
         `catch` \case MissingFields -> return missingFieldsError
         `catchLast` \case NotExists -> notExistsError
 

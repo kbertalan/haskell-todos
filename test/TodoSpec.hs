@@ -46,14 +46,14 @@ spec = do
 
   describe "Patch" $ do
     let existingTodo = TodoM testUUID "description" False
-        runPatch :: TodoMaybe -> [Todo] -> (Either (Either MissingId (Either MissingFields NotExists)) Todo, [Todo])
+        runPatch :: TodoMaybe -> [Todo] -> (Either (Either MissingFields NotExists) Todo, [Todo])
         runPatch patchTodo db = testTodoWithSeed (patch patchTodo) 0 db
 
     it "should patch existing todo" $
       hedgehog $ do
         txt <- forAll $ Gen.maybe $ Gen.text (Range.linear 0 100) Gen.unicode
         done <- forAll $ Gen.maybe Gen.bool
-        let patchTodo = TodoM (Just testUUID) (fromStrict <$> txt) done
+        let patchTodo = TodoM testUUID (fromStrict <$> txt) done
             savedTodo =
               TodoM
                 testUUID
@@ -61,19 +61,15 @@ spec = do
                 (fromJust (done <|> Just (completed existingTodo)))
         runPatch patchTodo [existingTodo] === (Right savedTodo, [savedTodo])
 
-    it "should fail on missing id" $
-      let patchTodo = TodoM Nothing Nothing Nothing
-       in runPatch patchTodo [] `shouldBe` (Left $ Left MissingId, [])
-
     it "should fail on not existing todo" $
-      let patchTodo = TodoM (Just testUUID) Nothing Nothing
-       in runPatch patchTodo [] `shouldBe` (Left $ Right $ Right NotExists, [])
+      let patchTodo = TodoM testUUID Nothing Nothing
+       in runPatch patchTodo [] `shouldBe` (Left $ Right NotExists, [])
 
   describe "json" $
     it "should parse serialized todo" $
       hedgehog $ do
         desc <- forAll $ Gen.text (Range.linear 0 100) Gen.unicode
         comp <- forAll Gen.bool
-        todo <- forAll $ Gen.constant $ TodoM @Identity testUUID (fromStrict desc) comp
+        todo <- forAll $ Gen.constant $ TodoM @Identity @Identity testUUID (fromStrict desc) comp
         encoded <- forAll $ Gen.constant $ A.encode todo
         Just todo === A.decode encoded
