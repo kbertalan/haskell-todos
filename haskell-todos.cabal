@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 89fa7f78ecfc1b7c8df3a981ca751b339ac858a7b2ef8919c4b975c581d5eaff
+-- hash: 1799adeeb5f0ce509f5b929701d3044e5b3d42f23c33c52b33333f931d74d80c
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -81,7 +81,7 @@ executable haskell-todos-exe
   hs-source-dirs:
       app
   default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
-  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T
+  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts "-with-rtsopts=-N -T"
   build-depends:
       MonadRandom
     , aeson
@@ -117,7 +117,7 @@ test-suite haskell-todos-test
   hs-source-dirs:
       test
   default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
-  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T
+  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts "-with-rtsopts=-N -T"
   build-depends:
       MonadRandom
     , aeson
