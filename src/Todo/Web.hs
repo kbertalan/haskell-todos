@@ -26,6 +26,7 @@ import Todo.Domain
     patch,
     showPage,
   )
+import Todo.JSON ()
 import Web.Scotty.Trans as W
   ( Parsable,
     delete,

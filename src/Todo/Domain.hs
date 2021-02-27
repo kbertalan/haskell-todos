@@ -44,18 +44,6 @@ import App.Paging (Page)
 import Control.Monad.Except (MonadError)
 import Control.Monad.Identity (Identity)
 import Control.Monad.Random (MonadRandom, getRandom)
-import Data.Aeson
-  ( FromJSON,
-    ToJSON,
-    defaultOptions,
-    fieldLabelModifier,
-    genericToEncoding,
-    parseJSON,
-    toEncoding,
-    withObject,
-    (.:),
-    (.:?),
-  )
 import Data.Function ((&))
 import Data.Monoid (Last (..), getLast)
 import Data.Text.Lazy (Text)
@@ -72,12 +60,6 @@ newtype Identifier = Identifier UUID
 
 unIdentifier :: Identifier -> UUID
 unIdentifier (Identifier uuid) = uuid
-
-instance ToJSON Identifier where
-  toEncoding (Identifier uuid) = toEncoding uuid
-
-instance FromJSON Identifier where
-  parseJSON v = Identifier <$> parseJSON v
 
 data TodoM i m = TodoM
   { identifier :: Field i Identifier,
@@ -96,41 +78,13 @@ deriving instance Eq Todo
 
 deriving instance Show Todo
 
-instance ToJSON Todo where
-  toEncoding =
-    genericToEncoding
-      defaultOptions
-        { fieldLabelModifier = \case
-            "identifier" -> "id"
-            a -> a
-        }
-
-instance FromJSON Todo where
-  parseJSON = withObject "Todo" $ \v ->
-    TodoM
-      <$> v .: "id"
-      <*> v .: "description"
-      <*> v .: "completed"
-
 instance Semigroup TodoLast where
   TodoM _i1 d1 c1 <> TodoM i2 d2 c2 = TodoM i2 (d1 <> d2) (c1 <> c2)
-
-instance FromJSON TodoMaybe where
-  parseJSON = withObject "Todo" $ \v ->
-    TodoM
-      <$> v .: "id"
-      <*> v .:? "description"
-      <*> v .:? "completed"
 
 newtype CreateTodoRequest = CreateTodoRequest
   { ctrDescription :: Text
   }
   deriving (Show, Generic)
-
-instance FromJSON CreateTodoRequest where
-  parseJSON = withObject "CreateTodoRequest" $ \v ->
-    CreateTodoRequest
-      <$> v .: "description"
 
 data NotExists = NotExists
   deriving (Show, Eq)

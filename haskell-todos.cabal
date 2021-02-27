@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 57b35c3e011d5fa82e4947c511c8dd25d677a96abbd1c1cbda062b8d5fda6591
+-- hash: 89fa7f78ecfc1b7c8df3a981ca751b339ac858a7b2ef8919c4b975c581d5eaff
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -42,6 +42,7 @@ library
       Todo
       Todo.DB
       Todo.Domain
+      Todo.JSON
       Todo.Web
   other-modules:
       Paths_haskell_todos
