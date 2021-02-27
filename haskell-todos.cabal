@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f4ba0b4c088d699a789b6f49434db02944cf31f24f022a99aafe799276cc16e7
+-- hash: 57b35c3e011d5fa82e4947c511c8dd25d677a96abbd1c1cbda062b8d5fda6591
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -69,6 +69,7 @@ library
     , uuid
     , vector
     , wai
+    , wai-middleware-metrics
   default-language: Haskell2010
 
 executable haskell-todos-exe
@@ -102,6 +103,7 @@ executable haskell-todos-exe
     , uuid
     , vector
     , wai
+    , wai-middleware-metrics
   default-language: Haskell2010
 
 test-suite haskell-todos-test
@@ -139,4 +141,5 @@ test-suite haskell-todos-test
     , uuid
     , vector
     , wai
+    , wai-middleware-metrics
   default-language: Haskell2010

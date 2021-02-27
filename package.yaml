@@ -39,6 +39,7 @@ dependencies:
 - MonadRandom
 - co-log
 - time
+- wai-middleware-metrics
 
 ghc-options:
   - -Werror

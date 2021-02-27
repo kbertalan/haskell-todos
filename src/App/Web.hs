@@ -1,27 +1,31 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric  #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module App.Web
-  ( Options(..)
-  , Scotty
-  , Action
-  , run
-  , jsonError
-  ) where
+  ( Options (..),
+    Scotty,
+    Action,
+    run,
+    jsonError,
+    middleware,
+  )
+where
 
-import Control.Monad.IO.Class    (MonadIO)
-import Data.Aeson                (ToJSON)
-import Data.Text.Lazy            (Text)
-import GHC.Generics              (Generic)
+import Control.Monad.IO.Class (MonadIO)
+import Data.Aeson (ToJSON)
+import Data.Text.Lazy (Text)
+import GHC.Generics (Generic)
 import Network.HTTP.Types.Status (Status)
-import Network.Wai               (Response)
-import Web.Scotty.Trans          (ActionT, ScottyT, defaultHandler, finish, json, scottyT, status)
+import Network.Wai (Response)
+import Web.Scotty.Trans (ActionT, ScottyT, defaultHandler, finish, json, middleware, scottyT, status)
 
 newtype Options = Options
   { webPort :: Int
-  } deriving (Show)
+  }
+  deriving (Show)
 
 type Scotty = ScottyT Text
+
 type Action = ActionT Text
 
 run :: (Monad m, MonadIO n) => Options -> (m Response -> IO Response) -> Scotty m () -> n ()
@@ -40,5 +44,6 @@ jsonError code msg =
 
 newtype Error = Error
   { message :: Text
-  } deriving stock (Generic)
+  }
+  deriving stock (Generic)
   deriving anyclass (ToJSON)
