@@ -16,7 +16,7 @@ import TestTodoApp (testTodoWithSeed)
 import Todo.Domain
 import Todo.JSON ()
 
-testUUID :: Identifier
+testUUID :: Identifier Todo
 testUUID = Identifier $ fromJust $ fromString "fffd04bd-0ede-42e0-8088-a28c5fba9949"
 
 spec :: Spec

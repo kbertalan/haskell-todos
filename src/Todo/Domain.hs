@@ -51,7 +51,7 @@ import GHC.Generics (Generic)
 import Prelude hiding (id)
 
 data TodoM i m = TodoM
-  { identifier :: Field i Identifier,
+  { identifier :: Field i (Identifier Todo),
     description :: Field m Text,
     completed :: Field m Bool
   }
@@ -92,14 +92,14 @@ class Logic m where
   create :: CreateTodoRequest -> m Todo
   modify :: Todo -> m (Either ModifyError Todo)
   patch :: (PatchError e) => TodoMaybe -> m (Either e Todo)
-  delete :: Identifier -> m (Either DeleteError ())
+  delete :: Identifier Todo -> m (Either DeleteError ())
 
 class Repo m where
   repoSelectPage :: Page -> m [Todo]
   repoInsert :: Todo -> m Todo
   repoUpdate :: Todo -> m Todo
-  repoGetById :: Identifier -> m (Maybe Todo)
-  repoDelete :: Identifier -> m ()
+  repoGetById :: Identifier Todo -> m (Maybe Todo)
+  repoDelete :: Identifier Todo -> m ()
 
 logicCreate :: (Repo m, MonadRandom m) => CreateTodoRequest -> m Todo
 logicCreate req = do
@@ -130,7 +130,7 @@ logicPatch req = do
       & throwIfNothing MissingFields
   repoUpdate todo
 
-logicDelete :: (Repo m, MonadError DeleteError m) => Identifier -> m ()
+logicDelete :: (Repo m, MonadError DeleteError m) => Identifier Todo -> m ()
 logicDelete i = do
   _existing <- repoGetById i >>= throwIfNothing NotExists
   repoDelete i

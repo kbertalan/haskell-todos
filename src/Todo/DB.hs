@@ -26,7 +26,7 @@ import qualified Hasql.Decoders as D
 import qualified Hasql.Encoders as E (Params, bool, int8, nonNullable, param, text, uuid)
 import Todo.Domain as Todo (Identifier (..), Todo, TodoM (..), completed, description, identifier, unIdentifier)
 
-dbGetById :: (MonadIO m, WithDB m) => Identifier -> m (Maybe Todo)
+dbGetById :: (MonadIO m, WithDB m) => Identifier Todo -> m (Maybe Todo)
 dbGetById i =
   DB.execute $
     statement
@@ -77,7 +77,7 @@ dbUpdate todo = do
       todo
   return todo
 
-dbDeleteById :: (MonadIO m, WithDB m) => Identifier -> m ()
+dbDeleteById :: (MonadIO m, WithDB m) => Identifier Todo -> m ()
 dbDeleteById i = do
   DB.execute $
     statement
