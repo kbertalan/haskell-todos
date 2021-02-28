@@ -5,11 +5,9 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
 
 module Todo.Domain
   ( Identifier (..),
-    unIdentifier,
     TodoM (..),
     Todo,
     TodoMaybe,
@@ -44,22 +42,13 @@ import App.Paging (Page)
 import Control.Monad.Except (MonadError)
 import Control.Monad.Identity (Identity)
 import Control.Monad.Random (MonadRandom, getRandom)
+import Data.Field (Field)
 import Data.Function ((&))
+import Data.Identifier (Identifier (..))
 import Data.Monoid (Last (..), getLast)
 import Data.Text.Lazy (Text)
-import Data.UUID (UUID)
 import GHC.Generics (Generic)
 import Prelude hiding (id)
-
-type family Field m a where
-  Field Identity a = a
-  Field m a = m a
-
-newtype Identifier = Identifier UUID
-  deriving (Show, Eq, Generic)
-
-unIdentifier :: Identifier -> UUID
-unIdentifier (Identifier uuid) = uuid
 
 data TodoM i m = TodoM
   { identifier :: Field i Identifier,

@@ -16,12 +16,6 @@ import Data.Aeson
   )
 import Todo.Domain
 
-instance ToJSON Identifier where
-  toEncoding (Identifier uuid) = toEncoding uuid
-
-instance FromJSON Identifier where
-  parseJSON v = Identifier <$> parseJSON v
-
 instance ToJSON Todo where
   toEncoding =
     genericToEncoding
