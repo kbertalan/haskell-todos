@@ -45,4 +45,14 @@ Modules:
 * _App.Log_: co-log settings.
 * _App.Random_: configuration for random numbers.
 * _App.Error_: a little utility module for error handling.
+* _App.Paging_: reusable paging request for multiple domains.
 
+### Domain
+
+A domain is a self-contained business area, in our current case the _Todo_ items. In the _Todo_ module I am wiring toghether the submodules:
+
+* _Todo.Domain_: The central part of the Todo domain. This module has minimal dependencies, if it has any there is a well defined interface for that. Its own interface toward the ourside worl is defined in a type class _Logic_, this type class is used in the web layer. It is dependent on MonadRandom, and it's own _Repo_ type class.
+  This module also contains all type definitions and the implementation of the _Logic_ type class functions (while the instance is still in the _App_ module)
+* _Todo.Web_: defines the REST API for Todo items and depends on the _Logic_ type class.
+* _Todo.JSON_: aeson orphan instances of _Todo.Domain_ types. As the domain types can be represented in many ways, and those ways are usually depend on the communicational channel, it can happen that more than one representation of the same class (eg: JSON in a REST API vs CSV in a file export)
+* _Todo.DB_: all functions which are responsible for reading and writing Todo items to the database. The functions are subject to be used as the Todo domain's _Repo_ type class implementations.
