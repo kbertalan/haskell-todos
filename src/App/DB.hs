@@ -19,6 +19,7 @@ import Control.Monad (forM_)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.ByteString (ByteString)
 import Data.FileEmbed (embedDir)
+import Data.List (sortOn)
 import qualified Hasql.Connection as C (settings)
 import qualified Hasql.Decoders as D (Result)
 import qualified Hasql.Encoders as E (Params)
@@ -66,7 +67,7 @@ poolOpts Options {..} =
 
 migrate :: DB -> IO (Either P.UsageError ())
 migrate db = P.use db $ do
-  let migrations = uncurry M.MigrationScript <$> embeddedMigrations
+  let migrations = uncurry M.MigrationScript <$> sortOn fst embeddedMigrations
   forM_ (M.MigrationInitialization : migrations) $ \m -> do
     T.transaction T.Serializable T.Write $ M.runMigration m
 
