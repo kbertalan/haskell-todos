@@ -8,6 +8,7 @@
 
 module Todo.Domain
   ( Identifier (..),
+    TodoId,
     TodoM (..),
     Todo,
     TodoMaybe,
@@ -50,8 +51,10 @@ import Data.Text.Lazy (Text)
 import GHC.Generics (Generic)
 import Prelude hiding (id)
 
+type TodoId = Identifier Todo
+
 data TodoM i m = TodoM
-  { identifier :: Field i (Identifier Todo),
+  { identifier :: Field i TodoId,
     description :: Field m Text,
     completed :: Field m Bool
   }

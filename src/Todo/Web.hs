@@ -1,27 +1,30 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Todo.Web
   ( todoApi,
+    TodoApi,
   )
 where
 
 import App.Error (catch, catchLast)
 import App.Paging (Page (..))
-import App.Web (Action, Scotty, jsonError)
+import App.Web (WebHandler)
 import Control.Monad (when)
-import Control.Monad.Identity (Identity)
 import Control.Monad.Trans (MonadIO, lift)
-import Data.Aeson (FromJSON)
-import Data.Text.Lazy (unpack)
-import Data.UUID (UUID)
-import Network.HTTP.Types.Status (status201, status400, status404)
-import Text.Read (readMaybe)
+import Data.Identifier (Identifier (..))
+import Data.Maybe (fromMaybe)
+import Data.UUID (fromText)
+import Servant
 import Todo.Domain
-  ( Identifier (..),
+  ( CreateTodoRequest,
     Logic,
     MissingFields (..),
     NotExists (..),
-    TodoM,
+    Todo,
+    TodoId,
+    TodoMaybe,
     create,
     delete,
     identifier,
@@ -30,52 +33,40 @@ import Todo.Domain
     showPage,
   )
 import Todo.JSON ()
-import Web.Scotty.Trans as W
-  ( Parsable,
-    delete,
-    get,
-    json,
-    jsonData,
-    param,
-    parseParam,
-    patch,
-    post,
-    put,
-    rescue,
-    status,
-  )
+import Prelude hiding (id)
 
-todoApi :: (MonadIO m, Logic m) => Scotty m ()
-todoApi = do
-  get "/todo" $ do
-    offset <- param "offset" `rescue` const (return 0)
-    limit <- param "limit" `rescue` const (return 20)
-    lift (showPage (Page offset limit)) >>= json
+type TodoApi =
+  "todo" :> QueryParam "offset" Word :> QueryParam "limit" Word :> Get '[JSON] [Todo]
+    :<|> "todo" :> ReqBody '[JSON] CreateTodoRequest :> PostCreated '[JSON] Todo
+    :<|> "todo" :> Capture "id" TodoId :> ReqBody '[JSON] Todo :> Put '[JSON] Todo
+    :<|> "todo" :> Capture "id" TodoId :> ReqBody '[JSON] TodoMaybe :> Patch '[JSON] Todo
+    :<|> "todo" :> Capture "id" TodoId :> Delete '[JSON] ()
 
-  post "/todo" $
-    jsonData >>= lift . create >>= \r ->
-      status status201 >> json r
-
-  put "/todo/:id" $
-    obtainTodo >>= lift . modify >>= handleModifyError >>= json
-
-  W.patch "/todo/:id" $
-    obtainTodo >>= lift . Todo.Domain.patch >>= handlePatchError >>= json
-
-  W.delete "/todo/:id" $
-    param "id" >>= lift . Todo.Domain.delete . Identifier >>= handleDeleteError >>= json
+todoApi :: (MonadIO m, Logic m) => ServerT TodoApi (WebHandler m)
+todoApi =
+  listHandler :<|> createHandler :<|> modifyHandler :<|> patchHandler :<|> deleteHandler
   where
-    obtainTodo :: (MonadIO m, FromJSON (TodoM Identity n)) => Action m (TodoM Identity n)
-    obtainTodo = do
-      idValue <- Identifier <$> param "id"
-      todo <- jsonData
-      when (idValue /= identifier todo) identifierError
-      return todo
+    listHandler moffset mlimit = do
+      let offset = fromMaybe 0 moffset
+          limit = fromMaybe 20 mlimit
+      lift $ showPage $ Page offset limit
 
-    identifierError :: (MonadIO m) => Action m a
-    identifierError = jsonError status400 "Identifiers in path and body are different"
-    notExistsError = jsonError status404 "Todo with provided identifier has not been found"
-    missingFieldsError = jsonError status400 "Could not construct final Todo record"
+    createHandler todo = do
+      lift $ create todo
+
+    modifyHandler id todo = do
+      when (id /= identifier todo) identifierError
+      lift (modify todo) >>= handleModifyError
+    patchHandler id todo = do
+      when (id /= identifier todo) identifierError
+      lift (patch todo) >>= handlePatchError
+
+    deleteHandler id =
+      lift (delete id) >>= handleDeleteError
+
+    identifierError = throwError $ err400 {errBody = "Identifiers in path and body are different"}
+    notExistsError = throwError $ err400 {errBody = "Todo with provided identifier has not been found"}
+    missingFieldsError = throwError $ err400 {errBody = "Could not construct final Todo record"}
 
     handlePatchError result =
       fmap return result
@@ -88,5 +79,5 @@ todoApi = do
 
     handleDeleteError = handleModifyError
 
-instance Parsable UUID where
-  parseParam = maybe (Left "Invalid UUID") Right . readMaybe . unpack
+instance FromHttpApiData TodoId where
+  parseUrlPiece text = maybe (Left "Could not read TodoId") (Right . Identifier) $ fromText text

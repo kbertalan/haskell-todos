@@ -1,49 +1,35 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module App.Web
   ( Options (..),
-    Scotty,
-    Action,
     run,
-    jsonError,
-    middleware,
+    WebHandler,
   )
 where
 
-import Control.Monad.IO.Class (MonadIO)
-import Data.Aeson (ToJSON)
-import Data.Text.Lazy (Text)
-import GHC.Generics (Generic)
-import Network.HTTP.Types.Status (Status)
-import Network.Wai (Response)
-import Web.Scotty.Trans (ActionT, ScottyT, defaultHandler, finish, json, middleware, scottyT, status)
+import Control.Monad.Except (ExceptT (..), runExceptT)
+import Data.List (foldl')
+import Network.Wai
+import qualified Network.Wai.Handler.Warp as Warp
+import Network.Wai.Middleware.Servant.Errors
+import Servant
 
 newtype Options = Options
   { webPort :: Int
   }
   deriving (Show)
 
-type Scotty = ScottyT Text
+type WebHandler m = ExceptT ServerError m
 
-type Action = ActionT Text
-
-run :: (Monad m, MonadIO n) => Options -> (m Response -> IO Response) -> Scotty m () -> n ()
-run opts runner routes = scottyT (webPort opts) runner $ do
-  errorHandler
-  routes
-
-errorHandler :: (Monad m) => Scotty m ()
-errorHandler =
-  defaultHandler $ \_ -> do
-    json $ Error "Something went wrong"
-
-jsonError :: (Monad m) => Status -> Text -> Action m a
-jsonError code msg =
-  status code >> json (Error msg) >> finish
-
-newtype Error = Error
-  { message :: Text
-  }
-  deriving stock (Generic)
-  deriving anyclass (ToJSON)
+run :: (HasServer a '[]) => Options -> [Middleware] -> Proxy a -> ServerT a (WebHandler m) -> (forall b. m b -> IO b) -> IO ()
+run opts middlewares api server runner =
+  Warp.run (webPort opts) $
+    foldl' (.) defaultMiddleWares middlewares $
+      serve api adaptedServer
+  where
+    defaultMiddleWares = errorMwDefJson
+    adaptedServer = hoistServer api adapter server
+    adapter ma = Handler $ ExceptT $ runner $ runExceptT ma

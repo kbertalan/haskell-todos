@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeOperators #-}
+
 module App where
 
 import App.DB as DB (Options, migrate, runWithDB)
@@ -5,10 +7,12 @@ import App.Ekg as Ekg (Options, runWithEkg, serverMetricsMiddleware)
 import App.Log as Log (runWithLog)
 import App.Monad (Env (Env), runAppWith)
 import App.Random as Random (Options, configure)
-import App.Web as Web (Options, middleware, run)
+import App.Web as Web (Options, run)
+import Data.Proxy (Proxy (..))
 import Data.Time.Clock as Time
-import Health (healthApi)
-import Todo (todoApi)
+import Health
+import Servant ((:<|>) (..))
+import Todo
 import Prelude hiding (log)
 
 data Options = Options
@@ -18,6 +22,8 @@ data Options = Options
     random :: !Random.Options
   }
   deriving (Show)
+
+type API = HealthApi :<|> TodoApi
 
 run :: App.Options -> IO ()
 run opts =
@@ -36,7 +42,9 @@ run opts =
           currentTime <- Time.getCurrentTime
           putStrLn $ "Started up in " <> show (Time.diffUTCTime currentTime time)
 
-          Web.run (web opts) (runAppWith env) $ do
-            middleware metricsMiddleware
-            healthApi
-            todoApi
+          Web.run
+            (web opts)
+            [metricsMiddleware]
+            (Proxy :: Proxy API)
+            (healthApi :<|> todoApi)
+            (runAppWith env)

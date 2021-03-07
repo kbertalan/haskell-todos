@@ -25,7 +25,6 @@ dependencies:
 - hasql-migration
 - hasql-pool
 - hasql-transaction
-- scotty
 - text
 - http-types
 - aeson
@@ -41,6 +40,9 @@ dependencies:
 - time
 - wai-middleware-metrics
 - file-embed
+- servant-server
+- servant-errors
+- warp
 
 ghc-options:
   - -Werror
