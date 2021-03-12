@@ -12,6 +12,7 @@ import Data.Proxy (Proxy (..))
 import Data.Time.Clock as Time
 import Health
 import Servant ((:<|>) (..))
+import qualified Servant.Docs as Doc
 import Todo
 import Prelude hiding (log)
 
@@ -48,3 +49,6 @@ run opts =
             (Proxy :: Proxy API)
             (healthApi :<|> todoApi)
             (runAppWith env)
+
+doc :: IO ()
+doc = putStrLn $ Doc.markdown (Doc.docs (Proxy :: Proxy API))

@@ -42,6 +42,7 @@ dependencies:
 - file-embed
 - servant-server
 - servant-errors
+- servant-docs
 - warp
 
 ghc-options:

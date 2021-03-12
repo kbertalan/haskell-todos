@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9c2bb938ef9a02f4bc338b2f28a2a09c504f6464229485a5771955a934434861
+-- hash: 21afa61b77743a78ffca5de5bb96bfa337f704f09b6ece4ae7002a9a290e0c54
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -67,6 +67,7 @@ library
     , http-types
     , mtl
     , random
+    , servant-docs
     , servant-errors
     , servant-server
     , text
@@ -104,6 +105,7 @@ executable haskell-todos-exe
     , mtl
     , optparse-applicative
     , random
+    , servant-docs
     , servant-errors
     , servant-server
     , text
@@ -145,6 +147,7 @@ test-suite haskell-todos-test
     , http-types
     , mtl
     , random
+    , servant-docs
     , servant-errors
     , servant-server
     , text
