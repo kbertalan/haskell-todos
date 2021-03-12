@@ -35,6 +35,7 @@ import Todo.Domain
     showPage,
   )
 import Todo.JSON ()
+import Todo.Swagger ()
 import Prelude hiding (id)
 
 type TodoApi =

@@ -2,6 +2,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators #-}
 
 module App.Web
   ( Options (..),
@@ -16,6 +17,8 @@ import Network.Wai
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai.Middleware.Servant.Errors
 import Servant
+import Servant.Swagger
+import Servant.Swagger.UI
 
 newtype Options = Options
   { webPort :: Int
@@ -24,12 +27,18 @@ newtype Options = Options
 
 type WebHandler m = ExceptT ServerError m
 
-run :: (HasServer a '[]) => Options -> [Middleware] -> Proxy a -> ServerT a (WebHandler m) -> (forall b. m b -> IO b) -> IO ()
-run opts middlewares api server runner =
+run :: forall a m. (HasServer a '[], HasSwagger a, Monad m) => Options -> [Middleware] -> ServerT a (WebHandler m) -> (forall b. m b -> IO b) -> IO ()
+run opts middlewares server runner =
   Warp.run (webPort opts) $
     foldl' (.) defaultMiddleWares middlewares $
-      serve api adaptedServer
+      serve apiWithSwagger adaptedServer
   where
     defaultMiddleWares = errorMwDefJson
-    adaptedServer = hoistServer api adapter server
+    api :: Proxy a
+    api = Proxy
+    swaggerDoc = toSwagger api
+    apiWithSwagger :: Proxy (SwaggerSchemaUI "swagger-ui" "swagger.json" :<|> a)
+    apiWithSwagger = Proxy
+    serverWithSwagger = swaggerSchemaUIServerT swaggerDoc :<|> server
+    adaptedServer = hoistServer apiWithSwagger adapter serverWithSwagger
     adapter ma = Handler $ ExceptT $ runner $ runExceptT ma

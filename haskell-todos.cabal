@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 21afa61b77743a78ffca5de5bb96bfa337f704f09b6ece4ae7002a9a290e0c54
+-- hash: c761a53c30fbe8415eac44bba330a3c454199f92250a1c2714e4c2d2c6d9b883
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -45,6 +45,7 @@ library
       Todo.DB
       Todo.Domain
       Todo.JSON
+      Todo.Swagger
       Todo.Web
   other-modules:
       Paths_haskell_todos
@@ -70,6 +71,9 @@ library
     , servant-docs
     , servant-errors
     , servant-server
+    , servant-swagger
+    , servant-swagger-ui
+    , swagger2
     , text
     , time
     , uuid
@@ -108,6 +112,9 @@ executable haskell-todos-exe
     , servant-docs
     , servant-errors
     , servant-server
+    , servant-swagger
+    , servant-swagger-ui
+    , swagger2
     , text
     , time
     , uuid
@@ -150,6 +157,9 @@ test-suite haskell-todos-test
     , servant-docs
     , servant-errors
     , servant-server
+    , servant-swagger
+    , servant-swagger-ui
+    , swagger2
     , text
     , time
     , uuid

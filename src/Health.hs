@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeOperators #-}
 
@@ -13,12 +14,17 @@ import App.Web (WebHandler)
 import Control.Monad.Trans (MonadIO, lift)
 import Data.ByteString.Lazy.Char8
 import Data.Int (Int64)
+import Data.Swagger
+import GHC.Generics
 import qualified Hasql.Decoders as D (column, int8, nonNullable, singleRow)
 import qualified Hasql.Encoders as E (noParams)
 import Servant
 import Servant.Docs
 
 newtype HealthIndicator = HealthIndicator String
+  deriving (Generic)
+
+instance ToSchema HealthIndicator
 
 type HealthApi = "health" :> Get '[PlainText] HealthIndicator
 

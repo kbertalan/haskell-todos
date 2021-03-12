@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
 module App where
@@ -43,10 +44,9 @@ run opts =
           currentTime <- Time.getCurrentTime
           putStrLn $ "Started up in " <> show (Time.diffUTCTime currentTime time)
 
-          Web.run
+          Web.run @API
             (web opts)
             [metricsMiddleware]
-            (Proxy :: Proxy API)
             (healthApi :<|> todoApi)
             (runAppWith env)
 
