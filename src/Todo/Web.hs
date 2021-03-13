@@ -38,17 +38,23 @@ import Todo.JSON ()
 import Todo.Swagger ()
 import Prelude hiding (id)
 
-type TodoApi =
-  "todo" :> QueryParam "offset" Word :> QueryParam "limit" Word :> Get '[JSON] [Todo]
-    :<|> "todo" :> ReqBody '[JSON] CreateTodoRequest :> PostCreated '[JSON] Todo
-    :<|> "todo" :> Capture "id" TodoId :> ReqBody '[JSON] Todo :> Put '[JSON] Todo
-    :<|> "todo" :> Capture "id" TodoId :> ReqBody '[JSON] TodoMaybe :> Patch '[JSON] Todo
-    :<|> "todo" :> Capture "id" TodoId :> Delete '[JSON] ()
+type QueryParamOffset = QueryParam' '[Optional, Strict, Description "return results from this offset"] "offset" Word
 
-instance ToParam (QueryParam "offset" Word) where
+type QueryParamLimit = QueryParam' '[Optional, Strict, Description "return maximum limit results"] "limit" Word
+
+type CaptureTodoId = Capture' '[Required, Strict, Description "Todo identifier"] "id" TodoId
+
+type TodoApi =
+  "todo" :> QueryParamOffset :> QueryParamLimit :> Get '[JSON] [Todo]
+    :<|> "todo" :> ReqBody '[JSON] CreateTodoRequest :> PostCreated '[JSON] Todo
+    :<|> "todo" :> CaptureTodoId :> ReqBody '[JSON] Todo :> Put '[JSON] Todo
+    :<|> "todo" :> CaptureTodoId :> ReqBody '[JSON] TodoMaybe :> Patch '[JSON] Todo
+    :<|> "todo" :> CaptureTodoId :> DeleteAccepted '[JSON] NoContent
+
+instance ToParam QueryParamOffset where
   toParam _ = DocQueryParam "offset" ["0", "10", "20"] "offset to query from" Normal
 
-instance ToParam (QueryParam "limit" Word) where
+instance ToParam QueryParamLimit where
   toParam _ = DocQueryParam "limit" ["10", "20"] "limit returned query results to this size" Normal
 
 instance ToCapture (Capture "id" TodoId) where
@@ -79,9 +85,6 @@ instance ToSample CreateTodoRequest where
     [ ("Creating a new todo with only a description", CreateTodoRequest "a new todo")
     ]
 
-instance ToSample () where
-  toSamples _ = [("Returns nothing", ())]
-
 sampleId :: TodoId
 sampleId = Identifier $ fromJust $ fromText "a990ed3b-a19c-4067-963e-47b26ee0fb43"
 
@@ -105,7 +108,7 @@ todoApi =
       lift (patch todo) >>= handlePatchError
 
     deleteHandler id =
-      lift (delete id) >>= handleDeleteError
+      lift (delete id) >>= handleDeleteError >> return NoContent
 
     identifierError = throwError $ err400 {errBody = "Identifiers in path and body are different"}
     notExistsError = throwError $ err400 {errBody = "Todo with provided identifier has not been found"}
