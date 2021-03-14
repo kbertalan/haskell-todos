@@ -43,6 +43,10 @@ packages:
 extra-deps:
 - hasql-migration-0.3.0@sha256:6ca4cc6c89834bb79eb9f15b504774043b5b3994336bd86a9d79e59da6d54963,2799
 - wai-middleware-metrics-0.2.4
+- git: https://github.com/kbertalan/servant-swagger-ui.git
+  commit: 535db4c5375f77a01791abebdbbcfc97bdc3bcea
+  subdirs:
+  - servant-swagger-ui-redoc
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

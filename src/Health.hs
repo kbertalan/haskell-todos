@@ -25,7 +25,7 @@ newtype HealthIndicator = HealthIndicator String
 
 instance ToSchema HealthIndicator
 
-type HealthApi = "health" :> Get '[PlainText] HealthIndicator
+type HealthApi = Summary "Check application health" :> "health" :> Get '[PlainText] HealthIndicator
 
 instance MimeRender PlainText HealthIndicator where
   mimeRender _ (HealthIndicator i) = pack i

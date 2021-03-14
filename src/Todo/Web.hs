@@ -44,11 +44,11 @@ type QueryParamLimit = QueryParam' '[Optional, Strict, Description "return maxim
 type CaptureTodoId = Capture' '[Required, Strict, Description "Todo identifier"] "id" TodoId
 
 type TodoApi =
-  "todo" :> QueryParamOffset :> QueryParamLimit :> Get '[JSON] [Todo]
-    :<|> "todo" :> ReqBody '[JSON] CreateTodoRequest :> PostCreated '[JSON] Todo
-    :<|> "todo" :> CaptureTodoId :> ReqBody '[JSON] Todo :> Put '[JSON] Todo
-    :<|> "todo" :> CaptureTodoId :> ReqBody '[JSON] TodoMaybe :> Patch '[JSON] Todo
-    :<|> "todo" :> CaptureTodoId :> DeleteAccepted '[JSON] NoContent
+  Summary "Query Todos" :> "todo" :> QueryParamOffset :> QueryParamLimit :> Get '[JSON] [Todo]
+    :<|> Summary "Create new Todo" :> "todo" :> ReqBody '[JSON] CreateTodoRequest :> PostCreated '[JSON] Todo
+    :<|> Summary "Update a complete Todo" :> "todo" :> CaptureTodoId :> ReqBody '[JSON] Todo :> Put '[JSON] Todo
+    :<|> Summary "Update a Todo using parital data" :> "todo" :> CaptureTodoId :> ReqBody '[JSON] TodoMaybe :> Patch '[JSON] Todo
+    :<|> Summary "Delete a Todo" :> "todo" :> CaptureTodoId :> DeleteAccepted '[JSON] NoContent
 
 todoApi :: (MonadIO m, Logic m) => ServerT TodoApi (WebHandler m)
 todoApi =

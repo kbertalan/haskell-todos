@@ -18,6 +18,19 @@ packages:
       sha256: 99366b831109417cd8e739fb45e9fd214cb79f28a507f8154e5528120042d0ac
   original:
     hackage: wai-middleware-metrics-0.2.4
+- completed:
+    subdir: servant-swagger-ui-redoc
+    name: servant-swagger-ui-redoc
+    version: 0.3.3.1.22.3
+    git: https://github.com/kbertalan/servant-swagger-ui.git
+    pantry-tree:
+      size: 381
+      sha256: f3df8797d55a24c593796bcde25d656bc9b84ab551f6ef31a1ab9e54f50c43ca
+    commit: 535db4c5375f77a01791abebdbbcfc97bdc3bcea
+  original:
+    subdir: servant-swagger-ui-redoc
+    git: https://github.com/kbertalan/servant-swagger-ui.git
+    commit: 535db4c5375f77a01791abebdbbcfc97bdc3bcea
 snapshots:
 - completed:
     size: 534126

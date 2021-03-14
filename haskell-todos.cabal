@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d95f49a23b006b376d1d3aea34fb54f0910807a461465f0a60307a1d44b14b1a
+-- hash: fa1ecc24a6f6d735582013c91aad93dc04b98d9774f9e0088fcac98ec815ba25
 
 name:           haskell-todos
-version:        0.1.0.0
+version:        0.1.1.0
 synopsis:       A sample web application in Haskell
 description:    Please see the README on GitHub at <https://github.com/kbertalan/haskell-todos#readme>
 category:       Web
@@ -71,7 +71,7 @@ library
     , servant-errors
     , servant-server
     , servant-swagger
-    , servant-swagger-ui
+    , servant-swagger-ui-redoc
     , swagger2
     , text
     , time
@@ -111,7 +111,7 @@ executable haskell-todos-exe
     , servant-errors
     , servant-server
     , servant-swagger
-    , servant-swagger-ui
+    , servant-swagger-ui-redoc
     , swagger2
     , text
     , time
@@ -155,7 +155,7 @@ test-suite haskell-todos-test
     , servant-errors
     , servant-server
     , servant-swagger
-    , servant-swagger-ui
+    , servant-swagger-ui-redoc
     , swagger2
     , text
     , time

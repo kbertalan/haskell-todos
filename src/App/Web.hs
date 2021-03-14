@@ -13,12 +13,16 @@ where
 
 import Control.Monad.Except (ExceptT (..), runExceptT)
 import Data.List (foldl')
+import Data.Swagger
+import qualified Data.Text as T
+import Data.Version
 import Network.Wai
 import qualified Network.Wai.Handler.Warp as Warp
 import Network.Wai.Middleware.Servant.Errors
+import Paths_haskell_todos as Meta
 import Servant
 import Servant.Swagger
-import Servant.Swagger.UI
+import Servant.Swagger.UI.ReDoc
 
 newtype Options = Options
   { webPort :: Int
@@ -36,9 +40,17 @@ run opts middlewares server runner =
     defaultMiddleWares = errorMwDefJson
     api :: Proxy a
     api = Proxy
-    swaggerDoc = toSwagger api
+    swaggerDoc =
+      (toSwagger api)
+        { _swaggerInfo =
+            mempty
+              { _infoTitle = "Simple Todo Rest App",
+                _infoDescription = Just "PET project for experimenting with Haskell",
+                _infoVersion = T.pack $ showVersion Meta.version
+              }
+        }
     apiWithSwagger :: Proxy (SwaggerSchemaUI "swagger-ui" "swagger.json" :<|> a)
     apiWithSwagger = Proxy
-    serverWithSwagger = swaggerSchemaUIServerT swaggerDoc :<|> server
+    serverWithSwagger = redocSchemaUIServerT swaggerDoc :<|> server
     adaptedServer = hoistServer apiWithSwagger adapter serverWithSwagger
     adapter ma = Handler $ ExceptT $ runner $ runExceptT ma
