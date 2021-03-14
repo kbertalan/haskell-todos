@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fa1ecc24a6f6d735582013c91aad93dc04b98d9774f9e0088fcac98ec815ba25
+-- hash: 9d894bf768b5916afc7ad41aa4dcc04a06b5ff17f0581e72be134b714f7527ec
 
 name:           haskell-todos
-version:        0.1.1.0
+version:        0.1.0.0
 synopsis:       A sample web application in Haskell
 description:    Please see the README on GitHub at <https://github.com/kbertalan/haskell-todos#readme>
 category:       Web
@@ -52,7 +52,7 @@ library
   hs-source-dirs:
       src
   default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
-  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fwrite-ide-info -hiedir=.hie
   build-depends:
       MonadRandom
     , aeson
@@ -90,7 +90,7 @@ executable haskell-todos-exe
   hs-source-dirs:
       app
   default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
-  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts "-with-rtsopts=-N -T"
+  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fwrite-ide-info -hiedir=.hie -threaded -rtsopts "-with-rtsopts=-N -T"
   build-depends:
       MonadRandom
     , aeson
@@ -132,7 +132,7 @@ test-suite haskell-todos-test
   hs-source-dirs:
       test
   default-extensions: OverloadedStrings BangPatterns LambdaCase NamedFieldPuns GeneralizedNewtypeDeriving DerivingStrategies StandaloneDeriving FlexibleContexts FlexibleInstances
-  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts "-with-rtsopts=-N -T"
+  ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fwrite-ide-info -hiedir=.hie -threaded -rtsopts "-with-rtsopts=-N -T"
   build-depends:
       MonadRandom
     , aeson
