@@ -19,7 +19,6 @@ import GHC.Generics
 import qualified Hasql.Decoders as D (column, int8, nonNullable, singleRow)
 import qualified Hasql.Encoders as E (noParams)
 import Servant
-import Servant.Docs
 
 newtype HealthIndicator = HealthIndicator String
   deriving (Generic)
@@ -30,9 +29,6 @@ type HealthApi = "health" :> Get '[PlainText] HealthIndicator
 
 instance MimeRender PlainText HealthIndicator where
   mimeRender _ (HealthIndicator i) = pack i
-
-instance ToSample HealthIndicator where
-  toSamples _ = singleSample $ HealthIndicator "OK"
 
 healthApi :: (WithDB m, MonadIO m) => ServerT HealthApi (WebHandler m)
 healthApi =

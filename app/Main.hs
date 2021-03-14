@@ -10,13 +10,11 @@ import Options.Applicative as O
 
 data Command
   = Server App.Options
-  | Doc
 
 main :: IO ()
 main =
   execParser appInfo >>= \case
     Server serverOpts -> App.run serverOpts
-    Doc -> App.doc
 
 appInfo :: ParserInfo Command
 appInfo =
@@ -26,13 +24,7 @@ appInfo =
 
 commandOptions :: O.Parser Command
 commandOptions =
-  hsubparser
-    ( command "server" (info (Server <$> appOptions) (progDesc "start server"))
-        <> command "doc" (info docOptions (progDesc "generate doc"))
-    )
-
-docOptions :: O.Parser Command
-docOptions = pure Doc
+  hsubparser $ command "server" (info (Server <$> appOptions) (progDesc "start server"))
 
 appOptions :: O.Parser App.Options
 appOptions =

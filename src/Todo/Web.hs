@@ -14,10 +14,9 @@ import App.Web (WebHandler)
 import Control.Monad (when)
 import Control.Monad.Trans (MonadIO, lift)
 import Data.Identifier (Identifier (..))
-import Data.Maybe (fromJust, fromMaybe)
+import Data.Maybe (fromMaybe)
 import Data.UUID (fromText)
 import Servant
-import Servant.Docs
 import Todo.Domain
   ( CreateTodoRequest (..),
     Logic,
@@ -50,43 +49,6 @@ type TodoApi =
     :<|> "todo" :> CaptureTodoId :> ReqBody '[JSON] Todo :> Put '[JSON] Todo
     :<|> "todo" :> CaptureTodoId :> ReqBody '[JSON] TodoMaybe :> Patch '[JSON] Todo
     :<|> "todo" :> CaptureTodoId :> DeleteAccepted '[JSON] NoContent
-
-instance ToParam QueryParamOffset where
-  toParam _ = DocQueryParam "offset" ["0", "10", "20"] "offset to query from" Normal
-
-instance ToParam QueryParamLimit where
-  toParam _ = DocQueryParam "limit" ["10", "20"] "limit returned query results to this size" Normal
-
-instance ToCapture (Capture "id" TodoId) where
-  toCapture _ = DocCapture "id" "Todo identifier"
-
-instance ToSample Todo where
-  toSamples _ =
-    [ ( "Newly created todo",
-        TodoM
-          sampleId
-          "I will finish this app, I promise"
-          False
-      )
-    ]
-
-instance ToSample TodoMaybe where
-  toSamples _ =
-    [ ( "Override description",
-        TodoM
-          sampleId
-          (Just "Go shopping")
-          Nothing
-      )
-    ]
-
-instance ToSample CreateTodoRequest where
-  toSamples _ =
-    [ ("Creating a new todo with only a description", CreateTodoRequest "a new todo")
-    ]
-
-sampleId :: TodoId
-sampleId = Identifier $ fromJust $ fromText "a990ed3b-a19c-4067-963e-47b26ee0fb43"
 
 todoApi :: (MonadIO m, Logic m) => ServerT TodoApi (WebHandler m)
 todoApi =

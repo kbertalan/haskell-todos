@@ -42,7 +42,6 @@ dependencies:
 - file-embed
 - servant-server
 - servant-errors
-- servant-docs
 - servant-swagger
 - servant-swagger-ui
 - swagger2

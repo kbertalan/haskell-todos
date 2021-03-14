@@ -9,11 +9,9 @@ import App.Log as Log (runWithLog)
 import App.Monad (Env (Env), runAppWith)
 import App.Random as Random (Options, configure)
 import App.Web as Web (Options, run)
-import Data.Proxy (Proxy (..))
 import Data.Time.Clock as Time
 import Health
 import Servant ((:<|>) (..))
-import qualified Servant.Docs as Doc
 import Todo
 import Prelude hiding (log)
 
@@ -49,6 +47,3 @@ run opts =
             [metricsMiddleware]
             (healthApi :<|> todoApi)
             (runAppWith env)
-
-doc :: IO ()
-doc = putStrLn $ Doc.markdown (Doc.docs (Proxy :: Proxy API))
