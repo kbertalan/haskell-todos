@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
@@ -8,11 +9,11 @@ module Todo.Web
   )
 where
 
-import App.Error (catch, catchLast)
+import App.Error (HandlerOf, catch, catchLast)
 import App.Paging (Page (..))
 import App.Web (WebHandler)
 import Control.Monad (when)
-import Control.Monad.Trans (MonadIO, lift)
+import Control.Monad.Trans (lift)
 import Data.Identifier (Identifier (..))
 import Data.Maybe (fromMaybe)
 import Data.UUID (fromText)
@@ -50,7 +51,7 @@ type TodoApi =
     :<|> Summary "Update a Todo using parital data" :> "todo" :> CaptureTodoId :> ReqBody '[JSON] TodoMaybe :> Patch '[JSON] Todo
     :<|> Summary "Delete a Todo" :> "todo" :> CaptureTodoId :> DeleteAccepted '[PlainText] NoContent
 
-todoApi :: (MonadIO m, Logic m) => ServerT TodoApi (WebHandler m)
+todoApi :: (Monad m, Logic m) => ServerT TodoApi (WebHandler m)
 todoApi =
   listHandler :<|> createHandler :<|> modifyHandler :<|> patchHandler :<|> deleteHandler
   where
@@ -65,6 +66,7 @@ todoApi =
     modifyHandler id todo = do
       when (id /= identifier todo) identifierError
       lift (modify todo) >>= handleModifyError
+
     patchHandler id todo = do
       when (id /= identifier todo) identifierError
       lift (patch todo) >>= handlePatchError
@@ -72,20 +74,28 @@ todoApi =
     deleteHandler id =
       lift (delete id) >>= handleDeleteError >> return NoContent
 
-    identifierError = throwError $ err400 {errBody = "Identifiers in path and body are different"}
-    notExistsError = throwError $ err400 {errBody = "Todo with provided identifier has not been found"}
-    missingFieldsError = throwError $ err400 {errBody = "Could not construct final Todo record"}
+identifierError :: (Monad m) => WebHandler m a
+identifierError = throwError $ err400 {errBody = "Identifiers in path and body are different"}
 
-    handlePatchError result =
-      fmap return result
-        `catch` \case MissingFields -> return missingFieldsError
-        `catchLast` \case NotExists -> notExistsError
+notExistsError :: (Monad m) => WebHandler m a
+notExistsError = throwError $ err400 {errBody = "Todo with provided identifier has not been found"}
 
-    handleModifyError result =
-      fmap return result
-        `catchLast` \case NotExists -> notExistsError
+missingFieldsError :: (Monad m) => WebHandler m a
+missingFieldsError = throwError $ err400 {errBody = "Could not construct final Todo record"}
 
-    handleDeleteError = handleModifyError
+handlePatchError :: (Monad m) => HandlerOf '[MissingFields, NotExists] a -> WebHandler m a
+handlePatchError result =
+  fmap return result
+    `catch` \case MissingFields -> return missingFieldsError
+    `catchLast` \case NotExists -> notExistsError
+
+handleModifyError :: (Monad m) => HandlerOf '[NotExists] a -> WebHandler m a
+handleModifyError result =
+  fmap return result
+    `catchLast` \case NotExists -> notExistsError
+
+handleDeleteError :: (Monad m) => HandlerOf '[NotExists] a -> WebHandler m a
+handleDeleteError = handleModifyError
 
 instance FromHttpApiData TodoId where
   parseUrlPiece text = maybe (Left "Could not read TodoId") (Right . Identifier) $ fromText text
