@@ -51,7 +51,9 @@ type family OneOf e xs :: Constraint where
   OneOf e (x ': xs) = (x :< e, OneOf e xs)
   OneOf e '[] = ()
 
-type HandlerOf xs a = Either (HandlerOf' xs) a
+type family HandlerOf xs a where
+  HandlerOf '[] a = a
+  HandlerOf xs a = Either (HandlerOf' xs) a
 
 type family HandlerOf' xs where
   HandlerOf' '[x] = x
