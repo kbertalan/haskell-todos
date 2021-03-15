@@ -29,7 +29,11 @@ instance ToSchema Todo where
               [ ("id", idSchema),
                 ("description", textSchema),
                 ("completed", boolSchema)
-              ]
+              ],
+            _schemaParamSchema =
+              mempty
+                { _paramSchemaType = Just SwaggerObject
+                }
           }
 
 instance ToSchema TodoMaybe where
@@ -46,5 +50,9 @@ instance ToSchema CreateTodoRequest where
           { _schemaRequired = ["description"],
             _schemaProperties =
               [ ("description", textSchema)
-              ]
+              ],
+            _schemaParamSchema =
+              mempty
+                { _paramSchemaType = Just SwaggerObject
+                }
           }

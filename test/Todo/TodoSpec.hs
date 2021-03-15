@@ -1,20 +1,19 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 
-module TodoSpec where
+module Todo.TodoSpec where
 
 import Control.Applicative ((<|>))
 import qualified Data.Aeson as A
-import Data.Functor.Identity (Identity)
+import Data.Identifier ()
 import Data.Maybe (fromJust)
-import Data.Text.Lazy (fromStrict)
 import Data.UUID (fromString)
-import qualified Hedgehog.Gen as Gen
-import qualified Hedgehog.Range as Range
 import Test.Hspec (Spec, describe, it, shouldBe)
-import Test.Hspec.Hedgehog
-import TestTodoApp (testTodoWithSeed)
+import Test.JSON (validateToJSON)
+import Test.QuickCheck
 import Todo.Domain
 import Todo.JSON ()
+import Todo.Test (testTodoWithSeed)
 
 testUUID :: Identifier Todo
 testUUID = Identifier $ fromJust $ fromString "fffd04bd-0ede-42e0-8088-a28c5fba9949"
@@ -46,31 +45,31 @@ spec = do
        in testTodoWithSeed (delete testUUID) 0 [existingTodo] `shouldBe` (Right (), [])
 
   describe "Patch" $ do
-    let existingTodo = TodoM testUUID "description" False
-        runPatch :: TodoMaybe -> [Todo] -> (Either (Either MissingFields NotExists) Todo, [Todo])
+    let runPatch :: TodoMaybe -> [Todo] -> (Either (Either MissingFields NotExists) Todo, [Todo])
         runPatch patchTodo db = testTodoWithSeed (patch patchTodo) 0 db
 
     it "should patch existing todo" $
-      hedgehog $ do
-        txt <- forAll $ Gen.maybe $ Gen.text (Range.linear 0 100) Gen.unicode
-        done <- forAll $ Gen.maybe Gen.bool
-        let patchTodo = TodoM testUUID (fromStrict <$> txt) done
-            savedTodo =
-              TodoM
-                testUUID
-                (fromJust (fmap fromStrict txt <|> Just (description existingTodo)))
-                (fromJust (done <|> Just (completed existingTodo)))
-        runPatch patchTodo [existingTodo] === (Right savedTodo, [savedTodo])
+      property $ \testId ->
+        forAll (TodoM testId <$> arbitrary <*> arbitrary) $ \patchTodo ->
+          forAll (TodoM testId <$> arbitrary <*> arbitrary) $ \existingTodo ->
+            let savedTodo =
+                  TodoM
+                    testId
+                    (fromJust (description patchTodo <|> Just (description existingTodo)))
+                    (fromJust (completed patchTodo <|> Just (completed existingTodo)))
+             in runPatch patchTodo [existingTodo] === (Right savedTodo, [savedTodo])
 
     it "should fail on not existing todo" $
       let patchTodo = TodoM testUUID Nothing Nothing
        in runPatch patchTodo [] `shouldBe` (Left $ Right NotExists, [])
 
-  describe "json" $
+  describe "json" $ do
     it "should parse serialized todo" $
-      hedgehog $ do
-        desc <- forAll $ Gen.text (Range.linear 0 100) Gen.unicode
-        comp <- forAll Gen.bool
-        todo <- forAll $ Gen.constant $ TodoM @Identity @Identity testUUID (fromStrict desc) comp
-        encoded <- forAll $ Gen.constant $ A.encode todo
-        Just todo === A.decode encoded
+      property $ \(todo :: Todo) ->
+        Just todo === A.decode (A.encode todo)
+    it "Todo toJSON is compatible with toEncoding" $
+      property $ validateToJSON @Todo
+    it "TodoMaybe toJSON is compatible with toEncoding" $
+      property $ validateToJSON @TodoMaybe
+    it "CreateTodoRequest toJSON is compatible with toEncoding" $
+      property $ validateToJSON @CreateTodoRequest

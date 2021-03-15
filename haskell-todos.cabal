@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9d894bf768b5916afc7ad41aa4dcc04a06b5ff17f0581e72be134b714f7527ec
+-- hash: afb23c047f5dfa1562544fc592d8711eb337e59a11964676e11a0f991d601b56
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -55,6 +55,7 @@ library
   ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fwrite-ide-info -hiedir=.hie
   build-depends:
       MonadRandom
+    , QuickCheck
     , aeson
     , base >=4.7 && <5
     , bytestring
@@ -67,6 +68,7 @@ library
     , hasql-transaction
     , http-types
     , mtl
+    , quickcheck-instances
     , random
     , servant-errors
     , servant-server
@@ -93,6 +95,7 @@ executable haskell-todos-exe
   ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fwrite-ide-info -hiedir=.hie -threaded -rtsopts "-with-rtsopts=-N -T"
   build-depends:
       MonadRandom
+    , QuickCheck
     , aeson
     , base >=4.7 && <5
     , bytestring
@@ -107,6 +110,7 @@ executable haskell-todos-exe
     , http-types
     , mtl
     , optparse-applicative
+    , quickcheck-instances
     , random
     , servant-errors
     , servant-server
@@ -126,8 +130,11 @@ test-suite haskell-todos-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      TestTodoApp
-      TodoSpec
+      Data.Identifier.IdentifierSpec
+      Test.JSON
+      Todo.SwaggerSpec
+      Todo.Test
+      Todo.TodoSpec
       Paths_haskell_todos
   hs-source-dirs:
       test
@@ -135,6 +142,7 @@ test-suite haskell-todos-test
   ghc-options: -Werror -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fwrite-ide-info -hiedir=.hie -threaded -rtsopts "-with-rtsopts=-N -T"
   build-depends:
       MonadRandom
+    , QuickCheck
     , aeson
     , base >=4.7 && <5
     , bytestring
@@ -146,11 +154,10 @@ test-suite haskell-todos-test
     , hasql-migration
     , hasql-pool
     , hasql-transaction
-    , hedgehog
     , hspec
-    , hspec-hedgehog
     , http-types
     , mtl
+    , quickcheck-instances
     , random
     , servant-errors
     , servant-server

@@ -9,9 +9,12 @@ import Data.Aeson
     defaultOptions,
     fieldLabelModifier,
     genericToEncoding,
+    genericToJSON,
+    object,
     pairs,
     parseJSON,
     toEncoding,
+    toJSON,
     withObject,
     (.:),
     (.:?),
@@ -27,6 +30,7 @@ instance FromJSON Todo where
       <*> v .: "completed"
 
 instance ToJSON Todo where
+  toJSON = genericToJSON todoOptions
   toEncoding = genericToEncoding todoOptions
 
 instance FromJSON TodoMaybe where
@@ -37,6 +41,7 @@ instance FromJSON TodoMaybe where
       <*> v .:? "completed"
 
 instance ToJSON TodoMaybe where
+  toJSON = genericToJSON todoOptions
   toEncoding = genericToEncoding todoOptions
 
 todoOptions :: Options
@@ -53,4 +58,5 @@ instance FromJSON CreateTodoRequest where
       <$> v .: "description"
 
 instance ToJSON CreateTodoRequest where
+  toJSON (CreateTodoRequest d) = object ["description" .= d]
   toEncoding (CreateTodoRequest d) = pairs ("description" .= d)

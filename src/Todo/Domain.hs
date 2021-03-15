@@ -49,6 +49,8 @@ import Data.Identifier (Identifier (..))
 import Data.Monoid (Last (..), getLast)
 import Data.Text.Lazy (Text)
 import GHC.Generics (Generic)
+import Test.QuickCheck
+import Test.QuickCheck.Instances.Text ()
 import Prelude hiding (id)
 
 type TodoId = Identifier Todo
@@ -70,13 +72,26 @@ deriving instance Eq Todo
 
 deriving instance Show Todo
 
+instance Arbitrary Todo where
+  arbitrary = TodoM <$> arbitrary <*> arbitrary <*> arbitrary
+
+deriving instance Eq TodoMaybe
+
+deriving instance Show TodoMaybe
+
+instance Arbitrary TodoMaybe where
+  arbitrary = TodoM <$> arbitrary <*> arbitrary <*> arbitrary
+
 instance Semigroup TodoLast where
   TodoM _i1 d1 c1 <> TodoM i2 d2 c2 = TodoM i2 (d1 <> d2) (c1 <> c2)
 
 newtype CreateTodoRequest = CreateTodoRequest
   { ctrDescription :: Text
   }
-  deriving (Show, Generic)
+  deriving (Eq, Show, Generic)
+
+instance Arbitrary CreateTodoRequest where
+  arbitrary = CreateTodoRequest <$> arbitrary
 
 data NotExists = NotExists
   deriving (Show, Eq)

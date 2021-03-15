@@ -48,7 +48,7 @@ type TodoApi =
     :<|> Summary "Create new Todo" :> "todo" :> ReqBody '[JSON] CreateTodoRequest :> PostCreated '[JSON] Todo
     :<|> Summary "Update a complete Todo" :> "todo" :> CaptureTodoId :> ReqBody '[JSON] Todo :> Put '[JSON] Todo
     :<|> Summary "Update a Todo using parital data" :> "todo" :> CaptureTodoId :> ReqBody '[JSON] TodoMaybe :> Patch '[JSON] Todo
-    :<|> Summary "Delete a Todo" :> "todo" :> CaptureTodoId :> DeleteAccepted '[JSON] NoContent
+    :<|> Summary "Delete a Todo" :> "todo" :> CaptureTodoId :> DeleteAccepted '[PlainText] NoContent
 
 todoApi :: (MonadIO m, Logic m) => ServerT TodoApi (WebHandler m)
 todoApi =

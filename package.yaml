@@ -46,6 +46,8 @@ dependencies:
 - servant-swagger-ui-redoc
 - swagger2
 - warp
+- QuickCheck
+- quickcheck-instances
 
 ghc-options:
   - -Werror
@@ -94,6 +96,4 @@ tests:
     dependencies:
     - haskell-todos
     - hspec
-    - hspec-hedgehog
-    - hedgehog
 
