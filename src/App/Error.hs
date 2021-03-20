@@ -10,7 +10,7 @@ module App.Error
     catch,
     catchLast,
     OneOf,
-    HandlerOf,
+    ResultOf,
   )
 where
 
@@ -51,10 +51,10 @@ type family OneOf e xs :: Constraint where
   OneOf e (x ': xs) = (x :< e, OneOf e xs)
   OneOf e '[] = ()
 
-type family HandlerOf xs a where
-  HandlerOf '[] a = a
-  HandlerOf xs a = Either (HandlerOf' xs) a
+type family ResultOf xs a where
+  ResultOf '[] a = a
+  ResultOf xs a = Either (ResultOf' xs) a
 
-type family HandlerOf' xs where
-  HandlerOf' '[x] = x
-  HandlerOf' (x ': xs) = Either x (HandlerOf' xs)
+type family ResultOf' xs where
+  ResultOf' '[x] = x
+  ResultOf' (x ': xs) = Either x (ResultOf' xs)

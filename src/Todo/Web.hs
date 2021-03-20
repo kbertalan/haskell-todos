@@ -9,7 +9,7 @@ module Todo.Web
   )
 where
 
-import App.Error (HandlerOf, catch, catchLast)
+import App.Error (ResultOf, catch, catchLast)
 import App.Paging (Page (..))
 import App.Web (WebHandler)
 import Control.Monad (when)
@@ -83,18 +83,18 @@ notExistsError = throwError $ err400 {errBody = "Todo with provided identifier h
 missingFieldsError :: (Monad m) => WebHandler m a
 missingFieldsError = throwError $ err400 {errBody = "Could not construct final Todo record"}
 
-handlePatchError :: (Monad m) => HandlerOf '[MissingFields, NotExists] a -> WebHandler m a
+handlePatchError :: (Monad m) => ResultOf '[MissingFields, NotExists] a -> WebHandler m a
 handlePatchError result =
   fmap return result
     `catch` \case MissingFields -> return missingFieldsError
     `catchLast` \case NotExists -> notExistsError
 
-handleModifyError :: (Monad m) => HandlerOf '[NotExists] a -> WebHandler m a
+handleModifyError :: (Monad m) => ResultOf '[NotExists] a -> WebHandler m a
 handleModifyError result =
   fmap return result
     `catchLast` \case NotExists -> notExistsError
 
-handleDeleteError :: (Monad m) => HandlerOf '[NotExists] a -> WebHandler m a
+handleDeleteError :: (Monad m) => ResultOf '[NotExists] a -> WebHandler m a
 handleDeleteError = handleModifyError
 
 instance FromHttpApiData TodoId where
