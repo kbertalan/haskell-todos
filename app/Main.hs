@@ -1,11 +1,13 @@
 module Main where
 
 import App
-import CLI
-import Options
+import CLI (Command (..), commandInfo)
+import Env (appEnv, parseEnv)
+import Options (defaultAppOptions)
 import qualified Options.Applicative as O
 
 main :: IO ()
-main =
-  O.execParser (commandInfo defaultAppOptions) >>= \case
+main = do
+  appOptions <- parseEnv $ appEnv defaultAppOptions
+  O.execParser (commandInfo appOptions) >>= \case
     Server options -> App.run options

@@ -1,22 +1,23 @@
 module App.Random
-  ( Options(..)
-  , Seed(..)
-  , configure
-  ) where
+  ( Options (..),
+    Seed (..),
+    configure,
+  )
+where
 
 import System.Random (mkStdGen, newStdGen, setStdGen)
 
 data Seed
   = New
   | Fixed Int
-  deriving (Show)
+  deriving (Show, Read)
 
 newtype Options = Options
   { seed :: Seed
-  } deriving (Show)
+  }
+  deriving (Show)
 
 configure :: Options -> IO ()
 configure opts = case seed opts of
-  New        -> newStdGen >>= setStdGen
+  New -> newStdGen >>= setStdGen
   Fixed seed -> setStdGen $ mkStdGen seed
-

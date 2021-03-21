@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7e89f812c2041178dee1660d8678687a8db3ff0ceeabeca8be633587904aabde
+-- hash: f471b14bdd9acd4bc49743fa1294a8285cf9f9b38ee0531b3e0908706a14a187
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -89,6 +89,7 @@ executable haskell-todos-exe
   other-modules:
       CLI
       DevelMain
+      Env
       Options
       Paths_haskell_todos
   hs-source-dirs:
