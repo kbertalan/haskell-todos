@@ -8,6 +8,7 @@
 
 module Todo.Domain
   ( Identifier (..),
+    Entity (..),
     TodoId,
     TodoM (..),
     Todo,
@@ -53,37 +54,45 @@ import Test.QuickCheck
 import Test.QuickCheck.Instances.Text ()
 import Prelude hiding (id)
 
-type TodoId = Identifier Todo
+type TodoId = Identifier (TodoM Identity)
 
-data TodoM i m = TodoM
-  { identifier :: Field i TodoId,
-    description :: Field m Text,
+data Entity i a = Entity
+  { identifier :: i,
+    record :: a
+  }
+  deriving (Generic, Show, Eq)
+
+instance (Arbitrary i, Arbitrary a) => Arbitrary (Entity i a) where
+  arbitrary = Entity <$> arbitrary <*> arbitrary
+
+data TodoM m = TodoM
+  { description :: Field m Text,
     completed :: Field m Bool
   }
   deriving (Generic)
 
-type Todo = TodoM Identity Identity
+type Todo = Entity TodoId (TodoM Identity)
 
-type TodoLast = TodoM Identity Last
+type TodoLast = TodoM Last
 
-type TodoMaybe = TodoM Identity Maybe
+type TodoMaybe = Entity TodoId (TodoM Maybe)
 
-deriving instance Eq Todo
+deriving instance Eq (TodoM Identity)
 
-deriving instance Show Todo
+deriving instance Show (TodoM Identity)
 
-instance Arbitrary Todo where
-  arbitrary = TodoM <$> arbitrary <*> arbitrary <*> arbitrary
+instance Arbitrary (TodoM Identity) where
+  arbitrary = TodoM <$> arbitrary <*> arbitrary
 
-deriving instance Eq TodoMaybe
+deriving instance Eq (TodoM Maybe)
 
-deriving instance Show TodoMaybe
+deriving instance Show (TodoM Maybe)
 
-instance Arbitrary TodoMaybe where
-  arbitrary = TodoM <$> arbitrary <*> arbitrary <*> arbitrary
+instance Arbitrary (TodoM Maybe) where
+  arbitrary = TodoM <$> arbitrary <*> arbitrary
 
 instance Semigroup TodoLast where
-  TodoM _i1 d1 c1 <> TodoM i2 d2 c2 = TodoM i2 (d1 <> d2) (c1 <> c2)
+  TodoM d1 c1 <> TodoM d2 c2 = TodoM (d1 <> d2) (c1 <> c2)
 
 newtype CreateTodoRequest = CreateTodoRequest
   { ctrDescription :: Text
@@ -110,23 +119,26 @@ class Logic m where
   create :: CreateTodoRequest -> m Todo
   modify :: Todo -> m (Either ModifyError Todo)
   patch :: (PatchError e) => TodoMaybe -> m (Either e Todo)
-  delete :: Identifier Todo -> m (Either DeleteError ())
+  delete :: TodoId -> m (Either DeleteError ())
 
 class Repo m where
   repoSelectPage :: Page -> m [Todo]
   repoInsert :: Todo -> m Todo
   repoUpdate :: Todo -> m Todo
-  repoGetById :: Identifier Todo -> m (Maybe Todo)
-  repoDelete :: Identifier Todo -> m ()
+  repoGetById :: TodoId -> m (Maybe Todo)
+  repoDelete :: TodoId -> m ()
 
 logicCreate :: (Repo m, MonadRandom m) => CreateTodoRequest -> m Todo
 logicCreate req = do
   newId <- getRandom
   let todo =
-        TodoM
+        Entity
           { identifier = Identifier newId,
-            description = ctrDescription req,
-            completed = False
+            record =
+              TodoM
+                { description = ctrDescription req,
+                  completed = False
+                }
           }
   repoInsert todo
 
@@ -140,29 +152,28 @@ logicPatch :: (Repo m, MonadError e m, PatchError e) => TodoMaybe -> m Todo
 logicPatch req = do
   let existingId = identifier req
   existing <- repoGetById existingId >>= throwIfNothing NotExists
-  let existingLast = convertTodoM @Identity @Last (Last . Just) existing
-      reqLast = convertTodoM @Maybe @Last Last req
-  todo <-
+  let existingLast = convertTodoM @Identity @Last (Last . Just) $ record existing
+      reqLast = convertTodoM @Maybe @Last Last $ record req
+  todoRecord <-
     existingLast <> reqLast
       & toTodo getLast
       & throwIfNothing MissingFields
-  repoUpdate todo
+  repoUpdate $ Entity existingId todoRecord
 
-logicDelete :: (Repo m, MonadError DeleteError m) => Identifier Todo -> m ()
+logicDelete :: (Repo m, MonadError DeleteError m) => TodoId -> m ()
 logicDelete i = do
   _existing <- repoGetById i >>= throwIfNothing NotExists
   repoDelete i
 
-toTodo :: (Applicative g) => (forall a. Field f a -> g a) -> TodoM Identity f -> g Todo
+toTodo :: (Applicative g) => (forall a. Field f a -> g a) -> TodoM f -> g (TodoM Identity)
 toTodo f TodoM {..} =
-  TodoM identifier
+  TodoM
     <$> f description
     <*> f completed
 
-convertTodoM :: forall f g b. (forall a. Field f a -> Field g a) -> TodoM b f -> TodoM b g
+convertTodoM :: forall f g. (forall a. Field f a -> Field g a) -> TodoM f -> TodoM g
 convertTodoM f TodoM {..} =
   TodoM
-    { identifier = identifier,
-      description = f @Text description,
+    { description = f @Text description,
       completed = f @Bool completed
     }

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f471b14bdd9acd4bc49743fa1294a8285cf9f9b38ee0531b3e0908706a14a187
+-- hash: 869ffe57bc03a6f9339e1772f058a1098aebb5608c39e190b484e1cb8ca7eb8d
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -77,6 +77,7 @@ library
     , swagger2
     , text
     , time
+    , unordered-containers
     , uuid
     , vector
     , wai
@@ -122,6 +123,7 @@ executable haskell-todos-exe
     , swagger2
     , text
     , time
+    , unordered-containers
     , uuid
     , vector
     , wai
@@ -169,6 +171,7 @@ test-suite haskell-todos-test
     , swagger2
     , text
     , time
+    , unordered-containers
     , uuid
     , vector
     , wai

@@ -2,14 +2,11 @@
 
 module Todo.JSON where
 
+import Control.Monad.Identity
 import Data.Aeson
   ( FromJSON,
-    Options,
     ToJSON,
-    defaultOptions,
-    fieldLabelModifier,
-    genericToEncoding,
-    genericToJSON,
+    Value (..),
     object,
     pairs,
     parseJSON,
@@ -17,40 +14,31 @@ import Data.Aeson
     toJSON,
     withObject,
     (.:),
-    (.:?),
     (.=),
   )
+import Data.HashMap.Strict (toList)
+import Data.Vector (fromList)
 import Todo.Domain
 
-instance FromJSON Todo where
-  parseJSON = withObject "Todo" $ \v ->
-    TodoM
+instance (FromJSON i, FromJSON a) => FromJSON (Entity i a) where
+  parseJSON = withObject "Entity" $ \v ->
+    Entity
       <$> v .: "id"
-      <*> v .: "description"
-      <*> v .: "completed"
+      <*> parseJSON (Object v)
 
-instance ToJSON Todo where
-  toJSON = genericToJSON todoOptions
-  toEncoding = genericToEncoding todoOptions
+instance (ToJSON i, ToJSON a) => ToJSON (Entity i a) where
+  toJSON (Entity i a) =
+    case toJSON a of
+      Object o -> object $ ("id" .= i) : toList o
+      other -> Array $ fromList [toJSON i, other]
 
-instance FromJSON TodoMaybe where
-  parseJSON = withObject "Todo" $ \v ->
-    TodoM
-      <$> v .: "id"
-      <*> v .:? "description"
-      <*> v .:? "completed"
+instance FromJSON (TodoM Identity)
 
-instance ToJSON TodoMaybe where
-  toJSON = genericToJSON todoOptions
-  toEncoding = genericToEncoding todoOptions
+instance ToJSON (TodoM Identity)
 
-todoOptions :: Options
-todoOptions =
-  defaultOptions
-    { fieldLabelModifier = \case
-        "identifier" -> "id"
-        a -> a
-    }
+instance FromJSON (TodoM Maybe)
+
+instance ToJSON (TodoM Maybe)
 
 instance FromJSON CreateTodoRequest where
   parseJSON = withObject "CreateTodoRequest" $ \v ->

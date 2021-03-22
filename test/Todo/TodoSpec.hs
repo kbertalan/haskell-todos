@@ -15,7 +15,7 @@ import Todo.Domain
 import Todo.JSON ()
 import Todo.Test (testTodoWithSeed)
 
-testUUID :: Identifier Todo
+testUUID :: TodoId
 testUUID = Identifier $ fromJust $ fromString "fffd04bd-0ede-42e0-8088-a28c5fba9949"
 
 spec :: Spec
@@ -23,17 +23,17 @@ spec = do
   describe "Create" $
     it "should accept simple description" $
       let request = CreateTodoRequest "desc"
-          expectedTodo = TodoM testUUID "desc" False
+          expectedTodo = Entity testUUID $ TodoM "desc" False
        in testTodoWithSeed (create request) 0 [] `shouldBe` (expectedTodo, [expectedTodo])
 
   describe "Modify" $ do
-    let modifiedTodo = TodoM testUUID "desc" False
+    let modifiedTodo = Entity testUUID $ TodoM "desc" False
 
     it "should fail on missing todo" $
       testTodoWithSeed (modify modifiedTodo) 0 [] `shouldBe` (Left NotExists, [])
 
     it "should update existing todo" $
-      let existingTodo = TodoM testUUID "other" True
+      let existingTodo = Entity testUUID $ TodoM "other" True
        in testTodoWithSeed (modify modifiedTodo) 0 [existingTodo] `shouldBe` (Right modifiedTodo, [modifiedTodo])
 
   describe "Delete" $ do
@@ -41,7 +41,7 @@ spec = do
       testTodoWithSeed (delete testUUID) 0 [] `shouldBe` (Left NotExists, [])
 
     it "should delete existing todo" $
-      let existingTodo = TodoM testUUID "other" True
+      let existingTodo = Entity testUUID $ TodoM "other" True
        in testTodoWithSeed (delete testUUID) 0 [existingTodo] `shouldBe` (Right (), [])
 
   describe "Patch" $ do
@@ -49,18 +49,18 @@ spec = do
         runPatch patchTodo db = testTodoWithSeed (patch patchTodo) 0 db
 
     it "should patch existing todo" $
-      property $ \testId ->
-        forAll (TodoM testId <$> arbitrary <*> arbitrary) $ \patchTodo ->
-          forAll (TodoM testId <$> arbitrary <*> arbitrary) $ \existingTodo ->
-            let savedTodo =
-                  TodoM
-                    testId
-                    (fromJust (description patchTodo <|> Just (description existingTodo)))
-                    (fromJust (completed patchTodo <|> Just (completed existingTodo)))
-             in runPatch patchTodo [existingTodo] === (Right savedTodo, [savedTodo])
+      property $ \testId patchRecord existingRecord ->
+        let existingTodo = Entity testId existingRecord
+            patchTodo = Entity testId patchRecord
+            savedTodo =
+              Entity testId $
+                TodoM
+                  (fromJust (description patchRecord <|> Just (description existingRecord)))
+                  (fromJust (completed patchRecord <|> Just (completed existingRecord)))
+         in runPatch patchTodo [existingTodo] === (Right savedTodo, [savedTodo])
 
     it "should fail on not existing todo" $
-      let patchTodo = TodoM testUUID Nothing Nothing
+      let patchTodo = Entity testUUID $ TodoM Nothing Nothing
        in runPatch patchTodo [] `shouldBe` (Left $ Right NotExists, [])
 
   describe "json" $ do

@@ -25,7 +25,6 @@ import Todo.Domain
     NotExists (..),
     Todo,
     TodoId,
-    TodoM (..),
     TodoMaybe,
     create,
     delete,
