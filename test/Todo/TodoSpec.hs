@@ -73,3 +73,13 @@ spec = do
       property $ validateToJSON @TodoMaybe
     it "CreateTodoRequest toJSON is compatible with toEncoding" $
       property $ validateToJSON @CreateTodoRequest
+  describe "entity" $ do
+    it "should read generated json: Int Int" $
+      property $ \(entity :: Entity Int Int) ->
+        Just entity === A.decode (A.encode entity)
+    it "should read generated json: (Maybe Int) [Int]" $
+      property $ \(entity :: Entity (Maybe Int) [Int]) ->
+        Just entity === A.decode (A.encode entity)
+    it "should read generated json: String Bool" $
+      property $ \(entity :: Entity String Bool) ->
+        Just entity === A.decode (A.encode entity)
