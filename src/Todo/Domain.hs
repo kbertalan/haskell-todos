@@ -42,6 +42,7 @@ where
 import Control.Monad.Except (MonadError)
 import Control.Monad.Identity (Identity)
 import Control.Monad.Random (MonadRandom, getRandom)
+import Data.Entity (Entity (..))
 import Data.Error (OneOf, throwIfNothing)
 import Data.Field (Field)
 import Data.Function ((&))
@@ -53,12 +54,6 @@ import GHC.Generics (Generic)
 import Prelude hiding (id)
 
 type TodoId = Identifier (TodoF Identity)
-
-data Entity i a = Entity
-  { identifier :: i,
-    record :: a
-  }
-  deriving (Generic, Show, Eq)
 
 data TodoF f = TodoF
   { description :: Field f Text,
