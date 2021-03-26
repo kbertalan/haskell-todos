@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f5b73207c8dd80e3c674246e8d16f1f22ded8b526061460ecb273b338391ac2f
+-- hash: b24880d6f03c591226109f7c5fec2dd9140d9bfff265551d9fdf43ff41fc3d9e
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -34,12 +34,12 @@ library
       App.Ekg
       App.Log
       App.Monad
-      App.Paging
       App.Random
       App.Web
       Data.Error
       Data.Field
       Data.Identifier
+      Data.Paging
       Health
       Todo
       Todo.DB

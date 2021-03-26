@@ -8,9 +8,9 @@ module Todo.DB
 where
 
 import App.DB as DB (WithDB, execute, statement)
-import App.Paging (Page (..))
 import Control.Monad.IO.Class (MonadIO)
 import Data.Functor.Contravariant ((>$<))
+import Data.Paging (Page (..))
 import Data.Text.Lazy as L (fromStrict, toStrict)
 import qualified Hasql.Decoders as D
   ( Row,

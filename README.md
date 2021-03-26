@@ -6,7 +6,7 @@ A simple web application for experimenting with Haskell development.
 
 Let me explain why I selected the dependencies:
 
-* __scotty__: friendly, basic web framework. Selected to experiment with the REST API interface. With HTTP protocol experience it is easy to grasp the Scotty way of implementing handlers.
+* __servant__: after trying scotty, it was time to move to a more advanced web library which has several benefits when developing REST API-s
 * __hasql__: postgresql client, easy to read and understand its documentation, it is a nice excersice to integrate pool and migrations for it
 * __mtl__: the monad transformers stack seems to be the most stable way to develop applications, also scottyT is integrating well with a custom monad transformers stack
 * __random__, __MonadRandom__: I wanted to generate some UUIDs in the application and this library looked the most straigthforward to integrate with my mtl stack.
@@ -44,8 +44,6 @@ Modules:
 * _App.Ekg_: Ekg setup, guarding it with bracket.
 * _App.Log_: co-log settings.
 * _App.Random_: configuration for random numbers.
-* _App.Error_: a little utility module for error handling.
-* _App.Paging_: reusable paging request for multiple domains.
 
 ### Domain
 

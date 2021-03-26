@@ -1,4 +1,4 @@
-module App.Paging (
+module Data.Paging (
   Page(..)
   ) where
 

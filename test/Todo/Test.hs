@@ -4,13 +4,13 @@ module Todo.Test
   )
 where
 
-import App.Paging (Page (..))
 import Control.Monad.Except (ExceptT, runExceptT)
 import Control.Monad.Random.Strict (MonadRandom, RandT, StdGen, evalRandT, mkStdGen)
 import Control.Monad.State.Strict (MonadState, State, runState)
 import qualified Control.Monad.State.Strict as State
 import Control.Monad.Trans (lift)
 import Data.Foldable (find)
+import Data.Paging (Page (..))
 import Todo.Domain
 
 newtype TestTodoM a = TestTodoM
