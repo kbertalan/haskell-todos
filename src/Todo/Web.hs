@@ -9,11 +9,11 @@ module Todo.Web
   )
 where
 
-import App.Error (ResultOf, catch, catchLast)
 import App.Paging (Page (..))
 import App.Web (WebHandler)
 import Control.Monad (when)
 import Control.Monad.Trans (lift)
+import Data.Error (ResultOf, catch, catchLast)
 import Data.Identifier (Identifier (..))
 import Data.Maybe (fromMaybe)
 import Data.UUID (fromText)

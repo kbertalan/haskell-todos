@@ -39,11 +39,11 @@ module Todo.Domain
   )
 where
 
-import App.Error (OneOf, throwIfNothing)
 import App.Paging (Page)
 import Control.Monad.Except (MonadError)
 import Control.Monad.Identity (Identity)
 import Control.Monad.Random (MonadRandom, getRandom)
+import Data.Error (OneOf, throwIfNothing)
 import Data.Field (Field)
 import Data.Function ((&))
 import Data.Identifier (Identifier (..))

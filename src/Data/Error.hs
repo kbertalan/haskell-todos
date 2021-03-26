@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeOperators #-}
 
 -- | Error handling inspired by Matt Parsons' blog at <https://www.parsonsmatt.org/2020/10/27/plucking_in_plucking_out.html>
-module App.Error
+module Data.Error
   ( throwIfNothing,
     throw,
     catch,
