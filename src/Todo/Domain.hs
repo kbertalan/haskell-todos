@@ -50,8 +50,6 @@ import Data.Identifier (Identifier (..))
 import Data.Monoid (Last (..), getLast)
 import Data.Text.Lazy (Text)
 import GHC.Generics (Generic)
-import Test.QuickCheck
-import Test.QuickCheck.Instances.Text ()
 import Prelude hiding (id)
 
 type TodoId = Identifier (TodoF Identity)
@@ -61,9 +59,6 @@ data Entity i a = Entity
     record :: a
   }
   deriving (Generic, Show, Eq)
-
-instance (Arbitrary i, Arbitrary a) => Arbitrary (Entity i a) where
-  arbitrary = Entity <$> arbitrary <*> arbitrary
 
 data TodoF f = TodoF
   { description :: Field f Text,
@@ -81,15 +76,9 @@ deriving instance Eq (TodoF Identity)
 
 deriving instance Show (TodoF Identity)
 
-instance Arbitrary (TodoF Identity) where
-  arbitrary = TodoF <$> arbitrary <*> arbitrary
-
 deriving instance Eq (TodoF Maybe)
 
 deriving instance Show (TodoF Maybe)
-
-instance Arbitrary (TodoF Maybe) where
-  arbitrary = TodoF <$> arbitrary <*> arbitrary
 
 instance Semigroup TodoLast where
   TodoF d1 c1 <> TodoF d2 c2 = TodoF (d1 <> d2) (c1 <> c2)
@@ -98,9 +87,6 @@ newtype CreateTodoRequest = CreateTodoRequest
   { ctrDescription :: Text
   }
   deriving (Eq, Show, Generic)
-
-instance Arbitrary CreateTodoRequest where
-  arbitrary = CreateTodoRequest <$> arbitrary
 
 data NotExists = NotExists
   deriving (Show, Eq)

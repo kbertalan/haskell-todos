@@ -5,6 +5,7 @@ module Todo.SwaggerSpec where
 import Data.Proxy (Proxy (..))
 import Servant.Swagger.Test
 import Test.Hspec (Spec)
+import Todo.QuickCheck ()
 import Todo.Web
 
 spec :: Spec

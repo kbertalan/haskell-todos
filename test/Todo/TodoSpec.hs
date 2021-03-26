@@ -13,6 +13,7 @@ import Test.JSON (validateToJSON)
 import Test.QuickCheck
 import Todo.Domain
 import Todo.JSON ()
+import Todo.QuickCheck ()
 import Todo.Test (testTodoWithSeed)
 
 testUUID :: TodoId
