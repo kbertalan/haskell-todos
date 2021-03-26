@@ -6,6 +6,7 @@ module Todo
   )
 where
 
+import App.DB (DatabaseT (..))
 import App.Log (logDebug)
 import App.Monad (AppM)
 import Control.Monad.Except (ExceptT, runExceptT)
@@ -33,21 +34,28 @@ import Todo.Domain
 import Todo.Web (TodoApi, todoApi)
 
 instance Logic AppM where
-  showPage = logged "showPage" . repoSelectPage
-  create = logged "create" . logicCreate
-  modify = logged "modify" . fmap runExceptT logicUpdate
-  patch = logged "path" . fmap runExceptT logicPatch
-  delete = logged "delete" . fmap runExceptT logicDelete
+  showPage = logged "showPage" . unDB . repoSelectPage
+  create = logged "create" . unDB . logicCreate
+  modify = logged "modify" . unDB . fmap runExceptT logicUpdate
+  patch = logged "path" . unDB . fmap runExceptT logicPatch
+  delete = logged "delete" . unDB . fmap runExceptT logicDelete
 
-instance Repo AppM where
+instance Logic (DatabaseT AppM) where
+  showPage = lift . showPage
+  create = lift . create
+  modify = lift . modify
+  patch = lift . patch
+  delete = lift . delete
+
+instance Repo (DatabaseT AppM) where
   repoSelectPage = dbSelectPage
   repoInsert = dbInsert
   repoUpdate = dbUpdate
   repoGetById = dbGetById
   repoDelete = dbDeleteById
 
-instance Repo (ExceptT e AppM) where
-  repoSelectPage = lift . dbSelectPage
+instance (Repo m, Monad m) => Repo (ExceptT e m) where
+  repoSelectPage = lift . repoSelectPage
   repoInsert = lift . repoInsert
   repoUpdate = lift . repoUpdate
   repoGetById = lift . repoGetById
