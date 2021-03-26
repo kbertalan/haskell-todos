@@ -1,6 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -39,6 +40,7 @@ module Todo.Domain
   )
 where
 
+import Control.DeepSeq (NFData)
 import Control.Monad.Except (MonadError)
 import Control.Monad.Identity (Identity)
 import Control.Monad.Random (MonadRandom, getRandom)
@@ -71,9 +73,13 @@ deriving instance Eq (TodoF Identity)
 
 deriving instance Show (TodoF Identity)
 
+deriving instance NFData (TodoF Identity)
+
 deriving instance Eq (TodoF Maybe)
 
 deriving instance Show (TodoF Maybe)
+
+deriving instance NFData (TodoF Maybe)
 
 instance Semigroup TodoLast where
   TodoF d1 c1 <> TodoF d2 c2 = TodoF (d1 <> d2) (c1 <> c2)
@@ -84,14 +90,14 @@ newtype CreateTodoRequest = CreateTodoRequest
   deriving (Eq, Show, Generic)
 
 data NotExists = NotExists
-  deriving (Show, Eq)
+  deriving (Generic, Show, Eq, NFData)
 
 data MissingFields = MissingFields
-  deriving (Show, Eq)
+  deriving (Generic, Show, Eq, NFData)
 
 type ModifyError = NotExists
 
-type PatchError e = OneOf e '[MissingFields, NotExists]
+type PatchError e = (NFData e, OneOf e '[MissingFields, NotExists])
 
 type DeleteError = NotExists
 

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c712a6e29bc7feaeca624c40440dff074c3a8d0f8a06c63f1188847207cecd3f
+-- hash: 1172155e9d99ccb07c7f949fa8bd69cf1b000d66e348d0c5f0e3b4361459e1a0
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -15,7 +15,7 @@ homepage:       https://github.com/kbertalan/haskell-todos#readme
 bug-reports:    https://github.com/kbertalan/haskell-todos/issues
 author:         Bertalan Kis
 maintainer:     kbertalan@gmail.com
-copyright:      2020 Bertalan Kis
+copyright:      2021 Bertalan Kis
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -62,6 +62,7 @@ library
     , base >=4.7 && <5
     , bytestring
     , co-log
+    , deepseq
     , ekg
     , file-embed
     , hasql
@@ -106,6 +107,7 @@ executable haskell-todos-exe
     , base >=4.7 && <5
     , bytestring
     , co-log
+    , deepseq
     , ekg
     , file-embed
     , haskell-todos
@@ -155,6 +157,7 @@ test-suite haskell-todos-test
     , base >=4.7 && <5
     , bytestring
     , co-log
+    , deepseq
     , ekg
     , file-embed
     , haskell-todos

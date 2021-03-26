@@ -7,11 +7,14 @@ module Todo
 where
 
 import App.DB (DatabaseT (..))
-import App.Log (logDebug)
-import App.Monad (AppM)
-import Control.Monad.Except (ExceptT, runExceptT)
+import App.Log (logDebug, withLogContext)
+import App.Monad (AppM, runAppWith)
+import Control.DeepSeq (NFData, force)
+import Control.Monad.Except (ExceptT, MonadIO (liftIO), runExceptT)
+import Control.Monad.Reader (ask)
 import Control.Monad.Trans (lift)
-import Data.Text (Text)
+import Data.Text (Text, pack)
+import Data.Time.Clock (diffUTCTime, getCurrentTime)
 import Todo.DB (dbDeleteById, dbGetById, dbInsert, dbSelectPage, dbUpdate)
 import Todo.Domain
   ( Logic,
@@ -34,11 +37,11 @@ import Todo.Domain
 import Todo.Web (TodoApi, todoApi)
 
 instance Logic AppM where
-  showPage = logged "showPage" . unDB . repoSelectPage
-  create = logged "create" . unDB . logicCreate
-  modify = logged "modify" . unDB . fmap runExceptT logicUpdate
-  patch = logged "path" . unDB . fmap runExceptT logicPatch
-  delete = logged "delete" . unDB . fmap runExceptT logicDelete
+  showPage = tracked "showPage" . unDB . repoSelectPage
+  create = tracked "create" . unDB . logicCreate
+  modify = tracked "modify" . unDB . fmap runExceptT logicUpdate
+  patch = tracked "path" . unDB . fmap runExceptT logicPatch
+  delete = tracked "delete" . unDB . fmap runExceptT logicDelete
 
 instance Logic (DatabaseT AppM) where
   showPage = lift . showPage
@@ -61,9 +64,23 @@ instance (Repo m, Monad m) => Repo (ExceptT e m) where
   repoGetById = lift . repoGetById
   repoDelete = lift . repoDelete
 
-logged :: Text -> AppM a -> AppM a
-logged name action = do
-  logDebug $ "starting " <> name
-  result <- action
-  logDebug $ "ended " <> name
+logged :: (NFData a) => Text -> AppM a -> AppM a
+logged name action = withLogContext name $ do
+  logDebug "starting"
+  result <- force <$> action
+  logDebug "ended"
   return result
+
+timed :: (NFData a) => AppM a -> AppM a
+timed action = do
+  env <- ask
+  (result, time) <- liftIO $ do
+    before <- getCurrentTime
+    result <- force <$> runAppWith env action
+    after <- getCurrentTime
+    return (result, diffUTCTime after before)
+  logDebug $ "time: " <> pack (show time)
+  return result
+
+tracked :: (NFData a) => Text -> AppM a -> AppM a
+tracked name = logged name . timed

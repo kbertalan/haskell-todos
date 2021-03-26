@@ -4,7 +4,7 @@ github:              "kbertalan/haskell-todos"
 license:             BSD3
 author:              "Bertalan Kis"
 maintainer:          "kbertalan@gmail.com"
-copyright:           "2020 Bertalan Kis"
+copyright:           "2021 Bertalan Kis"
 
 extra-source-files:
 - README.md
@@ -49,6 +49,7 @@ dependencies:
 - warp
 - QuickCheck
 - quickcheck-instances
+- deepseq
 
 ghc-options:
   - -Werror

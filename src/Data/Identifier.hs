@@ -2,6 +2,7 @@
 
 module Data.Identifier (Identifier (..)) where
 
+import Control.DeepSeq (NFData)
 import Data.Aeson (FromJSON, ToJSON, parseJSON, toEncoding, toJSON)
 import Data.UUID (UUID)
 import GHC.Generics (Generic)
@@ -12,6 +13,7 @@ newtype Identifier a = Identifier
   { unIdentifier :: UUID
   }
   deriving (Show, Eq, Generic)
+  deriving (NFData)
 
 instance ToJSON (Identifier a) where
   toJSON (Identifier uuid) = toJSON uuid

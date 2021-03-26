@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Data.Entity
@@ -5,6 +6,7 @@ module Data.Entity
   )
 where
 
+import Control.DeepSeq (NFData)
 import Data.Aeson
   ( FromJSON,
     ToJSON,
@@ -25,7 +27,7 @@ data Entity i a = Entity
   { identifier :: i,
     record :: a
   }
-  deriving (Generic, Show, Eq)
+  deriving (Generic, Show, Eq, NFData)
 
 instance (Arbitrary i, Arbitrary a) => Arbitrary (Entity i a) where
   arbitrary = Entity <$> arbitrary <*> arbitrary
