@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Data.Identifier.IdentifierSpec where
+module Data.IdentifierSpec where
 
 import Data.Identifier
 import Test.Hspec

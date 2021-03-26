@@ -1,11 +1,11 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Data.Entity.EntitySpec where
+module Data.EntitySpec where
 
-import Test.Hspec (Spec, describe, it)
-import Test.QuickCheck (property, (===))
 import Data.Aeson as A
 import Data.Entity
+import Test.Hspec (Spec, describe, it)
+import Test.QuickCheck (property, (===))
 
 spec :: Spec
 spec =

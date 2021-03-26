@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f9c9a0aeffd12960f14282af48df3dc00b2c08eb1e61d187ef82365de116159c
+-- hash: c712a6e29bc7feaeca624c40440dff074c3a8d0f8a06c63f1188847207cecd3f
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -137,12 +137,12 @@ test-suite haskell-todos-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Data.Entity.EntitySpec
-      Data.Identifier.IdentifierSpec
+      Data.EntitySpec
+      Data.IdentifierSpec
       Test.JSON
       Todo.SwaggerSpec
       Todo.Test
-      Todo.TodoSpec
+      TodoSpec
       Paths_haskell_todos
   hs-source-dirs:
       test

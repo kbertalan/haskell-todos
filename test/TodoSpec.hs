@@ -1,7 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 
-module Todo.TodoSpec where
+module TodoSpec where
 
 import Control.Applicative ((<|>))
 import qualified Data.Aeson as A
@@ -64,13 +64,13 @@ spec = do
       let patchTodo = Entity testUUID $ TodoF Nothing Nothing
        in runPatch patchTodo [] `shouldBe` (Left $ Right NotExists, [])
 
-  describe "json" $ do
+  describe "JSON" $ do
     it "should parse serialized todo" $
       property $ \(todo :: Todo) ->
         Just todo === A.decode (A.encode todo)
-    it "Todo toJSON is compatible with toEncoding" $
+    it "should have compatible Todo toJSON and toEncoding" $
       property $ validateToJSON @Todo
-    it "TodoMaybe toJSON is compatible with toEncoding" $
+    it "should have compatible TodoMaybe toJSON and toEncoding" $
       property $ validateToJSON @TodoMaybe
-    it "CreateTodoRequest toJSON is compatible with toEncoding" $
+    it "should have compatible CreateTodoRequest toJSON and toEncoding" $
       property $ validateToJSON @CreateTodoRequest
