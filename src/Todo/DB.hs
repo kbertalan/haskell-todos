@@ -24,7 +24,7 @@ import qualified Hasql.Decoders as D
     uuid,
   )
 import qualified Hasql.Encoders as E (Params, bool, int8, nonNullable, param, text, uuid)
-import Todo.Domain as Todo (Entity (..), Identifier (..), Todo, TodoId, TodoM (..), completed, description, identifier, unIdentifier)
+import Todo.Domain as Todo (Entity (..), Identifier (..), Todo, TodoF (..), TodoId, completed, description, identifier, unIdentifier)
 
 dbGetById :: (MonadIO m, WithDB m) => TodoId -> m (Maybe Todo)
 dbGetById i =
@@ -93,7 +93,7 @@ row :: D.Row Todo
 row =
   Entity
     <$> fmap Identifier (D.column (D.nonNullable D.uuid))
-    <*> ( TodoM
+    <*> ( TodoF
             <$> fmap fromStrict (D.column (D.nonNullable D.text))
             <*> D.column (D.nonNullable D.bool)
         )

@@ -34,13 +34,13 @@ instance (ToJSON i, ToJSON a) => ToJSON (Entity i a) where
       Object o -> object $ ("id" .= i) : toList o
       other -> object ["id" .= i, "record" .= other]
 
-instance FromJSON (TodoM Identity)
+instance FromJSON (TodoF Identity)
 
-instance ToJSON (TodoM Identity)
+instance ToJSON (TodoF Identity)
 
-instance FromJSON (TodoM Maybe)
+instance FromJSON (TodoF Maybe)
 
-instance ToJSON (TodoM Maybe)
+instance ToJSON (TodoF Maybe)
 
 instance FromJSON CreateTodoRequest where
   parseJSON = withObject "CreateTodoRequest" $ \v ->
