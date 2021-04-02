@@ -6,7 +6,7 @@ module Todo
   )
 where
 
-import App.DB (WithDB, getDB)
+import App.DB (WithPool, getPool)
 import App.Log (logDebug, withLogContext)
 import App.Monad (AppM, runAppWith)
 import Control.DeepSeq (NFData, force)
@@ -48,8 +48,8 @@ instance MonadRandom TodoM where
   getRandomR = TodoM . getRandomR
   getRandomRs = TodoM . getRandomRs
 
-instance WithDB TodoM where
-  getDB = TodoM getDB
+instance WithPool TodoM where
+  getPool = TodoM getPool
 
 instance Logic AppM where
   showPage = tracked "showPage" . runTodo . repoSelectPage

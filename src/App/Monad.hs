@@ -8,7 +8,7 @@ module App.Monad
   )
 where
 
-import App.DB (DB, WithDB, getDB)
+import App.DB (Pool, WithPool, getPool)
 import App.Ekg (Ekg, WithEkg, getEkg)
 import App.Log (Log)
 import Colog (HasLog, LogAction, Message, getLogAction, setLogAction)
@@ -22,14 +22,14 @@ newtype AppM a = AppM
   deriving newtype (Applicative, Functor, Monad, MonadIO, MonadReader Env, MonadRandom)
 
 data Env = Env
-  { envDB :: DB,
+  { envDBPool :: Pool,
     envEkg :: Ekg,
     envLog :: Log AppM,
     envStartupTime :: UTCTime
   }
 
-instance WithDB AppM where
-  getDB = asks envDB
+instance WithPool AppM where
+  getPool = asks envDBPool
 
 instance WithEkg AppM where
   getEkg = asks envEkg

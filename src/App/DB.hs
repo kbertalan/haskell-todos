@@ -4,10 +4,10 @@
 
 module App.DB
   ( Options (..),
-    WithDB,
-    getDB,
-    DB,
-    runWithDB,
+    WithPool,
+    getPool,
+    Pool,
+    runWithPool,
     execute,
     statement,
     migrate,
@@ -40,21 +40,21 @@ data Options = Options
   }
   deriving (Show)
 
-type DB = P.Pool
+type Pool = P.Pool
 
 newtype DBException = DBException P.UsageError
   deriving (Show)
   deriving anyclass (Exception)
 
-class WithDB m where
-  getDB :: m DB
+class WithPool m where
+  getPool :: m Pool
 
-runWithDB :: Options -> (DB -> IO ()) -> IO ()
-runWithDB opts = bracket (P.acquire $ poolOpts opts) P.release
+runWithPool :: Options -> (Pool -> IO ()) -> IO ()
+runWithPool opts = bracket (P.acquire $ poolOpts opts) P.release
 
-execute :: (MonadIO m, WithDB m) => S.Session a -> m a
+execute :: (MonadIO m, WithPool m) => S.Session a -> m a
 execute session =
-  getDB >>= liftIO . flip P.use session >>= \case
+  getPool >>= liftIO . flip P.use session >>= \case
     Left e -> liftIO . throwIO $ DBException e
     Right r -> return r
 
@@ -65,7 +65,7 @@ poolOpts Options {..} =
     C.settings dbHost (fromIntegral dbPort) dbUser dbPassword dbName
   )
 
-migrate :: DB -> IO (Either P.UsageError ())
+migrate :: Pool -> IO (Either P.UsageError ())
 migrate db = P.use db $ do
   let migrations = uncurry M.MigrationScript <$> sortOn fst embeddedMigrations
   forM_ (M.MigrationInitialization : migrations) $ \m -> do

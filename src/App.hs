@@ -3,7 +3,7 @@
 
 module App where
 
-import App.DB as DB (Options, migrate, runWithDB)
+import App.DB as DB (Options, migrate, runWithPool)
 import App.Ekg as Ekg (Options, runWithEkg, serverMetricsMiddleware)
 import App.Log as Log (runWithLog)
 import App.Monad (Env (Env), runAppWith)
@@ -30,15 +30,15 @@ run opts =
   Time.getCurrentTime >>= \time ->
     runWithLog $ \log ->
       runWithEkg (ekg opts) $ \ekg ->
-        runWithDB (db opts) $ \db -> do
+        runWithPool (db opts) $ \pool -> do
           Random.configure $ random opts
-          migrate db >>= \case
+          migrate pool >>= \case
             Right _ -> return ()
             Left e -> error $ show e
 
           metricsMiddleware <- serverMetricsMiddleware ekg
 
-          let env = Env db ekg log time
+          let env = Env pool ekg log time
           currentTime <- Time.getCurrentTime
           putStrLn $ "Started up in " <> show (Time.diffUTCTime currentTime time)
 
