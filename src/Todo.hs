@@ -6,11 +6,12 @@ module Todo
   )
 where
 
-import App.DB (DatabaseT (..))
+import App.DB (DatabaseT (..), WithDB, getDB)
 import App.Log (logDebug, withLogContext)
 import App.Monad (AppM, runAppWith)
 import Control.DeepSeq (NFData, force)
 import Control.Monad.Except (ExceptT, MonadIO (liftIO), runExceptT)
+import Control.Monad.Random (MonadRandom, getRandom, getRandomR, getRandomRs, getRandoms)
 import Control.Monad.Reader (ask)
 import Control.Monad.Trans (lift)
 import Data.Text (Text, pack)
@@ -36,28 +37,35 @@ import Todo.Domain
   )
 import Todo.Web (TodoApi, todoApi)
 
+newtype TodoM a = TodoM
+  { runTodo :: DatabaseT AppM a
+  }
+  deriving (Functor, Applicative, Monad, MonadIO)
+
+instance MonadRandom TodoM where
+  getRandom = TodoM $ lift getRandom
+  getRandoms = TodoM $ lift getRandoms
+  getRandomR = TodoM . lift . getRandomR
+  getRandomRs = TodoM . lift . getRandomRs
+
+instance WithDB TodoM where
+  getDB = TodoM getDB
+
 instance Logic AppM where
-  showPage = tracked "showPage" . unDB . repoSelectPage
-  create = tracked "create" . unDB . logicCreate
-  modify = tracked "modify" . unDB . fmap runExceptT logicUpdate
-  patch = tracked "path" . unDB . fmap runExceptT logicPatch
-  delete = tracked "delete" . unDB . fmap runExceptT logicDelete
+  showPage = tracked "showPage" . runDB . runTodo . repoSelectPage
+  create = tracked "create" . runDB . runTodo . logicCreate
+  modify = tracked "modify" . runDB . runTodo . runExceptT . logicUpdate
+  patch = tracked "path" . runDB . runTodo . runExceptT . logicPatch
+  delete = tracked "delete" . runDB . runTodo . runExceptT . logicDelete
 
-instance Logic (DatabaseT AppM) where
-  showPage = lift . showPage
-  create = lift . create
-  modify = lift . modify
-  patch = lift . patch
-  delete = lift . delete
-
-instance Repo (DatabaseT AppM) where
+instance Repo TodoM where
   repoSelectPage = dbSelectPage
   repoInsert = dbInsert
   repoUpdate = dbUpdate
   repoGetById = dbGetById
   repoDelete = dbDeleteById
 
-instance (Repo m, Monad m) => Repo (ExceptT e m) where
+instance Repo (ExceptT e TodoM) where
   repoSelectPage = lift . repoSelectPage
   repoInsert = lift . repoInsert
   repoUpdate = lift . repoUpdate

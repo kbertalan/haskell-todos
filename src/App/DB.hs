@@ -18,7 +18,6 @@ where
 import Control.Exception (Exception, bracket, throwIO)
 import Control.Monad (forM_)
 import Control.Monad.IO.Class (MonadIO, liftIO)
-import Control.Monad.Random (MonadRandom)
 import Control.Monad.Trans (MonadTrans, lift)
 import Data.ByteString (ByteString)
 import Data.FileEmbed (embedDir)
@@ -53,10 +52,10 @@ class WithDB m where
   getDB :: m DB
 
 newtype DatabaseT m a = DatabaseT
-  { unDB :: m a
+  { runDB :: m a
   }
   deriving (Functor)
-  deriving newtype (Applicative, Monad, MonadIO, MonadRandom)
+  deriving newtype (Applicative, Monad, MonadIO)
 
 instance MonadTrans DatabaseT where
   lift = DatabaseT
