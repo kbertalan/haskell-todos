@@ -6,7 +6,7 @@ module Todo
   )
 where
 
-import App.DB (DatabaseT (..), WithDB, getDB)
+import App.DB (WithDB, getDB)
 import App.Log (logDebug, withLogContext)
 import App.Monad (AppM, runAppWith)
 import Control.DeepSeq (NFData, force)
@@ -38,25 +38,25 @@ import Todo.Domain
 import Todo.Web (TodoApi, todoApi)
 
 newtype TodoM a = TodoM
-  { runTodo :: DatabaseT AppM a
+  { runTodo :: AppM a
   }
   deriving (Functor, Applicative, Monad, MonadIO)
 
 instance MonadRandom TodoM where
-  getRandom = TodoM $ lift getRandom
-  getRandoms = TodoM $ lift getRandoms
-  getRandomR = TodoM . lift . getRandomR
-  getRandomRs = TodoM . lift . getRandomRs
+  getRandom = TodoM getRandom
+  getRandoms = TodoM getRandoms
+  getRandomR = TodoM . getRandomR
+  getRandomRs = TodoM . getRandomRs
 
 instance WithDB TodoM where
   getDB = TodoM getDB
 
 instance Logic AppM where
-  showPage = tracked "showPage" . runDB . runTodo . repoSelectPage
-  create = tracked "create" . runDB . runTodo . logicCreate
-  modify = tracked "modify" . runDB . runTodo . runExceptT . logicUpdate
-  patch = tracked "path" . runDB . runTodo . runExceptT . logicPatch
-  delete = tracked "delete" . runDB . runTodo . runExceptT . logicDelete
+  showPage = tracked "showPage" . runTodo . repoSelectPage
+  create = tracked "create" . runTodo . logicCreate
+  modify = tracked "modify" . runTodo . runExceptT . logicUpdate
+  patch = tracked "path" . runTodo . runExceptT . logicPatch
+  delete = tracked "delete" . runTodo . runExceptT . logicDelete
 
 instance Repo TodoM where
   repoSelectPage = dbSelectPage

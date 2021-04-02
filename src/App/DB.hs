@@ -11,14 +11,12 @@ module App.DB
     execute,
     statement,
     migrate,
-    DatabaseT (..),
   )
 where
 
 import Control.Exception (Exception, bracket, throwIO)
 import Control.Monad (forM_)
 import Control.Monad.IO.Class (MonadIO, liftIO)
-import Control.Monad.Trans (MonadTrans, lift)
 import Data.ByteString (ByteString)
 import Data.FileEmbed (embedDir)
 import Data.List (sortOn)
@@ -50,18 +48,6 @@ newtype DBException = DBException P.UsageError
 
 class WithDB m where
   getDB :: m DB
-
-newtype DatabaseT m a = DatabaseT
-  { runDB :: m a
-  }
-  deriving (Functor)
-  deriving newtype (Applicative, Monad, MonadIO)
-
-instance MonadTrans DatabaseT where
-  lift = DatabaseT
-
-instance (Monad m, WithDB m) => WithDB (DatabaseT m) where
-  getDB = lift getDB
 
 runWithDB :: Options -> (DB -> IO ()) -> IO ()
 runWithDB opts = bracket (P.acquire $ poolOpts opts) P.release
