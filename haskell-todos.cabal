@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1172155e9d99ccb07c7f949fa8bd69cf1b000d66e348d0c5f0e3b4361459e1a0
+-- hash: af6af7ee1d85b5dacb0c5332f51328fe21276b868d2553a75dd44d192b478336
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -67,12 +67,12 @@ library
     , file-embed
     , hasql
     , hasql-migration
-    , hasql-pool
     , hasql-transaction
     , http-types
     , mtl
     , quickcheck-instances
     , random
+    , resource-pool
     , servant-errors
     , servant-server
     , servant-swagger
@@ -113,13 +113,13 @@ executable haskell-todos-exe
     , haskell-todos
     , hasql
     , hasql-migration
-    , hasql-pool
     , hasql-transaction
     , http-types
     , mtl
     , optparse-applicative
     , quickcheck-instances
     , random
+    , resource-pool
     , servant-errors
     , servant-server
     , servant-swagger
@@ -163,13 +163,13 @@ test-suite haskell-todos-test
     , haskell-todos
     , hasql
     , hasql-migration
-    , hasql-pool
     , hasql-transaction
     , hspec
     , http-types
     , mtl
     , quickcheck-instances
     , random
+    , resource-pool
     , servant-errors
     , servant-server
     , servant-swagger

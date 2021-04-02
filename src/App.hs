@@ -32,9 +32,7 @@ run opts =
       runWithEkg (ekg opts) $ \ekg ->
         runWithPool (db opts) $ \pool -> do
           Random.configure $ random opts
-          migrate pool >>= \case
-            Right _ -> return ()
-            Left e -> error $ show e
+          migrate pool
 
           metricsMiddleware <- serverMetricsMiddleware ekg
 

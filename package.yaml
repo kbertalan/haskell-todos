@@ -23,7 +23,7 @@ dependencies:
 - base >= 4.7 && < 5
 - hasql
 - hasql-migration
-- hasql-pool
+- resource-pool
 - hasql-transaction
 - text
 - http-types

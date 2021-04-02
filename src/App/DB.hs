@@ -4,13 +4,14 @@
 
 module App.DB
   ( Options (..),
-    WithPool,
-    getPool,
+    WithPool (..),
     Pool,
     runWithPool,
     execute,
     statement,
     migrate,
+    WithConnection (..),
+    Connection,
   )
 where
 
@@ -20,12 +21,12 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.ByteString (ByteString)
 import Data.FileEmbed (embedDir)
 import Data.List (sortOn)
-import qualified Hasql.Connection as C (settings)
+import qualified Data.Pool as P
+import qualified Hasql.Connection as C
 import qualified Hasql.Decoders as D (Result)
 import qualified Hasql.Encoders as E (Params)
 import qualified Hasql.Migration as M (MigrationCommand (..), runMigration)
-import qualified Hasql.Pool as P (Pool, Settings, UsageError, acquire, release, use)
-import qualified Hasql.Session as S (Session, statement)
+import qualified Hasql.Session as S (QueryError, Session, run, statement)
 import qualified Hasql.Statement as St (Statement (..))
 import qualified Hasql.Transaction.Sessions as T (IsolationLevel (Serializable), Mode (Write), transaction)
 
@@ -40,33 +41,50 @@ data Options = Options
   }
   deriving (Show)
 
-type Pool = P.Pool
+type Pool = P.Pool C.Connection
 
-newtype DBException = DBException P.UsageError
+type Connection = C.Connection
+
+data DBException
+  = ConnectionException C.ConnectionError
+  | StatementException S.QueryError
   deriving (Show)
   deriving anyclass (Exception)
 
 class WithPool m where
   getPool :: m Pool
 
+class WithConnection m where
+  getConnection :: m Connection
+
 runWithPool :: Options -> (Pool -> IO ()) -> IO ()
-runWithPool opts = bracket (P.acquire $ poolOpts opts) P.release
+runWithPool Options {..} = bracket acquire release
+  where
+    acquire =
+      P.createPool
+        createConnection
+        C.release
+        1
+        (fromIntegral poolTimeout)
+        poolSize
+    release = P.destroyAllResources
+    createConnection =
+      C.acquire settings >>= \case
+        Right r -> pure r
+        Left e -> throwIO $ ConnectionException e
+    settings = C.settings dbHost (fromIntegral dbPort) dbUser dbPassword dbName
 
 execute :: (MonadIO m, WithPool m) => S.Session a -> m a
-execute session =
-  getPool >>= liftIO . flip P.use session >>= \case
-    Left e -> liftIO . throwIO $ DBException e
-    Right r -> return r
+execute session = getPool >>= liftIO . flip usePool session
 
-poolOpts :: Options -> P.Settings
-poolOpts Options {..} =
-  ( poolSize,
-    fromIntegral poolTimeout,
-    C.settings dbHost (fromIntegral dbPort) dbUser dbPassword dbName
-  )
+usePool :: Pool -> S.Session a -> IO a
+usePool pool session =
+  P.withResource pool (S.run session) >>= \case
+    Left e -> throwIO $ StatementException e
+    Right r -> pure r
 
-migrate :: Pool -> IO (Either P.UsageError ())
-migrate db = P.use db $ do
+migrate :: Pool -> IO ()
+migrate pool = usePool pool $ do
   let migrations = uncurry M.MigrationScript <$> sortOn fst embeddedMigrations
   forM_ (M.MigrationInitialization : migrations) $ \m -> do
     T.transaction T.Serializable T.Write $ M.runMigration m
