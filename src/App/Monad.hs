@@ -12,14 +12,21 @@ import App.DB (Pool, WithPool, getPool)
 import App.Ekg (Ekg, WithEkg, getEkg)
 import App.Log (Log)
 import Colog (HasLog, LogAction, Message, getLogAction, setLogAction)
+import Control.Monad.IO.Class (MonadIO (liftIO))
 import Control.Monad.Random.Class (MonadRandom)
-import Control.Monad.Reader (MonadIO, MonadReader, ReaderT, asks, runReaderT)
+import Control.Monad.Reader (MonadReader (ask), ReaderT, asks, runReaderT)
 import Data.Time.Clock (UTCTime)
+import UnliftIO (MonadUnliftIO, withRunInIO)
 
 newtype AppM a = AppM
   { runApp :: ReaderT Env IO a
   }
   deriving newtype (Applicative, Functor, Monad, MonadIO, MonadReader Env, MonadRandom)
+
+instance MonadUnliftIO AppM where
+  withRunInIO go = do
+    env <- ask
+    liftIO $ go $ runAppWith env
 
 data Env = Env
   { envDBPool :: Pool,

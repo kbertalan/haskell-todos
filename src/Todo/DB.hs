@@ -7,7 +7,7 @@ module Todo.DB
   )
 where
 
-import App.DB as DB (WithPool, execute, statement)
+import App.DB as DB (WithConnection, execute, statement)
 import Control.Monad.IO.Class (MonadIO)
 import Data.Functor.Contravariant ((>$<))
 import Data.Paging (Page (..))
@@ -26,7 +26,7 @@ import qualified Hasql.Decoders as D
 import qualified Hasql.Encoders as E (Params, bool, int8, nonNullable, param, text, uuid)
 import Todo.Domain as Todo (Entity (..), Identifier (..), Todo, TodoF (..), TodoId, completed, description, identifier, unIdentifier)
 
-dbGetById :: (MonadIO m, WithPool m) => TodoId -> m (Maybe Todo)
+dbGetById :: (MonadIO m, WithConnection m) => TodoId -> m (Maybe Todo)
 dbGetById i =
   DB.execute $
     statement
@@ -38,7 +38,7 @@ dbGetById i =
     encoder = E.param (E.nonNullable E.uuid)
     decoder = D.rowMaybe row
 
-dbSelectPage :: (MonadIO m, WithPool m) => Page -> m [Todo]
+dbSelectPage :: (MonadIO m, WithConnection m) => Page -> m [Todo]
 dbSelectPage page = do
   DB.execute $
     statement
@@ -52,7 +52,7 @@ dbSelectPage page = do
         <> (fromIntegral . limit >$< E.param (E.nonNullable E.int8))
     decoder = D.rowList row
 
-dbInsert :: (MonadIO m, WithPool m) => Todo -> m Todo
+dbInsert :: (MonadIO m, WithConnection m) => Todo -> m Todo
 dbInsert todo = do
   DB.execute $
     statement
@@ -63,7 +63,7 @@ dbInsert todo = do
       todo
   return todo
 
-dbUpdate :: (MonadIO m, WithPool m) => Todo -> m Todo
+dbUpdate :: (MonadIO m, WithConnection m) => Todo -> m Todo
 dbUpdate todo = do
   DB.execute $
     statement
@@ -77,7 +77,7 @@ dbUpdate todo = do
       todo
   return todo
 
-dbDeleteById :: (MonadIO m, WithPool m) => TodoId -> m ()
+dbDeleteById :: (MonadIO m, WithConnection m) => TodoId -> m ()
 dbDeleteById i = do
   DB.execute $
     statement

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: af6af7ee1d85b5dacb0c5332f51328fe21276b868d2553a75dd44d192b478336
+-- hash: 54ded9c4fcb27d36cf41574afc90cf9ed48f0fe730665016594223501acf3e00
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -72,7 +72,6 @@ library
     , mtl
     , quickcheck-instances
     , random
-    , resource-pool
     , servant-errors
     , servant-server
     , servant-swagger
@@ -80,6 +79,8 @@ library
     , swagger2
     , text
     , time
+    , unliftio
+    , unliftio-pool
     , unordered-containers
     , uuid
     , vector
@@ -119,7 +120,6 @@ executable haskell-todos-exe
     , optparse-applicative
     , quickcheck-instances
     , random
-    , resource-pool
     , servant-errors
     , servant-server
     , servant-swagger
@@ -127,6 +127,8 @@ executable haskell-todos-exe
     , swagger2
     , text
     , time
+    , unliftio
+    , unliftio-pool
     , unordered-containers
     , uuid
     , vector
@@ -169,7 +171,6 @@ test-suite haskell-todos-test
     , mtl
     , quickcheck-instances
     , random
-    , resource-pool
     , servant-errors
     , servant-server
     , servant-swagger
@@ -177,6 +178,8 @@ test-suite haskell-todos-test
     , swagger2
     , text
     , time
+    , unliftio
+    , unliftio-pool
     , unordered-containers
     , uuid
     , vector

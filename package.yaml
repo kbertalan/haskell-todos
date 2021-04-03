@@ -23,7 +23,6 @@ dependencies:
 - base >= 4.7 && < 5
 - hasql
 - hasql-migration
-- resource-pool
 - hasql-transaction
 - text
 - http-types
@@ -50,6 +49,8 @@ dependencies:
 - QuickCheck
 - quickcheck-instances
 - deepseq
+- unliftio
+- unliftio-pool
 
 ghc-options:
   - -Werror

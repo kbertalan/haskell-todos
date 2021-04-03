@@ -12,16 +12,17 @@ module App.DB
     migrate,
     WithConnection (..),
     Connection,
+    runWithConnection,
   )
 where
 
 import Control.Exception (Exception, bracket, throwIO)
 import Control.Monad (forM_)
 import Control.Monad.IO.Class (MonadIO, liftIO)
+import Control.Monad.Reader (MonadReader (ask), ReaderT)
 import Data.ByteString (ByteString)
 import Data.FileEmbed (embedDir)
 import Data.List (sortOn)
-import qualified Data.Pool as P
 import qualified Hasql.Connection as C
 import qualified Hasql.Decoders as D (Result)
 import qualified Hasql.Encoders as E (Params)
@@ -29,6 +30,8 @@ import qualified Hasql.Migration as M (MigrationCommand (..), runMigration)
 import qualified Hasql.Session as S (QueryError, Session, run, statement)
 import qualified Hasql.Statement as St (Statement (..))
 import qualified Hasql.Transaction.Sessions as T (IsolationLevel (Serializable), Mode (Write), transaction)
+import UnliftIO (MonadUnliftIO)
+import qualified UnliftIO.Pool as P
 
 data Options = Options
   { poolSize :: !Int,
@@ -57,6 +60,9 @@ class WithPool m where
 class WithConnection m where
   getConnection :: m Connection
 
+instance (Monad m) => WithConnection (ReaderT Connection m) where
+  getConnection = ask
+
 runWithPool :: Options -> (Pool -> IO ()) -> IO ()
 runWithPool Options {..} = bracket acquire release
   where
@@ -74,8 +80,14 @@ runWithPool Options {..} = bracket acquire release
         Left e -> throwIO $ ConnectionException e
     settings = C.settings dbHost (fromIntegral dbPort) dbUser dbPassword dbName
 
-execute :: (MonadIO m, WithPool m) => S.Session a -> m a
-execute session = getPool >>= liftIO . flip usePool session
+runWithConnection :: (MonadUnliftIO m, WithPool m) => (Connection -> m a) -> m a
+runWithConnection action = getPool >>= flip P.withResource action
+
+execute :: (MonadIO m, WithConnection m) => S.Session a -> m a
+execute session =
+  getConnection >>= liftIO . S.run session >>= \case
+    Left e -> liftIO . throwIO $ StatementException e
+    Right r -> pure r
 
 usePool :: Pool -> S.Session a -> IO a
 usePool pool session =
