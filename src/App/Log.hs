@@ -19,12 +19,14 @@ import Colog
     Msg (msgText),
     WithLog,
     cmap,
+    defCapacity,
     logDebug,
     logError,
     logException,
     logInfo,
     logWarning,
     richMessageAction,
+    withBackgroundLogger,
     withLog,
   )
 import Control.Monad.IO.Class (MonadIO)
@@ -35,7 +37,7 @@ type Log m = LogAction m Message
 type WithLog env m = Colog.WithLog env Message m
 
 runWithLog :: (MonadIO m) => (Log m -> IO ()) -> IO ()
-runWithLog action = action richMessageAction
+runWithLog = withBackgroundLogger defCapacity richMessageAction
 
 withLogContext :: (App.Log.WithLog env m) => Text -> m a -> m a
 withLogContext name = withLog $ cmap converter
