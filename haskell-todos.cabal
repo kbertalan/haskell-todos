@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 54ded9c4fcb27d36cf41574afc90cf9ed48f0fe730665016594223501acf3e00
+-- hash: bf8583dfa785f05df15f946fc9f8c830679dfdaf75230bf7dd8c4ea7d02c3d4d
 
 name:           haskell-todos
 version:        0.1.0.0
@@ -61,6 +61,7 @@ library
     , aeson
     , base >=4.7 && <5
     , bytestring
+    , chronos
     , co-log
     , deepseq
     , ekg
@@ -78,7 +79,6 @@ library
     , servant-swagger-ui-redoc
     , swagger2
     , text
-    , time
     , unliftio
     , unliftio-pool
     , unordered-containers
@@ -107,6 +107,7 @@ executable haskell-todos-exe
     , aeson
     , base >=4.7 && <5
     , bytestring
+    , chronos
     , co-log
     , deepseq
     , ekg
@@ -126,7 +127,6 @@ executable haskell-todos-exe
     , servant-swagger-ui-redoc
     , swagger2
     , text
-    , time
     , unliftio
     , unliftio-pool
     , unordered-containers
@@ -158,6 +158,7 @@ test-suite haskell-todos-test
     , aeson
     , base >=4.7 && <5
     , bytestring
+    , chronos
     , co-log
     , deepseq
     , ekg
@@ -177,7 +178,6 @@ test-suite haskell-todos-test
     , servant-swagger-ui-redoc
     , swagger2
     , text
-    , time
     , unliftio
     , unliftio-pool
     , unordered-containers

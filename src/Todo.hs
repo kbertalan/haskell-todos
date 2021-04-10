@@ -9,13 +9,13 @@ where
 import App.DB (Connection, WithConnection, WithPool, getPool, runWithConnection)
 import App.Log (logDebug, withLogContext)
 import App.Monad (AppM, runAppWith)
+import Chronos (stopwatch)
 import Control.DeepSeq (NFData, force)
 import Control.Monad.Except (ExceptT, MonadIO (liftIO), runExceptT)
 import Control.Monad.Random (MonadRandom)
 import Control.Monad.Reader (ReaderT (runReaderT), ask)
 import Control.Monad.Trans (lift)
 import Data.Text (Text, pack)
-import Data.Time.Clock (diffUTCTime, getCurrentTime)
 import Todo.DB (dbDeleteById, dbGetById, dbInsert, dbSelectPage, dbUpdate)
 import Todo.Domain
   ( Logic,
@@ -81,12 +81,11 @@ logged name action = withLogContext name $ do
 timed :: (NFData a) => AppM a -> AppM a
 timed action = do
   env <- ask
-  (result, time) <- liftIO $ do
-    before <- getCurrentTime
-    result <- force <$> runAppWith env action
-    after <- getCurrentTime
-    return (result, diffUTCTime after before)
-  logDebug $ "time: " <> pack (show time)
+  (duration, result) <-
+    liftIO $
+      stopwatch $
+        force <$> runAppWith env action
+  logDebug $ "time: " <> pack (show duration)
   return result
 
 tracked :: (NFData a) => Text -> AppM a -> AppM a

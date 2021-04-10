@@ -11,11 +11,11 @@ where
 import App.DB (Pool, WithPool, getPool)
 import App.Ekg (Ekg, WithEkg, getEkg)
 import App.Log (Log)
+import Chronos (Time)
 import Colog (HasLog, LogAction, Message, getLogAction, setLogAction)
 import Control.Monad.IO.Class (MonadIO (liftIO))
 import Control.Monad.Random.Class (MonadRandom)
 import Control.Monad.Reader (MonadReader (ask), ReaderT, asks, runReaderT)
-import Data.Time.Clock (UTCTime)
 import UnliftIO (MonadUnliftIO, withRunInIO)
 
 newtype AppM a = AppM
@@ -32,7 +32,7 @@ data Env = Env
   { envDBPool :: Pool,
     envEkg :: Ekg,
     envLog :: Log AppM,
-    envStartupTime :: UTCTime
+    envStartupTime :: Time
   }
 
 instance WithPool AppM where

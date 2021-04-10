@@ -9,9 +9,10 @@ import App.Log as Log (runWithLog)
 import App.Monad (Env (Env), runAppWith)
 import App.Random as Random (Options, configure)
 import App.Web as Web (Options, run)
-import Data.Time.Clock as Time
+import Chronos (Time (getTime), now)
 import Health
 import Servant ((:<|>) (..))
+import Text.Printf (printf)
 import Todo
 import Prelude hiding (log)
 
@@ -27,7 +28,7 @@ type API = HealthApi :<|> TodoApi
 
 run :: App.Options -> IO ()
 run opts =
-  Time.getCurrentTime >>= \time ->
+  now >>= \time ->
     runWithLog $ \log ->
       runWithEkg (ekg opts) $ \ekg ->
         runWithPool (db opts) $ \pool -> do
@@ -37,11 +38,16 @@ run opts =
           metricsMiddleware <- serverMetricsMiddleware ekg
 
           let env = Env pool ekg log time
-          currentTime <- Time.getCurrentTime
-          putStrLn $ "Started up in " <> show (Time.diffUTCTime currentTime time)
+          currentTime <- now
+          putStrLn $ "Started up in " <> printf "%.4f" (diffTimeInSeconds currentTime time) <> "s"
 
           Web.run @API
             (web opts)
             [metricsMiddleware]
             (healthApi :<|> todoApi)
             (runAppWith env)
+
+diffTimeInSeconds :: Time -> Time -> Double
+diffTimeInSeconds h l = fromIntegral (getTime h - getTime l) / nanoSecondInSecond
+  where
+    nanoSecondInSecond = 1000000000
