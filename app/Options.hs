@@ -2,7 +2,7 @@ module Options where
 
 import App
 import App.DB as DB
-import App.Ekg as Ekg
+import App.Metrics as Metrics
 import App.Random as Random
 import App.Web as Web
 
@@ -23,10 +23,9 @@ defaultAppOptions =
             dbPassword = "postgres",
             dbName = "postgres"
           },
-      ekg =
-        Ekg.Options
-          { host = "localhost",
-            port = 8000
+      metrics =
+        Metrics.Options
+          { path = "/metrics"
           },
       random =
         Random.Options

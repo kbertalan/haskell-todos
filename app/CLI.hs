@@ -4,14 +4,14 @@ module CLI (Command (..), commandInfo) where
 
 import App
 import App.DB as DB
-import App.Ekg as Ekg
+import App.Metrics as Metrics
 import App.Random as Random
 import App.Web as Web
 import Data.ByteString (ByteString)
 import Data.String (fromString)
 import Data.Text (unpack)
+import qualified Data.Text as T
 import Data.Text.Encoding (decodeUtf8)
-import qualified Data.Text.Lazy as TL
 import Options.Applicative
 
 newtype Command
@@ -32,7 +32,7 @@ appOptions App.Options {..} =
   App.Options
     <$> webOptions web
     <*> dbOptions db
-    <*> ekgOptions ekg
+    <*> metricsOptions metrics
     <*> randomOptions random
 
 webOptions :: Web.Options -> Parser Web.Options
@@ -106,25 +106,18 @@ dbOptions DB.Options {..} =
             <> showDefault
             <> help "Database name"
 
-ekgOptions :: Ekg.Options -> Parser Ekg.Options
-ekgOptions Ekg.Options {host = ekgHost, port = ekgPort} =
-  Ekg.Options
-    <$> host
-    <*> port
+metricsOptions :: Metrics.Options -> Parser Metrics.Options
+metricsOptions Metrics.Options {path = metricsPath} =
+  Metrics.Options
+    <$> path
   where
-    host =
+    path =
       fmap fromString $
         strOption $
-          long "ekg-host"
-            <> value (TL.unpack ekgHost)
+          long "metrics-path"
+            <> value (T.unpack metricsPath)
             <> showDefault
-            <> help "ekg host to bind"
-    port =
-      option auto $
-        long "ekg-port"
-          <> value ekgPort
-          <> showDefault
-          <> help "Ekg port"
+            <> help "path where metrics are exposed"
 
 randomOptions :: Random.Options -> Parser Random.Options
 randomOptions Random.Options {seed = randomSeed} =

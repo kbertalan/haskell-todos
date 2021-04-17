@@ -32,13 +32,11 @@ dependencies:
 - vector
 - unordered-containers
 - wai
-- ekg
 - bytestring
 - random
 - MonadRandom
 - co-log
 - chronos
-- wai-middleware-metrics
 - file-embed
 - servant-server
 - servant-errors
@@ -51,6 +49,8 @@ dependencies:
 - deepseq
 - unliftio
 - unliftio-pool
+- prometheus
+- prometheus-wai-middleware
 
 ghc-options:
   - -Werror

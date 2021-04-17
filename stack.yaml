@@ -42,11 +42,13 @@ packages:
 #
 extra-deps:
 - hasql-migration-0.3.0@sha256:6ca4cc6c89834bb79eb9f15b504774043b5b3994336bd86a9d79e59da6d54963,2799
-- wai-middleware-metrics-0.2.4
 - git: https://github.com/kbertalan/servant-swagger-ui.git
   commit: 535db4c5375f77a01791abebdbbcfc97bdc3bcea
   subdirs:
   - servant-swagger-ui-redoc
+- git: https://github.com/kbertalan/prometheus.git
+  commit: e734681b82de8c0e989293c79d1b6b7c29d1f6d2
+- prometheus-wai-middleware-1.0.1.0@sha256:a65a8c02e47e5bd6eccfd9ea9cbefcbc01f109be080a3832d759e1b3f33a673a,1537
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

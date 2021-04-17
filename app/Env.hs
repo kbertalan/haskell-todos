@@ -5,7 +5,7 @@ module Env where
 
 import App
 import qualified App.DB as DB
-import qualified App.Ekg as Ekg
+import qualified App.Metrics as Metrics
 import qualified App.Random as Random
 import qualified App.Web as Web
 import Data.Maybe (fromMaybe)
@@ -26,7 +26,7 @@ appEnv App.Options {..} =
   App.Options
     <$> webEnv web
     <*> dbEnv db
-    <*> ekgEnv ekg
+    <*> metricsEnv metrics
     <*> randomEnv random
 
 webEnv :: Web.Options -> Env Web.Options
@@ -45,11 +45,10 @@ dbEnv DB.Options {..} =
     <*> "DB_PASSWORD" ?= dbPassword
     <*> "DB_NAME" ?= dbName
 
-ekgEnv :: Ekg.Options -> Env Ekg.Options
-ekgEnv Ekg.Options {..} =
-  Ekg.Options
-    <$> "EKG_HOST" ?= host
-    <*> "EKG_PORT" ?= port
+metricsEnv :: Metrics.Options -> Env Metrics.Options
+metricsEnv Metrics.Options {..} =
+  Metrics.Options
+    <$> "METRICS_PATH" ?= path
 
 randomEnv :: Random.Options -> Env Random.Options
 randomEnv Random.Options {..} =

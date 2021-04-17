@@ -9,7 +9,7 @@ module App.Monad
 where
 
 import App.DB (Pool, WithPool, getPool)
-import App.Ekg (Ekg, WithEkg, getEkg)
+import App.Metrics (Metrics, WithMetrics, getMetrics)
 import App.Log (Log)
 import Chronos (Time)
 import Colog (HasLog, LogAction, Message, getLogAction, setLogAction)
@@ -30,7 +30,7 @@ instance MonadUnliftIO AppM where
 
 data Env = Env
   { envDBPool :: Pool,
-    envEkg :: Ekg,
+    envMetrics :: Metrics,
     envLog :: Log AppM,
     envStartupTime :: Time
   }
@@ -38,8 +38,8 @@ data Env = Env
 instance WithPool AppM where
   getPool = asks envDBPool
 
-instance WithEkg AppM where
-  getEkg = asks envEkg
+instance WithMetrics AppM where
+  getMetrics = asks envMetrics
 
 instance HasLog Env Message AppM where
   getLogAction :: Env -> LogAction AppM Message
