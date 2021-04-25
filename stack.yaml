@@ -17,8 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver:
-  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/31.yaml
+resolver: lts-17.10
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -42,12 +41,7 @@ packages:
 #
 extra-deps:
 - hasql-migration-0.3.0@sha256:6ca4cc6c89834bb79eb9f15b504774043b5b3994336bd86a9d79e59da6d54963,2799
-- git: https://github.com/kbertalan/servant-swagger-ui.git
-  commit: 535db4c5375f77a01791abebdbbcfc97bdc3bcea
-  subdirs:
-  - servant-swagger-ui-redoc
-- prometheus-2.2.2@sha256:d794f5fe975be2f3ca7d7af71a7aeeb006615ad7d98835fa42caba9457a51936,4288
-- prometheus-wai-middleware-1.0.1.0@sha256:a65a8c02e47e5bd6eccfd9ea9cbefcbc01f109be080a3832d759e1b3f33a673a,1537
+- servant-swagger-ui-redoc-0.3.4.1.22.3@sha256:c19967101d9205b1a936fad254f22f02c471953c10b1137364a4589e121f0562,1474
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

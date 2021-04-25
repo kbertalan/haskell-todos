@@ -12,36 +12,15 @@ packages:
   original:
     hackage: hasql-migration-0.3.0@sha256:6ca4cc6c89834bb79eb9f15b504774043b5b3994336bd86a9d79e59da6d54963,2799
 - completed:
-    subdir: servant-swagger-ui-redoc
-    name: servant-swagger-ui-redoc
-    version: 0.3.3.1.22.3
-    git: https://github.com/kbertalan/servant-swagger-ui.git
+    hackage: servant-swagger-ui-redoc-0.3.4.1.22.3@sha256:c19967101d9205b1a936fad254f22f02c471953c10b1137364a4589e121f0562,1474
     pantry-tree:
       size: 381
-      sha256: f3df8797d55a24c593796bcde25d656bc9b84ab551f6ef31a1ab9e54f50c43ca
-    commit: 535db4c5375f77a01791abebdbbcfc97bdc3bcea
+      sha256: 854dc59f86a3d1c30f48c9be287dcba7dbdaf482f4488d8d94884ff577678cc3
   original:
-    subdir: servant-swagger-ui-redoc
-    git: https://github.com/kbertalan/servant-swagger-ui.git
-    commit: 535db4c5375f77a01791abebdbbcfc97bdc3bcea
-- completed:
-    hackage: prometheus-2.2.2@sha256:d794f5fe975be2f3ca7d7af71a7aeeb006615ad7d98835fa42caba9457a51936,4288
-    pantry-tree:
-      size: 1559
-      sha256: 3b1cb27cf8cb0a8da83b5730e85132e058e808f8dd1be349ea3dbb162c7f14c3
-  original:
-    hackage: prometheus-2.2.2@sha256:d794f5fe975be2f3ca7d7af71a7aeeb006615ad7d98835fa42caba9457a51936,4288
-- completed:
-    hackage: prometheus-wai-middleware-1.0.1.0@sha256:a65a8c02e47e5bd6eccfd9ea9cbefcbc01f109be080a3832d759e1b3f33a673a,1537
-    pantry-tree:
-      size: 355
-      sha256: efe1ec58759b8926555dca41bbafed69da0b3008d0508312445ec969c0bc107e
-  original:
-    hackage: prometheus-wai-middleware-1.0.1.0@sha256:a65a8c02e47e5bd6eccfd9ea9cbefcbc01f109be080a3832d759e1b3f33a673a,1537
+    hackage: servant-swagger-ui-redoc-0.3.4.1.22.3@sha256:c19967101d9205b1a936fad254f22f02c471953c10b1137364a4589e121f0562,1474
 snapshots:
 - completed:
-    size: 534126
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/31.yaml
-    sha256: 637fb77049b25560622a224845b7acfe81a09fdb6a96a3c75997a10b651667f6
-  original:
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/31.yaml
+    size: 567241
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/10.yaml
+    sha256: 321b3b9f0c7f76994b39e0dabafdc76478274b4ff74cc5e43d410897a335ad3b
+  original: lts-17.10
