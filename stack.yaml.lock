@@ -25,16 +25,12 @@ packages:
     git: https://github.com/kbertalan/servant-swagger-ui.git
     commit: 535db4c5375f77a01791abebdbbcfc97bdc3bcea
 - completed:
-    name: prometheus
-    version: 2.2.2
-    git: https://github.com/kbertalan/prometheus.git
+    hackage: prometheus-2.2.2@sha256:d794f5fe975be2f3ca7d7af71a7aeeb006615ad7d98835fa42caba9457a51936,4288
     pantry-tree:
-      size: 1968
-      sha256: 6d2aea1244170ebf567fb8474f9379657e7c630ce01ae98014649a78c036c30e
-    commit: e734681b82de8c0e989293c79d1b6b7c29d1f6d2
+      size: 1559
+      sha256: 3b1cb27cf8cb0a8da83b5730e85132e058e808f8dd1be349ea3dbb162c7f14c3
   original:
-    git: https://github.com/kbertalan/prometheus.git
-    commit: e734681b82de8c0e989293c79d1b6b7c29d1f6d2
+    hackage: prometheus-2.2.2@sha256:d794f5fe975be2f3ca7d7af71a7aeeb006615ad7d98835fa42caba9457a51936,4288
 - completed:
     hackage: prometheus-wai-middleware-1.0.1.0@sha256:a65a8c02e47e5bd6eccfd9ea9cbefcbc01f109be080a3832d759e1b3f33a673a,1537
     pantry-tree:

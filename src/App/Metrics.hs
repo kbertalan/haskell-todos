@@ -1,73 +1,64 @@
+{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module App.Metrics
   ( Options (..),
-    Metrics (..),
+    AppMetrics (..),
     WithMetrics,
     getMetrics,
     runWithMetrics,
   )
 where
 
-import           Control.Monad                                  (forM_)
-import           Control.Monad.Reader                           (ReaderT (runReaderT))
-import           Data.Text                                      (Text)
-import qualified Data.Text                                      as T
-import           Network.HTTP.Types                             (methodGet)
-import           Network.HTTP.Types.Header                      (hContentType)
-import           Network.HTTP.Types.Status                      (status200)
-import           Network.Wai                                    (Middleware, Request (requestMethod), responseBuilder)
-import           Network.Wai.Internal                           (Request (pathInfo))
-import           Network.Wai.Middleware.Prometheus              (applicationMetrics, instrumentApplication)
-import           System.Metrics.Prometheus.Concurrent.Registry  (Registry, new, sample)
-import           System.Metrics.Prometheus.Concurrent.RegistryT (RegistryT (unRegistryT), registerCounter',
-                                                                 registerGauge', registerHistogram')
-import           System.Metrics.Prometheus.Encode.Text          (encodeMetrics)
-import           System.Metrics.Prometheus.Metric               (Metric (CounterMetric, GaugeMetric, HistogramMetric))
-import           System.Metrics.Prometheus.MetricId             (MetricId (labels, name))
-import           System.Metrics.Prometheus.Registry             (RegistrySample)
+import Control.Monad.Identity (Identity)
+import Data.HKD (TraversableHKD (traverseHKD))
+import Data.Text (Text)
+import qualified Data.Text as T
+import Network.HTTP.Types (methodGet)
+import Network.HTTP.Types.Header (hContentType)
+import Network.HTTP.Types.Status (status200)
+import Network.Wai (Middleware, Request (requestMethod), responseBuilder)
+import Network.Wai.Internal (Request (pathInfo))
+import Network.Wai.Middleware.Prometheus (applicationMetrics, instrumentApplication)
+import System.Metrics.Prometheus.Concurrent.RegistryT
+import System.Metrics.Prometheus.Encode.Text (encodeMetrics)
+import System.Metrics.Prometheus.Registry (RegistrySample)
 
 newtype Options = Options
   { path :: Text
   }
   deriving (Show)
 
-data Metrics = Metrics
-  { metricsRegistry   :: !Registry,
-    metricsMiddleware :: !Middleware,
-    metricsEndpoint   :: !Middleware
+data AppMetrics f = AppMetrics
+  { metricsMiddleware :: !Middleware,
+    metricsEndpoint :: !Middleware,
+    metricsRegistered :: !(f Identity)
   }
 
-type ExposedMetrics = [(MetricId, Metric)]
-
-runWithMetrics :: Options -> ExposedMetrics -> (Metrics -> IO ()) -> IO ()
+runWithMetrics :: (TraversableHKD f) => Options -> f (RegistryT IO) -> (AppMetrics f -> IO ()) -> IO ()
 runWithMetrics Options {..} exposed action = do
-  registry <- new
-  runRegistryT' registry $ do
-    forM_ exposed $ \(mid, m) ->
-      let n = name mid
-          l = labels mid
-       in case m of
-            CounterMetric c   -> registerCounter' n l c
-            GaugeMetric g     -> registerGauge' n l g
-            HistogramMetric h -> registerHistogram' n l h
-  appMetrics <- runRegistryT' registry $ applicationMetrics mempty
+  (instrumentMiddleware, endpointMiddleware, registeredMetrics) <- runRegistryT $ do
+    appMetrics <- applicationMetrics mempty
+    endpoint <- prometheusEndpoint pathAsList =<< sample
+    registered <- traverseHKD register exposed
 
-  let endpoint = prometheusEndpoint (filter (not . T.null) $ T.split (=='/') path) $ sample registry
+    return (instrumentApplication appMetrics, endpoint, registered)
 
-  action $ Metrics registry (instrumentApplication appMetrics) endpoint
-
-runRegistryT' :: Registry -> RegistryT m a -> m a
-runRegistryT' registry r = runReaderT (unRegistryT r) registry
-
-class WithMetrics m where
-  getMetrics :: m Metrics
-
-prometheusEndpoint :: [Text] -> IO RegistrySample -> Middleware
-prometheusEndpoint path runSample app request respond
-    | matches path request = respond . prometheusResponse =<< runSample
-    | otherwise = app request respond
+  action $ AppMetrics instrumentMiddleware endpointMiddleware registeredMetrics
   where
+    register :: RegistryT IO a -> RegistryT IO (Identity a)
+    register = fmap return
+    pathAsList = filter (not . T.null) $ T.split (== '/') path
+
+class WithMetrics m f | m -> f where
+  getMetrics :: m (AppMetrics f)
+
+prometheusEndpoint :: [Text] -> IO RegistrySample -> RegistryT IO Middleware
+prometheusEndpoint path runSample = return go
+  where
+    go app request respond
+      | matches path request = respond . prometheusResponse =<< runSample
+      | otherwise = app request respond
     prometheusResponse = responseBuilder status200 headers . encodeMetrics
     headers = [(hContentType, "text/plain; version=0.0.4")]
 
