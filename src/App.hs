@@ -9,10 +9,11 @@ import App.Log as Log (runWithLog)
 import App.Metrics as Metrics (AppMetrics (metricsEndpoint, metricsMiddleware), Options, runWithMetrics)
 import App.Monad (Env (Env), runAppWith)
 import App.Random as Random (Options, configure)
-import App.Web as Web (Options, run)
+import App.Web as Web (Options, run, webApp)
 import Chronos (Time (getTime), now)
 import Data.HKD (FunctorHKD (mapHKD), TraversableHKD (traverseHKD))
 import Health
+import Network.Wai (Application)
 import Servant ((:<|>) (..))
 import Text.Printf (printf)
 import Todo (TodoApi, todoApi)
@@ -49,6 +50,23 @@ run opts =
                 [metricsEndpoint ms, metricsMiddleware ms]
                 (healthApi :<|> todoApi)
                 (runAppWith env)
+
+lambda :: App.Options -> IO Application
+lambda opts =
+  now >>= \time ->
+    runWithLog $ \log ->
+      let registerMetrics = App.Metrics Todo.metrics
+       in runWithMetrics (metrics opts) registerMetrics $ \ms ->
+            runWithPool (db opts) $ \pool -> do
+              Random.configure $ random opts
+              migrate pool
+
+              let env = Env pool ms log time
+              pure $
+                Web.webApp @API
+                  [metricsEndpoint ms, metricsMiddleware ms]
+                  (healthApi :<|> todoApi)
+                  (runAppWith env)
 
 diffTimeInSeconds :: Time -> Time -> Double
 diffTimeInSeconds h l = fromIntegral (getTime h - getTime l) / nanoSecondInSecond

@@ -3,10 +3,7 @@ cradle:
     - path: "./src"
       component: "haskell-todos:lib"
 
-    - path: "./app/Main.hs"
-      component: "haskell-todos:exe:haskell-todos-exe"
-
-    - path: "./app/Paths_haskell_todos.hs"
+    - path: "./app"
       component: "haskell-todos:exe:haskell-todos-exe"
 
     - path: "./test"

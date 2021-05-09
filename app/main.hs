@@ -1,5 +1,3 @@
-module Main where
-
 import App
 import CLI (Command (..), commandInfo)
 import Env (appEnv, parseEnv)

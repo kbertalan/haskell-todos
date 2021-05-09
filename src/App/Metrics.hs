@@ -35,7 +35,7 @@ data AppMetrics f = AppMetrics
     metricsRegistered :: !(f Identity)
   }
 
-runWithMetrics :: (TraversableHKD f) => Options -> f (RegistryT IO) -> (AppMetrics f -> IO ()) -> IO ()
+runWithMetrics :: (TraversableHKD f) => Options -> f (RegistryT IO) -> (AppMetrics f -> IO a) -> IO a
 runWithMetrics Options {..} exposed action = do
   (instrumentMiddleware, endpointMiddleware, registeredMetrics) <- runRegistryT $ do
     appMetrics <- applicationMetrics mempty

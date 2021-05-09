@@ -36,7 +36,7 @@ type Log m = LogAction m Message
 
 type WithLog env m = Colog.WithLog env Message m
 
-runWithLog :: (MonadIO m) => (Log m -> IO ()) -> IO ()
+runWithLog :: (MonadIO m) => (Log m -> IO a) -> IO a
 runWithLog = withBackgroundLogger defCapacity richMessageAction
 
 withLogContext :: (App.Log.WithLog env m) => Text -> m a -> m a

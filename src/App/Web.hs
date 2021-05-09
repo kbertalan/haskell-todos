@@ -2,12 +2,14 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
 module App.Web
   ( Options (..),
     run,
     WebHandler,
+    webApp,
   )
 where
 
@@ -33,9 +35,12 @@ type WebHandler m = ExceptT ServerError m
 
 run :: forall a m. (HasServer a '[], HasSwagger a, Monad m) => Options -> [Middleware] -> ServerT a (WebHandler m) -> (forall b. m b -> IO b) -> IO ()
 run opts middlewares server runner =
-  Warp.run (webPort opts) $
-    foldl' (.) defaultMiddleWares middlewares $
-      serve apiWithSwagger adaptedServer
+  Warp.run (webPort opts) $ webApp @a @m middlewares server runner
+
+webApp :: forall a m. (HasServer a '[], HasSwagger a, Monad m) => [Middleware] -> ServerT a (WebHandler m) -> (forall b. m b -> IO b) -> Application
+webApp middlewares server runner =
+  foldl' (.) defaultMiddleWares middlewares $
+    serve apiWithSwagger adaptedServer
   where
     defaultMiddleWares = errorMwDefJson
     api :: Proxy a

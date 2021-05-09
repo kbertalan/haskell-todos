@@ -63,7 +63,7 @@ class WithConnection m where
 instance (Monad m) => WithConnection (ReaderT Connection m) where
   getConnection = ask
 
-runWithPool :: Options -> (Pool -> IO ()) -> IO ()
+runWithPool :: Options -> (Pool -> IO a) -> IO a
 runWithPool Options {..} = bracket acquire release
   where
     acquire =

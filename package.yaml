@@ -51,6 +51,8 @@ dependencies:
 - unliftio-pool
 - prometheus
 - prometheus-wai-middleware
+- aws-lambda-haskell-runtime-wai
+- aws-lambda-haskell-runtime
 
 ghc-options:
   - -Werror
@@ -78,12 +80,23 @@ library:
 
 executables:
   haskell-todos-exe:
-    main:                Main.hs
+    main:                main.hs
     source-dirs:         app
     ghc-options:
     - -threaded
     - -rtsopts
     - '"-with-rtsopts=-N -T"'
+    dependencies:
+    - haskell-todos
+    - optparse-applicative
+  bootstrap:
+    main:                lambda.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - '"-with-rtsopts=-N -T"'
+    - -O2
     dependencies:
     - haskell-todos
     - optparse-applicative

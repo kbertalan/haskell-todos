@@ -42,6 +42,10 @@ packages:
 extra-deps:
 - hasql-migration-0.3.0@sha256:6ca4cc6c89834bb79eb9f15b504774043b5b3994336bd86a9d79e59da6d54963,2799
 - servant-swagger-ui-redoc-0.3.4.1.22.3@sha256:c19967101d9205b1a936fad254f22f02c471953c10b1137364a4589e121f0562,1474
+- aws-lambda-haskell-runtime-4.1.0@sha256:4fbf9855326ed0173c3ef27c006412c8da46f84b0566fa92a44ad0e988432d82,2916
+- aws-lambda-haskell-runtime-wai-2.0.1@sha256:faf95e0697905883c3998d3b451ee86ac4e811e0430d4cefbeabc4cdbf6e9a03,1986
+- safe-exceptions-checked-0.1.0@sha256:ae142f284c6b102f0e7606a69a5719f4f72771d9cc353af72fa4484326689100,1603
+
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
