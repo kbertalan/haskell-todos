@@ -6,20 +6,41 @@ module Env where
 import App
 import qualified App.DB as DB
 import qualified App.Metrics as Metrics
+import App.Random (Seed (Fixed, New))
 import qualified App.Random as Random
 import qualified App.Web as Web
+import qualified Data.ByteString as BS
 import Data.Maybe (fromMaybe)
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 import System.Environment (lookupEnv)
 import Text.Read (readMaybe)
 
 newtype Env a = Env {parseEnv :: IO a}
   deriving (Functor, Applicative)
 
-(?=) :: (Read a) => String -> a -> Env a
+(?=) :: (FromEnv a) => String -> a -> Env a
 (?=) name defaultValue = Env $ do
   value <- lookupEnv name
-  let result = readMaybe =<< value
+  let result = fromEnv =<< value
   return $ fromMaybe defaultValue result
+
+class FromEnv a where
+  fromEnv :: String -> Maybe a
+
+instance FromEnv Int where
+  fromEnv = readMaybe
+
+instance FromEnv T.Text where
+  fromEnv = Just . T.pack
+
+instance FromEnv BS.ByteString where
+  fromEnv = Just . T.encodeUtf8 . T.pack
+
+instance FromEnv Random.Seed where
+  fromEnv "New" = Just New
+  fromEnv "new" = Just New
+  fromEnv a = Fixed <$> readMaybe a
 
 appEnv :: App.Options -> Env App.Options
 appEnv App.Options {..} =
