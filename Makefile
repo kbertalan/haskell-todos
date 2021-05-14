@@ -13,3 +13,18 @@ devel:
 		--clear \
 		--lint
 
+@PHONY: lambda
+lambda:
+	mkdir -p build
+	@rm -rf ./build/*
+	docker build -t todo-lambda .
+	id=$$(docker create todo-lambda); docker cp $$id:/root/output ./build; docker rm -v $$id
+	cd build/output; zip -r function.zip *
+
+@PHONY: lambda-test
+lambda-test:
+	docker run --rm \
+		-v `pwd`/build/output:/var/task:ro,delegated \
+		lambci/lambda:provided.al2 \
+		todos
+

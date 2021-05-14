@@ -1,5 +1,5 @@
 .hie/
 .stack-work/
 *~
-respawn.*
+build/
 
