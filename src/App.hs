@@ -13,7 +13,7 @@ import App.Monad (runAppWith)
 import App.Random as Random (Options, configure)
 import App.Web as Web (Options, run, webApp)
 import Chronos (Time (getTime), now)
-import Data.HKD (FunctorHKD (mapHKD), TraversableHKD (traverseHKD))
+import Data.HKD (TraversableHKD (traverseHKD))
 import Data.Has (Has (obtain))
 import Health
 import Network.Wai (Application)
@@ -78,9 +78,6 @@ diffTimeInSeconds h l = fromIntegral (getTime h - getTime l) / nanoSecondInSecon
 newtype Metrics m = Metrics
   { todo :: Todo.Metrics m
   }
-
-instance FunctorHKD App.Metrics where
-  mapHKD f (Metrics todo) = Metrics $ mapHKD f todo
 
 instance TraversableHKD App.Metrics where
   traverseHKD f (Metrics todo) = Metrics <$> traverseHKD f todo

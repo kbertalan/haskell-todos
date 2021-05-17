@@ -11,7 +11,7 @@ module Todo.Metrics
   )
 where
 
-import Data.HKD (FunctorHKD (mapHKD), TraversableHKD (traverseHKD))
+import Data.HKD (TraversableHKD (traverseHKD))
 import System.Metrics.Prometheus.Concurrent.RegistryT (RegistryT, registerHistogram)
 import System.Metrics.Prometheus.Metric.Histogram as Histogram
 import System.Metrics.Prometheus.MetricId (Name (..))
@@ -36,16 +36,6 @@ metrics =
       patch = registerHistogram (Name "todo_patch") mempty buckets,
       delete = registerHistogram (Name "todo_delete") mempty buckets
     }
-
-instance FunctorHKD Metrics where
-  mapHKD f m =
-    Metrics
-      { showPage = f $ showPage m,
-        create = f $ create m,
-        modify = f $ modify m,
-        patch = f $ patch m,
-        delete = f $ delete m
-      }
 
 instance TraversableHKD Metrics where
   traverseHKD f Metrics {..} =
