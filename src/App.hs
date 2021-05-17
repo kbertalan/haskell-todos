@@ -37,8 +37,8 @@ run :: App.Options -> IO ()
 run opts =
   now >>= \time ->
     runWithLog $ \log ->
-      let registerMetrics = App.Metrics Todo.metrics
-       in runWithMetrics (metrics opts) registerMetrics $ \ms ->
+      let exposedMetrics = AllMetrics Todo.metrics
+       in runWithMetrics (metrics opts) exposedMetrics $ \ms ->
             runWithPool (db opts) $ \pool -> do
               Random.configure $ random opts
               migrate pool
@@ -57,8 +57,8 @@ lambda :: App.Options -> IO Application
 lambda opts =
   now >>= \time ->
     runWithLog $ \log ->
-      let registerMetrics = App.Metrics Todo.metrics
-       in runWithMetrics (metrics opts) registerMetrics $ \ms ->
+      let exposedMetrics = AllMetrics Todo.metrics
+       in runWithMetrics (metrics opts) exposedMetrics $ \ms ->
             runWithPool (db opts) $ \pool -> do
               Random.configure $ random opts
               migrate pool
@@ -75,12 +75,12 @@ diffTimeInSeconds h l = fromIntegral (getTime h - getTime l) / nanoSecondInSecon
   where
     nanoSecondInSecond = 1_000_000_000
 
-newtype Metrics m = Metrics
+newtype AllMetrics m = AllMetrics
   { todo :: Todo.Metrics m
   }
 
-instance TraversableHKD App.Metrics where
-  traverseHKD f (Metrics todo) = Metrics <$> traverseHKD f todo
+instance TraversableHKD AllMetrics where
+  traverseHKD f (AllMetrics todo) = AllMetrics <$> traverseHKD f todo
 
-instance Has (Todo.Metrics m) (App.Metrics m) where
+instance Has (Todo.Metrics m) (AllMetrics m) where
   obtain = todo
