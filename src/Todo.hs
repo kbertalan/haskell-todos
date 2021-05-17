@@ -1,4 +1,8 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE NumericUnderscores #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Todo
@@ -8,9 +12,9 @@ module Todo
   )
 where
 
-import App.DB (Connection, WithConnection, WithPool, getPool, runWithConnection)
+import App.DB (Connection, WithConnection, runWithConnection)
 import App.Log (logDebug, withLogContext)
-import App.Metrics (WithMetrics (getMetrics), metricsRegistered)
+import App.Metrics (AppMetrics, metricsRegistered)
 import App.Monad (AppM, runAppWith)
 import Chronos (Timespan (getTimespan), stopwatch)
 import Control.DeepSeq (NFData, force)
@@ -18,7 +22,9 @@ import Control.Monad.Except (ExceptT, MonadIO (liftIO), runExceptT)
 import Control.Monad.Identity (Identity (runIdentity))
 import Control.Monad.Random (MonadRandom)
 import Control.Monad.Reader (ReaderT (runReaderT), ask)
+import Control.Monad.Reader.Class (asks)
 import Control.Monad.Trans (lift)
+import Data.Has (Has (obtain))
 import Data.Text (Text)
 import System.Metrics.Prometheus.Metric.Histogram (Histogram, observe)
 import Todo.DB (dbDeleteById, dbGetById, dbInsert, dbSelectPage, dbUpdate)
@@ -48,15 +54,12 @@ newtype TodoM f a = TodoM
   }
   deriving (Functor, Applicative, Monad, MonadIO, MonadRandom)
 
-instance WithPool (TodoM f) where
-  getPool = TodoM $ lift getPool
-
 deriving instance WithConnection (TodoM f)
 
 runTodo :: TodoM f a -> AppM f a
 runTodo = runWithConnection . runReaderT . unTodo
 
-instance M.WithTodoMetrics f => Logic (AppM f) where
+instance (Has (M.Metrics Identity) (f Identity)) => Logic (AppM f) where
   showPage page = metric M.showPage >>= \hist -> tracked "showPage" hist $ runTodo $ repoSelectPage page
   create request = metric M.create >>= \hist -> tracked "create" hist $ runTodo $ logicCreate request
   modify todo = metric M.modify >>= \hist -> tracked "modify" hist $ runTodo $ runExceptT $ logicUpdate todo
@@ -64,12 +67,11 @@ instance M.WithTodoMetrics f => Logic (AppM f) where
   delete todoId = metric M.delete >>= \hist -> tracked "delete" hist $ runTodo $ runExceptT $ logicDelete todoId
 
 metric ::
-  Functor m =>
-  WithTodoMetrics f =>
-  WithMetrics m f =>
+  forall f b.
+  Has (M.Metrics Identity) (f Identity) =>
   (Metrics Identity -> Identity b) ->
-  m b
-metric f = runIdentity . f . getTodoMetrics . metricsRegistered <$> getMetrics
+  (AppM f) b
+metric g = runIdentity . g . obtain . metricsRegistered <$> asks (obtain @(AppMetrics f))
 
 instance Repo (TodoM f) where
   repoSelectPage = dbSelectPage

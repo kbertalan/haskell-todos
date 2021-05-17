@@ -4,8 +4,6 @@
 module App.Metrics
   ( Options (..),
     AppMetrics (..),
-    WithMetrics,
-    getMetrics,
     runWithMetrics,
   )
 where
@@ -49,9 +47,6 @@ runWithMetrics Options {..} exposed action = do
     register :: RegistryT IO a -> RegistryT IO (Identity a)
     register = fmap return
     pathAsList = filter (not . T.null) $ T.split (== '/') path
-
-class WithMetrics m f | m -> f where
-  getMetrics :: m (AppMetrics f)
 
 prometheusEndpoint :: [Text] -> IO RegistrySample -> RegistryT IO Middleware
 prometheusEndpoint path runSample = return go

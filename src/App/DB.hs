@@ -4,7 +4,6 @@
 
 module App.DB
   ( Options (..),
-    WithPool (..),
     Pool,
     runWithPool,
     execute,
@@ -20,8 +19,10 @@ import Control.Exception (Exception, bracket, throwIO)
 import Control.Monad (forM_)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Reader (MonadReader (ask), ReaderT)
+import Control.Monad.Reader.Class (asks)
 import Data.ByteString (ByteString)
 import Data.FileEmbed (embedDir)
+import Data.Has (Has (obtain))
 import Data.List (sortOn)
 import qualified Hasql.Connection as C
 import qualified Hasql.Decoders as D (Result)
@@ -54,9 +55,6 @@ data DBException
   deriving (Show)
   deriving anyclass (Exception)
 
-class WithPool m where
-  getPool :: m Pool
-
 class WithConnection m where
   getConnection :: m Connection
 
@@ -80,8 +78,8 @@ runWithPool Options {..} = bracket acquire release
         Left e -> throwIO $ ConnectionException e
     settings = C.settings dbHost (fromIntegral dbPort) dbUser dbPassword dbName
 
-runWithConnection :: (MonadUnliftIO m, WithPool m) => (Connection -> m a) -> m a
-runWithConnection action = getPool >>= flip P.withResource action
+runWithConnection :: (MonadUnliftIO m, MonadReader env m, Has Pool env) => (Connection -> m a) -> m a
+runWithConnection action = asks obtain >>= flip P.withResource action
 
 execute :: (MonadIO m, WithConnection m) => S.Session a -> m a
 execute session =

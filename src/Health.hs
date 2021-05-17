@@ -9,11 +9,13 @@ module Health
   )
 where
 
-import App.DB as DB (WithPool, execute, runWithConnection, statement)
+import App.DB as DB (Pool, execute, runWithConnection, statement)
 import App.Web (WebHandler)
 import Control.Monad.Reader (ReaderT (runReaderT))
+import Control.Monad.Reader.Class (MonadReader)
 import Control.Monad.Trans (lift)
 import Data.ByteString.Lazy.Char8
+import Data.Has (Has)
 import Data.Int (Int64)
 import Data.Swagger
 import GHC.Generics
@@ -32,11 +34,11 @@ type HealthApi = Summary "Check application health" :> "health" :> Get '[PlainTe
 instance MimeRender PlainText HealthIndicator where
   mimeRender _ (HealthIndicator i) = pack i
 
-healthApi :: (WithPool m, MonadUnliftIO m) => ServerT HealthApi (WebHandler m)
+healthApi :: (MonadReader env m, Has Pool env, MonadUnliftIO m) => ServerT HealthApi (WebHandler m)
 healthApi =
   lift selectLiteral >> return (HealthIndicator "OK")
 
-selectLiteral :: (WithPool m, MonadUnliftIO m) => m Int64
+selectLiteral :: (MonadReader env m, Has Pool env, MonadUnliftIO m) => m Int64
 selectLiteral = DB.runWithConnection $ runReaderT $ DB.execute $ statement "select 1" E.noParams decoder ()
   where
     decoder = D.singleRow $ D.column $ D.nonNullable D.int8

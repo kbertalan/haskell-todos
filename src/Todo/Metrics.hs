@@ -8,11 +8,9 @@ module Todo.Metrics
     delete,
     metrics,
     Metrics,
-    WithTodoMetrics (..),
   )
 where
 
-import Control.Monad.Identity (Identity)
 import Data.HKD (FunctorHKD (mapHKD), TraversableHKD (traverseHKD))
 import System.Metrics.Prometheus.Concurrent.RegistryT (RegistryT, registerHistogram)
 import System.Metrics.Prometheus.Metric.Histogram as Histogram
@@ -57,6 +55,3 @@ instance TraversableHKD Metrics where
       <*> f modify
       <*> f patch
       <*> f delete
-
-class WithTodoMetrics f where
-  getTodoMetrics :: f Identity -> Metrics Identity

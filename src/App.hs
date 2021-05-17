@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NumericUnderscores #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
@@ -5,20 +6,21 @@
 module App where
 
 import App.DB as DB (Options, migrate, runWithPool)
+import App.Env (Env (..))
 import App.Log as Log (runWithLog)
 import App.Metrics as Metrics (AppMetrics (metricsEndpoint, metricsMiddleware), Options, runWithMetrics)
-import App.Monad (Env (Env), runAppWith)
+import App.Monad (runAppWith)
 import App.Random as Random (Options, configure)
 import App.Web as Web (Options, run, webApp)
 import Chronos (Time (getTime), now)
 import Data.HKD (FunctorHKD (mapHKD), TraversableHKD (traverseHKD))
+import Data.Has (Has (obtain))
 import Health
 import Network.Wai (Application)
 import Servant ((:<|>) (..))
 import Text.Printf (printf)
 import Todo (TodoApi, todoApi)
 import qualified Todo
-import Todo.Metrics (WithTodoMetrics)
 import Prelude hiding (log)
 
 data Options = Options
@@ -83,5 +85,5 @@ instance FunctorHKD App.Metrics where
 instance TraversableHKD App.Metrics where
   traverseHKD f (Metrics todo) = Metrics <$> traverseHKD f todo
 
-instance WithTodoMetrics App.Metrics where
-  getTodoMetrics = todo
+instance Has (Todo.Metrics m) (App.Metrics m) where
+  obtain = todo
