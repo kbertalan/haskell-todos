@@ -9,8 +9,8 @@ variable "subnet_ids" {
 }
 
 resource "random_password" "password" {
-  length = 16
-  special = true
+  length           = 16
+  special          = true
   override_special = "_@%"
 }
 
@@ -18,7 +18,7 @@ resource "aws_db_subnet_group" "default" {
   name       = "todo-db"
   subnet_ids = var.subnet_ids
 
-  tags = merge(var. tags, {
+  tags = merge(var.tags, {
     Name = "Todo database subnet group"
   })
 }
