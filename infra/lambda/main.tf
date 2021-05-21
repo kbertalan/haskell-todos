@@ -93,7 +93,7 @@ resource "aws_lambda_function" "lambda" {
       "DB_USER"      = var.database.user
       "DB_PASSWORD"  = var.database.password
       "POOL_SIZE"    = "2"
-      "POOL_TIMEOUT" = "1"
+      "POOL_TIMEOUT" = "60"
     }
   }
 
