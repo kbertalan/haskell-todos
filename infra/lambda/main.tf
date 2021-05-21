@@ -161,15 +161,6 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
   policy_arn = aws_iam_policy.logging.arn
 }
 
-#resource "aws_lambda_permission" "lambda_permission" {
-#  statement_id  = "AllowInvocationFromTodoApiGateway"
-#  action        = "lambda:InvokeFunction"
-#  function_name = aws_lambda_function.lambda.function_name
-#  principal     = "apigateway.amazonaws.com"
-#
-#  source_arn = "${var.api_gateway_execution_arn}/*/*/*"
-#}
-
 data "aws_iam_policy" "vpc" {
   name = "AWSLambdaVPCAccessExecutionRole"
 }
@@ -199,4 +190,12 @@ resource "aws_security_group_rule" "database" {
   to_port                  = var.database.port
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.lambda.id
+}
+
+output "invoke_arn" {
+  value = aws_lambda_function.lambda.invoke_arn
+}
+
+output "function_name" {
+  value = aws_lambda_function.lambda.function_name
 }

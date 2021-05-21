@@ -39,3 +39,11 @@ module "lambda" {
     password = module.db.password
   }
 }
+
+module "gateway" {
+  source = "./gw"
+  tags   = local.tags
+
+  lambda_invoke_arn    = module.lambda.invoke_arn
+  lambda_function_name = module.lambda.function_name
+}
