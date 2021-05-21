@@ -28,3 +28,7 @@ lambda-test:
 		lambci/lambda:provided.al2 \
 		todos
 
+@PHONY: lambda-deploy
+lambda-deploy:
+	aws s3 cp build/output/todo-function.zip s3://todo-lambda-deploy/todo-function.zip
+	aws lambda update-function-code --function-name todo-lambda --region eu-west-1 --s3-bucket todo-lambda-deploy --s3-key todo-function.zip --publish | grep -v PASSWORD
