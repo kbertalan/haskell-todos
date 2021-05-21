@@ -19,7 +19,7 @@ lambda:
 	@rm -rf ./build/*
 	docker build -t todo-lambda .
 	id=$$(docker create todo-lambda); docker cp $$id:/root/output ./build; docker rm -v $$id
-	cd build/output; zip -r function.zip *
+	cd build/output; zip -r todo-function.zip *
 
 @PHONY: lambda-test
 lambda-test:
