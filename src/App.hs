@@ -7,7 +7,7 @@ module App where
 
 import App.DB as DB (Options, migrate, runWithPool)
 import App.Env (Env (..))
-import App.Log as Log (runWithLog)
+import App.Log as Log (runWithDisabledLog, runWithLog)
 import App.Metrics as Metrics (AppMetrics (metricsEndpoint, metricsMiddleware), Options, runWithMetrics)
 import App.Monad (runAppWith)
 import App.Random as Random (Options, configure)
@@ -56,7 +56,7 @@ run opts =
 lambda :: App.Options -> IO Application
 lambda opts =
   now >>= \time ->
-    runWithLog $ \log ->
+    runWithDisabledLog $ \log ->
       let exposedMetrics = AllMetrics Todo.metrics
        in runWithMetrics (metrics opts) exposedMetrics $ \ms ->
             runWithPool (db opts) $ \pool -> do

@@ -22,3 +22,16 @@ services:
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
     network_mode: host
 
+#  lambda:
+#    image: lambci/lambda:provided.al2
+#    volumes: 
+#      - ./build/output:/var/task
+#    command: todos
+#    environment:
+#      DOCKER_LAMBDA_STAY_OPEN: 1
+#      AWS_LAMBDA_FUNCTION_MEMORY_SIZE: 128
+#      DOCKER_LAMBDA_DEBUG: 1
+#      DB_HOST: db
+#    ports:
+#      - "9001:9001"
+#    mem_limit: 128

@@ -2,6 +2,8 @@
 
 module App.Log
   ( runWithLog,
+    runWithSyncLog,
+    runWithDisabledLog,
     Log,
     App.Log.WithLog,
     logDebug,
@@ -14,7 +16,7 @@ module App.Log
 where
 
 import Colog
-  ( LogAction,
+  ( LogAction (LogAction),
     Message,
     Msg (msgText),
     WithLog,
@@ -38,6 +40,12 @@ type WithLog env m = Colog.WithLog env Message m
 
 runWithLog :: (MonadIO m) => (Log m -> IO a) -> IO a
 runWithLog = withBackgroundLogger defCapacity richMessageAction
+
+runWithSyncLog :: (MonadIO m) => (Log m -> IO a) -> IO a
+runWithSyncLog action = action richMessageAction
+
+runWithDisabledLog :: (MonadIO m) => (Log m -> IO a) -> IO a
+runWithDisabledLog action = action $ LogAction $ \_ -> pure ()
 
 withLogContext :: (App.Log.WithLog env m) => Text -> m a -> m a
 withLogContext name = withLog $ cmap converter
