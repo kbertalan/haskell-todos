@@ -7,16 +7,17 @@ module App where
 
 import App.DB as DB (Options, migrate, runWithPool)
 import App.Env (Env (..))
-import App.Log as Log (runWithDisabledLog, runWithLog)
+import App.Log as Log (runWithLog)
 import App.Metrics as Metrics (AppMetrics (metricsEndpoint, metricsMiddleware), Options, runWithMetrics)
 import App.Monad (runAppWith)
 import App.Random as Random (Options, configure)
 import App.Web as Web (Options, run, webApp)
+import Aws.Lambda (HandlerName (HandlerName), defaultDispatcherOptions)
+import Aws.Lambda.Wai (runWaiAsProxiedHttpLambda)
 import Chronos (Time (getTime), now)
 import Data.HKD (TraversableHKD (traverseHKD))
 import Data.Has (Has (obtain))
 import Health
-import Network.Wai (Application)
 import Servant ((:<|>) (..))
 import Text.Printf (printf)
 import Todo (TodoApi, todoApi)
@@ -53,10 +54,10 @@ run opts =
                 (healthApi :<|> todoApi)
                 (runAppWith env)
 
-lambda :: App.Options -> IO Application
+lambda :: App.Options -> IO ()
 lambda opts =
   now >>= \time ->
-    runWithDisabledLog $ \log ->
+    runWithLog $ \log ->
       let exposedMetrics = AllMetrics Todo.metrics
        in runWithMetrics (metrics opts) exposedMetrics $ \ms ->
             runWithPool (db opts) $ \pool -> do
@@ -64,11 +65,12 @@ lambda opts =
               migrate pool
 
               let env = Env pool ms log time
-              pure $
-                Web.webApp @API
-                  [metricsEndpoint ms, metricsMiddleware ms]
-                  (healthApi :<|> todoApi)
-                  (runAppWith env)
+              runWaiAsProxiedHttpLambda defaultDispatcherOptions Nothing (HandlerName "todos") $
+                pure $
+                  Web.webApp @API
+                    [metricsEndpoint ms, metricsMiddleware ms]
+                    (healthApi :<|> todoApi)
+                    (runAppWith env)
 
 diffTimeInSeconds :: Time -> Time -> Double
 diffTimeInSeconds h l = fromIntegral (getTime h - getTime l) / nanoSecondInSecond
