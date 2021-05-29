@@ -8,11 +8,11 @@
 module Todo
   ( todoApi,
     TodoApi,
-    module M,
+    M.Metrics,
+    M.metrics,
   )
 where
 
-import App.DB (Connection, WithConnection, runWithConnection)
 import App.Log (logDebug, withLogContext)
 import App.Metrics (AppMetrics, metricsRegistered)
 import App.Monad (AppM, runAppWith)
@@ -20,8 +20,7 @@ import Chronos (Timespan (getTimespan), stopwatch)
 import Control.DeepSeq (NFData, force)
 import Control.Monad.Except (ExceptT, MonadIO (liftIO), runExceptT)
 import Control.Monad.Identity (Identity (runIdentity))
-import Control.Monad.Random (MonadRandom)
-import Control.Monad.Reader (ReaderT (runReaderT), ask)
+import Control.Monad.Reader (ask)
 import Control.Monad.Reader.Class (asks)
 import Control.Monad.Trans (lift)
 import Data.Has (Has (obtain))
@@ -46,18 +45,9 @@ import Todo.Domain
     repoUpdate,
     showPage,
   )
-import Todo.Metrics as M
+import qualified Todo.Metrics as M
+import Todo.Monad (TodoM, runTodo)
 import Todo.Web (TodoApi, todoApi)
-
-newtype TodoM f a = TodoM
-  { unTodo :: ReaderT Connection (AppM f) a
-  }
-  deriving (Functor, Applicative, Monad, MonadIO, MonadRandom)
-
-deriving instance WithConnection (TodoM f)
-
-runTodo :: TodoM f a -> AppM f a
-runTodo = runWithConnection . runReaderT . unTodo
 
 instance (Has (M.Metrics Identity) (f Identity)) => Logic (AppM f) where
   showPage page = metric M.showPage >>= \hist -> tracked "showPage" hist $ runTodo $ repoSelectPage page
@@ -68,10 +58,10 @@ instance (Has (M.Metrics Identity) (f Identity)) => Logic (AppM f) where
 
 metric ::
   forall f b.
-  Has (M.Metrics Identity) (f Identity) =>
-  (Metrics Identity -> Identity b) ->
+  Has M.RegisteredMetrics (f Identity) =>
+  (M.RegisteredMetrics -> Identity b) ->
   (AppM f) b
-metric g = runIdentity . g . obtain . metricsRegistered <$> asks (obtain @(AppMetrics f))
+metric g = runIdentity . g . obtain @M.RegisteredMetrics . metricsRegistered <$> asks (obtain @(AppMetrics f))
 
 instance Repo (TodoM f) where
   repoSelectPage = dbSelectPage

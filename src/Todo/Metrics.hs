@@ -8,9 +8,11 @@ module Todo.Metrics
     delete,
     metrics,
     Metrics,
+    RegisteredMetrics,
   )
 where
 
+import Control.Monad.Identity (Identity)
 import Data.HKD (TraversableHKD (traverseHKD))
 import System.Metrics.Prometheus.Concurrent.RegistryT (RegistryT, registerHistogram)
 import System.Metrics.Prometheus.Metric.Histogram as Histogram
@@ -26,6 +28,8 @@ data Metrics m = Metrics
     patch :: m Histogram,
     delete :: m Histogram
   }
+
+type RegisteredMetrics = Metrics Identity
 
 metrics :: Metrics (RegistryT IO)
 metrics =
