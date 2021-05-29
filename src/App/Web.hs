@@ -33,9 +33,8 @@ newtype Options = Options
 
 type WebHandler m = ExceptT ServerError m
 
-run :: forall a m. (HasServer a '[], HasSwagger a, Monad m) => Options -> [Middleware] -> ServerT a (WebHandler m) -> (forall b. m b -> IO b) -> IO ()
-run opts middlewares server runner =
-  Warp.run (webPort opts) $ webApp @a @m middlewares server runner
+run :: Options -> Application -> IO ()
+run opts = Warp.run (webPort opts)
 
 webApp :: forall a m. (HasServer a '[], HasSwagger a, Monad m) => [Middleware] -> ServerT a (WebHandler m) -> (forall b. m b -> IO b) -> Application
 webApp middlewares server runner =

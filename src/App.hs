@@ -7,7 +7,7 @@ module App where
 
 import App.DB as DB (Options, migrate, runWithPool)
 import App.Env (Env (..))
-import App.Log as Log (runWithLog)
+import App.Log as Log (logInfo, runWithLog)
 import App.Metrics as Metrics (AppMetrics (metricsEndpoint, metricsMiddleware), Options, runWithMetrics)
 import App.Monad (runAppWith)
 import App.Random as Random (Options, configure)
@@ -15,9 +15,12 @@ import App.Web as Web (Options, run, webApp)
 import Aws.Lambda (HandlerName (HandlerName), defaultDispatcherOptions)
 import Aws.Lambda.Wai (runWaiAsProxiedHttpLambda)
 import Chronos (Time (getTime), now)
+import Colog (usingLoggerT)
 import Data.HKD (TraversableHKD (traverseHKD))
 import Data.Has (Has (obtain))
+import qualified Data.Text as T
 import Health
+import Network.Wai (Application)
 import Servant ((:<|>) (..))
 import Text.Printf (printf)
 import Todo (TodoApi, todoApi)
@@ -36,6 +39,17 @@ type API = HealthApi :<|> TodoApi
 
 run :: App.Options -> IO ()
 run opts =
+  startup opts $ Web.run (web opts)
+
+lambda :: App.Options -> IO ()
+lambda opts =
+  startup opts $
+    runWaiAsProxiedHttpLambda defaultDispatcherOptions Nothing (HandlerName "todos") . pure
+
+type Callback = Application -> IO ()
+
+startup :: App.Options -> Callback -> IO ()
+startup opts callback =
   now >>= \time ->
     runWithLog $ \log ->
       let exposedMetrics = AllMetrics Todo.metrics
@@ -46,31 +60,15 @@ run opts =
 
               let env = Env pool ms log time
               currentTime <- now
-              putStrLn $ "Started up in " <> printf "%.4f" (diffTimeInSeconds currentTime time) <> "s"
+              runAppWith env $
+                usingLoggerT log $
+                  logInfo $ "Started up in " <> T.pack (printf "%.4f" (diffTimeInSeconds currentTime time)) <> "s"
 
-              Web.run @API
-                (web opts)
-                [metricsEndpoint ms, metricsMiddleware ms]
-                (healthApi :<|> todoApi)
-                (runAppWith env)
-
-lambda :: App.Options -> IO ()
-lambda opts =
-  now >>= \time ->
-    runWithLog $ \log ->
-      let exposedMetrics = AllMetrics Todo.metrics
-       in runWithMetrics (metrics opts) exposedMetrics $ \ms ->
-            runWithPool (db opts) $ \pool -> do
-              Random.configure $ random opts
-              migrate pool
-
-              let env = Env pool ms log time
-              runWaiAsProxiedHttpLambda defaultDispatcherOptions Nothing (HandlerName "todos") $
-                pure $
-                  Web.webApp @API
-                    [metricsEndpoint ms, metricsMiddleware ms]
-                    (healthApi :<|> todoApi)
-                    (runAppWith env)
+              callback $
+                Web.webApp @API
+                  [metricsEndpoint ms, metricsMiddleware ms]
+                  (healthApi :<|> todoApi)
+                  (runAppWith env)
 
 diffTimeInSeconds :: Time -> Time -> Double
 diffTimeInSeconds h l = fromIntegral (getTime h - getTime l) / nanoSecondInSecond
