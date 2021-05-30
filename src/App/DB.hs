@@ -58,7 +58,7 @@ data DBException
 class WithConnection m where
   getConnection :: m Connection
 
-instance (Monad m) => WithConnection (ReaderT Connection m) where
+instance Monad m => WithConnection (ReaderT Connection m) where
   getConnection = ask
 
 runWithPool :: Options -> (Pool -> IO a) -> IO a

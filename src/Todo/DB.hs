@@ -1,3 +1,5 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Todo.DB
   ( dbGetById,
     dbSelectPage,

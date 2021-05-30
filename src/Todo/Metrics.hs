@@ -1,19 +1,28 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Todo.Metrics
-  ( showPage,
+  ( Metrics,
+    showPage,
     create,
     modify,
     patch,
     delete,
-    metrics,
-    Metrics,
     RegisteredMetrics,
+    HasRegisteredMetrics,
+    metrics,
+    getMetric,
   )
 where
 
-import Control.Monad.Identity (Identity)
+import App.Metrics (AppMetrics (metricsRegistered))
+import App.Monad (AppM)
+import Control.Monad.Identity (Identity, runIdentity)
+import Control.Monad.Reader (asks)
 import Data.HKD (TraversableHKD (traverseHKD))
+import Data.Has (Has (obtain))
 import System.Metrics.Prometheus.Concurrent.RegistryT (RegistryT, registerHistogram)
 import System.Metrics.Prometheus.Metric.Histogram as Histogram
 import System.Metrics.Prometheus.MetricId (Name (..))
@@ -29,7 +38,18 @@ data Metrics m = Metrics
     delete :: m Histogram
   }
 
+instance TraversableHKD Metrics where
+  traverseHKD f Metrics {..} =
+    Metrics
+      <$> f showPage
+      <*> f create
+      <*> f modify
+      <*> f patch
+      <*> f delete
+
 type RegisteredMetrics = Metrics Identity
+
+type HasRegisteredMetrics f = Has RegisteredMetrics (f Identity)
 
 metrics :: Metrics (RegistryT IO)
 metrics =
@@ -41,11 +61,9 @@ metrics =
       delete = registerHistogram (Name "todo_delete") mempty buckets
     }
 
-instance TraversableHKD Metrics where
-  traverseHKD f Metrics {..} =
-    Metrics
-      <$> f showPage
-      <*> f create
-      <*> f modify
-      <*> f patch
-      <*> f delete
+getMetric ::
+  forall f a.
+  HasRegisteredMetrics f =>
+  (RegisteredMetrics -> Identity a) ->
+  (AppM f) a
+getMetric g = asks $ (runIdentity . g . obtain . metricsRegistered) . (obtain @(AppMetrics f))

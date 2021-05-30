@@ -1,7 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE NumericUnderscores #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
@@ -13,62 +12,51 @@ module Todo
   )
 where
 
-import App.Log (logDebug, withLogContext)
-import App.Metrics (AppMetrics, metricsRegistered)
-import App.Monad (AppM, runAppWith)
-import Chronos (Timespan (getTimespan), stopwatch)
-import Control.DeepSeq (NFData, force)
-import Control.Monad.Except (ExceptT, MonadIO (liftIO), runExceptT)
-import Control.Monad.Identity (Identity (runIdentity))
-import Control.Monad.Reader (ask)
-import Control.Monad.Reader.Class (asks)
+import App.DB (runWithConnection)
+import App.Monad (AppM, tracked)
+import Control.DeepSeq (NFData)
+import Control.Monad.Except (ExceptT, runExceptT)
+import Control.Monad.IO.Class (MonadIO)
+import Control.Monad.Identity (Identity)
+import Control.Monad.Random (MonadRandom)
+import Control.Monad.Reader (runReaderT)
 import Control.Monad.Trans (lift)
-import Data.Has (Has (obtain))
 import Data.Text (Text)
-import System.Metrics.Prometheus.Metric.Histogram (Histogram, observe)
+import System.Metrics.Prometheus.Metric.Histogram (Histogram)
 import Todo.DB (dbDeleteById, dbGetById, dbInsert, dbSelectPage, dbUpdate)
 import Todo.Domain
-  ( Logic,
-    Repo,
-    create,
-    delete,
-    logicCreate,
-    logicDelete,
-    logicPatch,
-    logicUpdate,
-    modify,
-    patch,
-    repoDelete,
-    repoGetById,
-    repoInsert,
-    repoSelectPage,
-    repoUpdate,
-    showPage,
-  )
 import qualified Todo.Metrics as M
-import Todo.Monad (TodoM, runTodo)
 import Todo.Web (TodoApi, todoApi)
 
-instance (Has (M.Metrics Identity) (f Identity)) => Logic (AppM f) where
-  showPage page = metric M.showPage >>= \hist -> tracked "showPage" hist $ runTodo $ repoSelectPage page
-  create request = metric M.create >>= \hist -> tracked "create" hist $ runTodo $ logicCreate request
-  modify todo = metric M.modify >>= \hist -> tracked "modify" hist $ runTodo $ runExceptT $ logicUpdate todo
-  patch todo = metric M.patch >>= \hist -> tracked "path" hist $ runTodo $ runExceptT $ logicPatch todo
-  delete todoId = metric M.delete >>= \hist -> tracked "delete" hist $ runTodo $ runExceptT $ logicDelete todoId
+instance M.HasRegisteredMetrics f => Logic (AppM f) where
+  showPage page = runAction M.showPage "showPage" $ repoSelectPage page
+  create request = runAction M.create "create" $ logicCreate request
+  modify todo = runAction M.modify "modify" $ runExceptT $ logicUpdate todo
+  patch todo = runAction M.patch "path" $ runExceptT $ logicPatch todo
+  delete todoId = runAction M.delete "delete" $ runExceptT $ logicDelete todoId
 
-metric ::
-  forall f b.
-  Has M.RegisteredMetrics (f Identity) =>
-  (M.RegisteredMetrics -> Identity b) ->
-  (AppM f) b
-metric g = runIdentity . g . obtain @M.RegisteredMetrics . metricsRegistered <$> asks (obtain @(AppMetrics f))
+runAction ::
+  M.HasRegisteredMetrics f =>
+  NFData a =>
+  (M.RegisteredMetrics -> Identity Histogram) ->
+  Text ->
+  TodoM f a ->
+  AppM f a
+runAction metric name action =
+  M.getMetric metric
+    >>= \hist -> tracked name hist $ unTodo action
+
+newtype TodoM f a = TodoM
+  { unTodo :: AppM f a
+  }
+  deriving (Functor, Applicative, Monad, MonadIO, MonadRandom)
 
 instance Repo (TodoM f) where
-  repoSelectPage = dbSelectPage
-  repoInsert = dbInsert
-  repoUpdate = dbUpdate
-  repoGetById = dbGetById
-  repoDelete = dbDeleteById
+  repoSelectPage = TodoM . runWithConnection . runReaderT . dbSelectPage
+  repoInsert = TodoM . runWithConnection . runReaderT . dbInsert
+  repoUpdate = TodoM . runWithConnection . runReaderT . dbUpdate
+  repoGetById = TodoM . runWithConnection . runReaderT . dbGetById
+  repoDelete = TodoM . runWithConnection . runReaderT . dbDeleteById
 
 instance Repo (ExceptT e (TodoM f)) where
   repoSelectPage = lift . repoSelectPage
@@ -76,25 +64,3 @@ instance Repo (ExceptT e (TodoM f)) where
   repoUpdate = lift . repoUpdate
   repoGetById = lift . repoGetById
   repoDelete = lift . repoDelete
-
-logged :: (NFData a) => Text -> AppM f a -> AppM f a
-logged name action = withLogContext name $ do
-  logDebug "starting"
-  result <- force <$> action
-  logDebug "ended"
-  return result
-
-timed :: (NFData a) => Histogram -> AppM f a -> AppM f a
-timed histogram action = do
-  env <- ask
-  (duration, result) <-
-    liftIO $
-      stopwatch $
-        force <$> runAppWith env action
-  liftIO $ observe (asMillisecond duration) histogram
-  return result
-  where
-    asMillisecond = (/ 1_000_000) . fromIntegral . getTimespan
-
-tracked :: (NFData a) => Text -> Histogram -> AppM f a -> AppM f a
-tracked name histogram = logged name . timed histogram
