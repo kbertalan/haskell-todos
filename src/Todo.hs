@@ -28,7 +28,7 @@ import Todo.Domain
 import qualified Todo.Metrics as M
 import Todo.Web (TodoApi, todoApi)
 
-instance M.HasRegisteredMetrics f => Logic (AppM f) where
+instance M.HasRegisteredMetrics f => Logic (AppM f Text) where
   showPage page = runAction M.showPage "showPage" $ repoSelectPage page
   create request = runAction M.create "create" $ logicCreate request
   modify todo = runAction M.modify "modify" $ runExceptT $ logicUpdate todo
@@ -40,25 +40,25 @@ runAction ::
   NFData a =>
   (M.RegisteredMetrics -> Identity Histogram) ->
   Text ->
-  TodoM f a ->
-  AppM f a
+  TodoM f Text a ->
+  AppM f Text a
 runAction metric name action =
   M.getMetric metric
     >>= \hist -> tracked name hist $ unTodo action
 
-newtype TodoM f a = TodoM
-  { unTodo :: AppM f a
+newtype TodoM f l a = TodoM
+  { unTodo :: AppM f l a
   }
   deriving (Functor, Applicative, Monad, MonadIO, MonadRandom)
 
-instance Repo (TodoM f) where
+instance Repo (TodoM f l) where
   repoSelectPage = TodoM . runWithConnection . runReaderT . dbSelectPage
   repoInsert = TodoM . runWithConnection . runReaderT . dbInsert
   repoUpdate = TodoM . runWithConnection . runReaderT . dbUpdate
   repoGetById = TodoM . runWithConnection . runReaderT . dbGetById
   repoDelete = TodoM . runWithConnection . runReaderT . dbDeleteById
 
-instance Repo (ExceptT e (TodoM f)) where
+instance Repo (ExceptT e (TodoM f l)) where
   repoSelectPage = lift . repoSelectPage
   repoInsert = lift . repoInsert
   repoUpdate = lift . repoUpdate

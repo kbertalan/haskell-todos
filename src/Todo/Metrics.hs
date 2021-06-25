@@ -62,8 +62,8 @@ metrics =
     }
 
 getMetric ::
-  forall f a.
+  forall f l a.
   HasRegisteredMetrics f =>
   (RegisteredMetrics -> Identity a) ->
-  (AppM f) a
+  (AppM f l) a
 getMetric g = asks $ (runIdentity . g . obtain . metricsRegistered) . (obtain @(AppMetrics f))

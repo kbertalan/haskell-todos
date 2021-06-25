@@ -7,6 +7,7 @@ module App.Log
     runWithSyncLog,
     runWithDisabledLog,
     Log,
+    LogAction,
     logger,
     logged,
   )

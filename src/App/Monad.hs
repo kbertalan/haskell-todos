@@ -3,6 +3,7 @@
 module App.Monad
   ( AppM,
     runAppWith,
+    withEnv,
     timed,
     tracked,
   )
@@ -20,20 +21,27 @@ import Data.Text (Text)
 import System.Metrics.Prometheus.Metric.Histogram (Histogram, observe)
 import UnliftIO (MonadUnliftIO, withRunInIO)
 
-newtype AppM f a = AppM
-  { runApp :: ReaderT (Env f (AppM f)) IO a
-  }
-  deriving newtype (Applicative, Functor, Monad, MonadIO, MonadReader (Env f (AppM f)), MonadRandom)
+type AppEnv f l = Env f l (AppM f l)
 
-instance MonadUnliftIO (AppM f) where
+newtype AppM f l a = AppM
+  { runApp :: ReaderT (AppEnv f l) IO a
+  }
+  deriving newtype (Applicative, Functor, Monad, MonadIO, MonadReader (AppEnv f l), MonadRandom)
+
+instance MonadUnliftIO (AppM f l) where
   withRunInIO go = do
     env <- ask
     liftIO $ go $ runAppWith env
 
-runAppWith :: Env f (AppM f) -> AppM f a -> IO a
+runAppWith :: AppEnv f l -> AppM f l a -> IO a
 runAppWith e a = runReaderT (runApp a) e
 
-timed :: NFData a => Histogram -> AppM f a -> AppM f a
+withEnv :: (AppEnv f l -> AppEnv g m) -> AppM g m a -> AppM f l a
+withEnv f action = do
+  env <- ask
+  liftIO $ runAppWith (f env) action
+
+timed :: NFData a => Histogram -> AppM f l a -> AppM f l a
 timed histogram action = do
   env <- ask
   (duration, result) <-
@@ -45,5 +53,5 @@ timed histogram action = do
   where
     asMillisecond = (/ 1_000_000) . fromIntegral . getTimespan
 
-tracked :: (NFData a) => Text -> Histogram -> AppM f a -> AppM f a
+tracked :: (NFData a) => Text -> Histogram -> AppM f Text a -> AppM f Text a
 tracked name histogram = logged name . timed histogram

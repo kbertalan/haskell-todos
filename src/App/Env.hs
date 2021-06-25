@@ -3,22 +3,28 @@
 module App.Env where
 
 import App.DB (Pool)
-import App.Log (Log)
+import App.Log (LogAction)
 import App.Metrics (AppMetrics)
 import Chronos (Time)
-import Data.Has (Has (obtain))
+import Data.Has (Has (obtain), Over (over))
 
-data Env f m = Env
+data Env metricsF logMessage m = Env
   { envDBPool :: Pool,
-    envMetrics :: AppMetrics f,
-    envLog :: Log m,
+    envMetrics :: AppMetrics metricsF,
+    envLog :: LogAction m logMessage,
     envStartupTime :: Time
   }
 
-instance Has Pool (Env f m) where obtain = envDBPool
+instance Has Pool (Env f l m) where obtain = envDBPool
 
-instance Has (AppMetrics f) (Env f m) where obtain = envMetrics
+instance Has (AppMetrics f) (Env f l m) where obtain = envMetrics
 
-instance Has (Log m) (Env f m) where obtain = envLog
+instance Has (LogAction m l) (Env f l m) where obtain = envLog
 
-instance Has Time (Env f m) where obtain = envStartupTime
+instance Over (LogAction m l) (LogAction m other) (Env f l m) (Env f other m) where
+  over f env =
+    env
+      { envLog = f $ envLog env
+      }
+
+instance Has Time (Env f l m) where obtain = envStartupTime
