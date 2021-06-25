@@ -1,54 +1,39 @@
-{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module App.Log
   ( runWithLog,
     runWithSyncLog,
     runWithDisabledLog,
     Log,
-    App.Log.WithLog,
-    logDebug,
-    logInfo,
-    logWarning,
-    logError,
-    logException,
-    withLogContext,
+    logger,
   )
 where
 
 import Colog
   ( LogAction (LogAction),
-    Message,
-    Msg (msgText),
-    WithLog,
-    cmap,
     defCapacity,
-    logDebug,
-    logError,
-    logException,
-    logInfo,
-    logWarning,
-    richMessageAction,
+    logTextStdout,
     withBackgroundLogger,
-    withLog,
   )
 import Control.Monad.IO.Class (MonadIO)
+import Control.Monad.Reader (asks)
+import Control.Monad.Reader.Class (MonadReader)
+import Data.Has (Has, obtain)
 import Data.Text (Text)
+import Prelude hiding (log)
 
-type Log m = LogAction m Message
-
-type WithLog env m = Colog.WithLog env Message m
+type Log m = LogAction m Text
 
 runWithLog :: (MonadIO m) => (Log m -> IO a) -> IO a
-runWithLog = withBackgroundLogger defCapacity richMessageAction
+runWithLog = withBackgroundLogger defCapacity logTextStdout
 
 runWithSyncLog :: (MonadIO m) => (Log m -> IO a) -> IO a
-runWithSyncLog action = action richMessageAction
+runWithSyncLog action = action logTextStdout
 
 runWithDisabledLog :: (MonadIO m) => (Log m -> IO a) -> IO a
 runWithDisabledLog action = action $ LogAction $ \_ -> pure ()
 
-withLogContext :: (App.Log.WithLog env m) => Text -> m a -> m a
-withLogContext name = withLog $ cmap converter
-  where
-    converter :: Message -> Message
-    converter msg = msg {msgText = name <> ": " <> msgText msg}
+logger :: forall msg env m. (MonadReader env m, Has (LogAction m msg) env) => msg -> m ()
+logger msg = do
+  LogAction log <- asks obtain
+  log msg

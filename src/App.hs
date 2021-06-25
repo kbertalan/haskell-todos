@@ -7,7 +7,7 @@ module App where
 
 import App.DB as DB (Options, migrate, runWithPool)
 import App.Env (Env (..))
-import App.Log as Log (logInfo, runWithLog)
+import App.Log as Log (logger, runWithLog)
 import App.Metrics as Metrics (AppMetrics (metricsEndpoint, metricsMiddleware), Options, runWithMetrics)
 import App.Monad (runAppWith)
 import App.Random as Random (Options, configure)
@@ -15,7 +15,6 @@ import App.Web as Web (Options, run, webApp)
 import Aws.Lambda (HandlerName (HandlerName), defaultDispatcherOptions)
 import Aws.Lambda.Wai (runWaiAsProxiedHttpLambda)
 import Chronos (Time (getTime), now)
-import Colog (usingLoggerT)
 import Data.HKD (TraversableHKD (traverseHKD))
 import Data.Has (Has (obtain))
 import qualified Data.Text as T
@@ -61,8 +60,7 @@ startup opts callback =
               let env = Env pool ms log time
               currentTime <- now
               runAppWith env $
-                usingLoggerT log $
-                  logInfo $ "Started up in " <> T.pack (printf "%.4f" (diffTimeInSeconds currentTime time)) <> "s"
+                logger $ "Started up in " <> T.pack (printf "%.4f" (diffTimeInSeconds currentTime time)) <> "s"
 
               callback $
                 Web.webApp @API
