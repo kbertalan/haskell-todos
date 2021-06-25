@@ -1,4 +1,3 @@
-{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module App.Env where
