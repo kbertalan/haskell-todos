@@ -1,12 +1,16 @@
+{-# LANGUAGE NumericUnderscores #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module App.Metrics
   ( Options (..),
     AppMetrics (..),
     runWithMetrics,
+    timed,
   )
 where
 
+import Chronos (Timespan (getTimespan), stopwatch)
+import Control.DeepSeq (NFData, force)
 import Control.Monad.Identity (Identity)
 import Data.HKD (TraversableHKD (traverseHKD))
 import Data.Text (Text)
@@ -19,7 +23,9 @@ import Network.Wai.Internal (Request (pathInfo))
 import Network.Wai.Middleware.Prometheus (applicationMetrics, instrumentApplication)
 import System.Metrics.Prometheus.Concurrent.RegistryT
 import System.Metrics.Prometheus.Encode.Text (encodeMetrics)
+import System.Metrics.Prometheus.Metric.Histogram (Histogram, observe)
 import System.Metrics.Prometheus.Registry (RegistrySample)
+import UnliftIO (MonadUnliftIO, withRunInIO)
 
 newtype Options = Options
   { path :: Text
@@ -61,3 +67,19 @@ matches path request = matchesMethod && matchesPath
   where
     matchesPath = pathInfo request == path
     matchesMethod = requestMethod request == methodGet
+
+timed ::
+  MonadUnliftIO m =>
+  NFData a =>
+  Histogram ->
+  m a ->
+  m a
+timed histogram action = do
+  withRunInIO $ \run -> do
+    (duration, result) <-
+      stopwatch $
+        force <$> run action
+    observe (asMillisecond duration) histogram
+    return result
+  where
+    asMillisecond = (/ 1_000_000) . fromIntegral . getTimespan
