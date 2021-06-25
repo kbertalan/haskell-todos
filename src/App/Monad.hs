@@ -10,7 +10,7 @@ module App.Monad
 where
 
 import App.Env (Env)
-import App.Log (logged)
+import App.Log (logged, withLogContext)
 import Chronos (stopwatch)
 import Chronos.Types (getTimespan)
 import Control.DeepSeq (NFData, force)
@@ -54,4 +54,4 @@ timed histogram action = do
     asMillisecond = (/ 1_000_000) . fromIntegral . getTimespan
 
 tracked :: (NFData a) => Text -> Histogram -> AppM f Text a -> AppM f Text a
-tracked name histogram = logged name . timed histogram
+tracked name histogram = withLogContext name . logged . timed histogram
