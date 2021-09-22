@@ -17,7 +17,7 @@ import Todo.QuickCheck ()
 import Todo.Test (testTodoWithSeed)
 
 testUUID :: TodoId
-testUUID = Identifier $ fromJust $ fromString "fffd04bd-0ede-42e0-8088-a28c5fba9949"
+testUUID = Identifier $ fromJust $ fromString "9474f0eb-06d7-4fd8-b89e-0ce996962508"
 
 spec :: Spec
 spec = do

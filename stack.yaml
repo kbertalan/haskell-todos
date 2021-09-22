@@ -17,7 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: lts-17.10
+resolver: lts-18.10
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -45,6 +45,8 @@ extra-deps:
 - aws-lambda-haskell-runtime-4.1.0@sha256:4fbf9855326ed0173c3ef27c006412c8da46f84b0566fa92a44ad0e988432d82,2916
 - aws-lambda-haskell-runtime-wai-2.0.1@sha256:faf95e0697905883c3998d3b451ee86ac4e811e0430d4cefbeabc4cdbf6e9a03,1986
 - safe-exceptions-checked-0.1.0@sha256:ae142f284c6b102f0e7606a69a5719f4f72771d9cc353af72fa4484326689100,1603
+- co-log-0.4.0.1@sha256:3d4c17f37693c80d1aa2c41669bc3438fac3e89dc5f479e57d79bc3ddc4dfcc5,5087
+- ansi-terminal-0.10.3@sha256:e2fbcef5f980dc234c7ad8e2fa433b0e8109132c9e643bc40ea5608cd5697797,3226
 
 
 # Override default flag values for local packages and extra-deps
